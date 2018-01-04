@@ -21,8 +21,10 @@
                 </div>
             </field>
             <xpath expr="//notebook/page/label[@for='description']" position="before">
-                <label for="note"/>
-                <field name="note" placeholder="Add an internal note here..."/>
+                <div>
+                    <label for="note"/>
+                    <field name="note" placeholder="Add an internal note here..."/>
+                </div>
             </xpath>
         </field>
     </record>

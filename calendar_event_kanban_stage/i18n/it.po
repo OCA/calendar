@@ -1,0 +1,97 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* calendar_event_kanban_stage
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-01-04 08:51+0000\n"
+"PO-Revision-Date: 2018-01-04 08:51+0000\n"
+"Last-Translator: Simone Rubino <simone.rubino@agilebg.com>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: calendar_event_kanban_stage
+#: model:ir.ui.view,arch_db:calendar_event_kanban_stage.view_calendar_event_kanban
+msgid "<span class=\"o_stat_text\" attrs=\"{'invisible': [('attendees_count', '&lt;', 2)]}\"> <i class=\"fa fa-users\"/> Attendees</span>\n"
+"                        <span class=\"o_stat_text\" attrs=\"{'invisible': [('attendees_count', '&gt;', 1)]}\"> <i class=\"fa fa-users\"/> Attendee</span>"
+msgstr "<span class=\"o_stat_text\" attrs=\"{'invisible': [('attendees_count', '&lt;', 2)]}\"> <i class=\"fa fa-users\"/> Partecipanti</span>\n"
+"                        <span class=\"o_stat_text\" attrs=\"{'invisible': [('attendees_count', '&gt;', 1)]}\"> <i class=\"fa fa-users\"/> Partecipante</span>"
+
+#. module: calendar_event_kanban_stage
+#: model:ir.ui.view,arch_db:calendar_event_kanban_stage.view_calendar_event_form
+msgid "Add an internal note here..."
+msgstr "Aggiungi qui una nota interna..."
+
+#. module: calendar_event_kanban_stage
+#: model:ir.model.fields,field_description:calendar_event_kanban_stage.field_calendar_event_attendees_count
+msgid "Attendees"
+msgstr "Partecipanti"
+
+#. module: calendar_event_kanban_stage
+#: model:base.kanban.stage,name:calendar_event_kanban_stage.event_done
+msgid "Done"
+msgstr "Fatto"
+
+#. module: calendar_event_kanban_stage
+#: model:ir.model,name:calendar_event_kanban_stage.model_calendar_event
+msgid "Event"
+msgstr "Evento"
+
+#. module: calendar_event_kanban_stage
+#: model:base.kanban.stage,legend_blocked:calendar_event_kanban_stage.event_done
+#: model:base.kanban.stage,legend_blocked:calendar_event_kanban_stage.event_planned
+#: model:base.kanban.stage,legend_blocked:calendar_event_kanban_stage.event_to_plan
+msgid "Give a card the special handling status to indicate that it requires handling by a special user or subset of users."
+msgstr "Assegna lo stato 'gestione speciale' a una scheda per indicare che richiede di essere gestita da particolari utenti o gruppi."
+
+#. module: calendar_event_kanban_stage
+#: model:ir.model.fields,field_description:calendar_event_kanban_stage.field_calendar_event_note
+msgid "Internal Notes"
+msgstr "Note Interne"
+
+#. module: calendar_event_kanban_stage
+#: model:base.kanban.stage,legend_priority:calendar_event_kanban_stage.event_done
+#: model:base.kanban.stage,legend_priority:calendar_event_kanban_stage.event_planned
+#: model:base.kanban.stage,legend_priority:calendar_event_kanban_stage.event_to_plan
+msgid "Mark a card as medium or high priority (one or two stars) to indicate that it should be escalated ahead of others with lower priority/star counts."
+msgstr "Contrassegna una scheda con priorità media o alta (una o due stelle) per indicare che dovrebbe superare altre schede con priorità/stelle minore."
+
+#. module: calendar_event_kanban_stage
+#: model:base.kanban.stage,legend_done:calendar_event_kanban_stage.event_done
+#: model:base.kanban.stage,legend_done:calendar_event_kanban_stage.event_planned
+#: model:base.kanban.stage,legend_done:calendar_event_kanban_stage.event_to_plan
+msgid "Mark a card as ready when it has been fully processed."
+msgstr "Contrassegna una scheda come pronta quando è stata processata completamente."
+
+#. module: calendar_event_kanban_stage
+#: model:base.kanban.stage,name:calendar_event_kanban_stage.event_planned
+msgid "Planned"
+msgstr "Pianificata"
+
+#. module: calendar_event_kanban_stage
+#: model:ir.ui.view,arch_db:calendar_event_kanban_stage.view_calendar_event_form
+#: model:ir.ui.view,arch_db:calendar_event_kanban_stage.view_calendar_event_form_popup
+msgid "Priority"
+msgstr "Priorità"
+
+#. module: calendar_event_kanban_stage
+#: model:base.kanban.stage,legend_normal:calendar_event_kanban_stage.event_done
+#: model:base.kanban.stage,legend_normal:calendar_event_kanban_stage.event_planned
+#: model:base.kanban.stage,legend_normal:calendar_event_kanban_stage.event_to_plan
+msgid "This is the default status and indicates that a card can be processed by any user working this queue."
+msgstr "Questo è lo stato di default e indica che una scheda può essere gestita da qualunque utente che stia lavorando in questa colonna."
+
+#. module: calendar_event_kanban_stage
+#: model:base.kanban.stage,name:calendar_event_kanban_stage.event_to_plan
+msgid "To Plan"
+msgstr "Da pianificare"
+
+#. module: calendar_event_kanban_stage
+#: model:ir.ui.view,arch_db:calendar_event_kanban_stage.view_calendar_event_kanban
+msgid "oe_kanban_text_red"
+msgstr "oe_kanban_text_red"
