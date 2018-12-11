@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2018 Onestein
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+
+<odoo>
+    <record forcecreate="True" id="sync_caldav_calendars" model="ir.cron">
+        <field name="name">Caldav Calendar: synchronization</field>
+        <field name="model_id" ref="model_calendar_caldav"/>
+        <field name="state">code</field>
+        <field name="code">model.sync_events_cron()</field>
+        <field name="user_id" ref="base.user_root" />
+        <field name="interval_number">12</field>
+        <field name="interval_type">hours</field>
+        <field name="numbercall">-1</field>
+        <field name="doall" eval="False"/>
+    </record>
+</odoo>

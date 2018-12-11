@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2018 Onestein
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+
+<odoo>
+    <record id="res_users_calendar_form" model="ir.ui.view">
+        <field name="model">res.users</field>
+        <field name="priority">0</field>
+        <field name="arch" type="xml">
+            <form create="false">
+                <field name="caldav_calendar_ids">
+                    <tree editable="top" create="false" delete="false">
+                        <field name="caldav_name" readonly="1"/>
+                        <field name="sync"/>
+                    </tree>
+                </field>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_users_form_simple_modif" model="ir.ui.view">
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form_simple_modif"/>
+        <field name="arch" type="xml">
+            <xpath expr="//footer" position="before">
+                <group col="3" name="caldav" attrs="{'invisible': [('caldav_calendar_ids', '=', [])]}">
+                    <label for="caldav_calendar_ids" string="CalDAV Calendars" colspan="1"/>
+                    <field name="caldav_calendar_ids" nolabel="1" colspan="2">
+                        <tree editable="top" create="false" delete="false">
+                            <field name="caldav_name" readonly="1"/>
+                            <field name="sync"/>
+                        </tree>
+                    </field>
+
+                    <!-- TODO: Find better way to create an offset-->
+                    <label invisible="1" string="" />
+                    <button type="object"
+                            name="sync_caldav_calendars"
+                            string="Sync Calendars" />
+                    <button type="object"
+                            name="remove_caldav_sync"
+                            string="Remove Synchronization" />
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="res_users_calendar_action">
+        <field name="name">Select calendars to sync</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.users</field>
+        <field name="view_type">form</field>
+        <field name="view_id" ref="res_users_calendar_form"/>
+        <field name="target">new</field>
+    </record>
+</odoo>
