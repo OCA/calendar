@@ -119,7 +119,7 @@ class CalendarEvent(models.Model):
             if record._event_in_past():
                 continue
 
-            if not record.categ_ids:
+            if not record.categ_ids or record._event_in_past():
                 continue
 
             for resource in record.resource_ids:
