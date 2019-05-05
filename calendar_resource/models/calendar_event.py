@@ -100,7 +100,7 @@ class CalendarEvent(models.Model):
                 ('resource_ids', '!=', False),
                 ('start', '<', record.stop),
                 ('stop', '>', record.start),
-            ])
+            ], limit=1)
             for resource in overlaps.mapped(lambda s: s.resource_ids):
                 raise ValidationError(
                     _(
