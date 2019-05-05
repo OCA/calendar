@@ -97,6 +97,7 @@ class CalendarEvent(models.Model):
 
             overlaps = self.env['calendar.event'].search([
                 ('id', '!=', record.id),
+                ('resource_ids', '!=', False),
                 ('start', '<', record.stop),
                 ('stop', '>', record.start),
             ])
