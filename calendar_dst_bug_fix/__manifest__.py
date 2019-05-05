@@ -16,7 +16,6 @@
     "installable": True,
     "preloadable": True,
     "depends": [
-        "base",
         "calendar",
     ],
 }
