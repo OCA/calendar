@@ -31,6 +31,7 @@ class ResourceResource(models.Model):
     )
     calendar_id = fields.Many2one(
         "resource.calendar", string='Working Time',
-        default=lambda self: self.env['res.company']._company_default_get().resource_calendar_id,
+        default=lambda self: self.env['res.company'].\
+        _company_default_get().resource_calendar_id,
         required=False,
         help="Define the schedule of resource")
