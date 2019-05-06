@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_resource_allocation_line_user,resource.allocation.line,model_resource_allocation_line,resource_planning.group_resource_planning_user,1,0,0,0
+access_resource_allocation_line_manager,resource.allocation.line,model_resource_allocation_line,resource_planning.group_resource_planning_manager,1,1,1,1
+access_resource_allocation_plan_user,resource.allocation.plan,model_resource_allocation_plan,resource_planning.group_resource_planning_user,1,0,0,0
+access_resource_allocation_plan_manager,resource.allocation.plan,model_resource_allocation_plan,resource_planning.group_resource_planning_manager,1,1,1,1

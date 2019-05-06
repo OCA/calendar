@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2019 Brainbean Apps (https://brainbeanapps.com)
+    License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
+-->
+<odoo>
+
+    <record id="resource_allocation_plan_form" model="ir.ui.view">
+        <field name="name">resource.allocation.plan.form</field>
+        <field name="model">resource.allocation.plan</field>
+        <field name="arch" type="xml">
+            <form string="Resource Allocation Plan">
+                <!-- <sheet string="Analytic Entry">
+                    <group>
+                        <group>
+                            <field name="date"/>
+                            <field name="project_id" required="1"/>
+                            <field name="task_id"/>
+                            <field name="name"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="amount"/>
+                            <field name="unit_amount" widget="timesheet_uom"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                </sheet> -->
+            </form>
+        </field>
+    </record>
+
+    <record id="resource_allocation_plan_tree" model="ir.ui.view">
+        <field name="name">resource.allocation.plan.tree</field>
+        <field name="model">resource.allocation.plan</field>
+        <field name="arch" type="xml">
+            <tree
+                string="Resource Allocation Plans"
+                import="false"
+                decoration-info="state == 'draft'"
+                decoration-muted="state == 'confirmed'"
+                decoration-bf="message_needaction == True"
+            >
+                <field name="name" string="Period"/>
+                <field name="timespan_since"/>
+                <field name="timespan_until"/>
+                <field name="state"/>
+                <field name="message_needaction" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="resource_allocation_plan_pivot" model="ir.ui.view">
+        <field name="name">resource.allocation.plan.pivot</field>
+        <field name="model">resource.allocation.plan</field>
+        <field name="arch" type="xml">
+            <pivot string="Resource Allocation Plans">
+                <!-- <field name="employee_id" type="row"/>
+                <field name="date" interval="month" type="col"/>
+                <field name="unit_amount" type="measure" widget="timesheet_uom"/> -->
+            </pivot>
+        </field>
+    </record>
+
+    <record id="resource_allocation_plan_graph" model="ir.ui.view">
+        <field name="name">resource.allocation.plan.graph</field>
+        <field name="model">resource.allocation.plan</field>
+        <field name="arch" type="xml">
+            <graph string="Resource Allocation Plans" stacked="True">
+                <!-- <field name="date" type="row"/>
+                <field name="project_id" type="col"/>
+                <field name="unit_amount" type="measure" widget="timesheet_uom"/> -->
+            </graph>
+        </field>
+    </record>
+
+    <record id="resource_allocation_plan_search" model="ir.ui.view">
+        <field name="name">resource.allocation.plan.search</field>
+        <field name="model">resource.allocation.plan</field>
+        <field name="arch" type="xml">
+            <search string="Plan">
+                <!-- <field name="date"/>
+                <field name="employee_id"/>
+                <field name="project_id"/>
+                <field name="task_id"/>
+                <field name="name"/>
+                <filter name="mine" string="My Timesheets" domain="[('user_id', '=', uid)]"/>
+                <separator/>
+                <filter name="month" string="Date" date="date"/>
+                <group expand="0" string="Group By">
+                    <filter string="Employee" name="groupby_employee" domain="[]" context="{'group_by':'employee_id'}"/>
+                    <filter string="Project" name="groupby_project" domain="[]" context="{'group_by':'project_id'}"/>
+                    <filter string="Task" name="groupby_task" domain="[]" context="{'group_by':'task_id'}"/>
+                    <filter string="Timesheet Date" name="groupby_date" domain="[]" context="{'group_by':'date'}" help="Timesheet by Date"/>
+                </group> -->
+            </search>
+        </field>
+    </record>
+
+    <record id="action_resource_planning_plans" model="ir.actions.act_window">
+        <field name="name">Resource Allocation Plans</field>
+        <field name="res_model">resource.allocation.plan</field>
+        <field name="search_view_id" ref="resource_allocation_plan_search"/>
+    </record>
+
+    <menuitem
+        id="menu_resource_planning_plans"
+        name="Plans"
+        parent="menu_resource_planning_root"
+        sequence="10"
+        action="action_resource_planning_plans"
+        groups="resource_planning.group_resource_planning_user"
+    />
+
+</odoo>

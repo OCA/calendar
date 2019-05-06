@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2019 Brainbean Apps (https://brainbeanapps.com)
+    License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
+-->
+<odoo>
+
+    <menuitem
+        id="menu_resource_planning_root"
+        name="Resource Planning"
+        parent="calendar.mail_menu_calendar"
+        sequence="1"
+        groups="resource_planning.group_resource_planning_user"
+    />
+
+</odoo>
