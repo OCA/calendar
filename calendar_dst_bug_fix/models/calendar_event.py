@@ -23,12 +23,14 @@ class CalendarEvent(models.Model):
                     and isinstance(record['id'], (str))
                     and tz and len(id_pair) > 1):
                 delta = self.get_time_dst_delta(int(id_pair[0]), tz, record)
-                if delta:
-                    for field in TIME_FIELDS_IN_EVENT:
-                        if field in record and record[field]:
-                            record[field] = api_fields.Datetime.to_string(
-                                api_fields.Datetime.from_string(
-                                    record[field]) + delta)
+                if not delta:
+                    data.append(record)
+                    continue
+                for field in TIME_FIELDS_IN_EVENT:
+                    if field in record and record[field]:
+                        record[field] = api_fields.Datetime.to_string(
+                            api_fields.Datetime.from_string(
+                                record[field]) + delta)
             data.append(record)
         return data
 
