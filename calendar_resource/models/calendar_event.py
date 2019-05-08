@@ -82,34 +82,27 @@ class CalendarEvent(models.Model):
     @api.multi
     @api.constrains('resource_ids', 'start', 'stop')
     def _check_resource_ids_double_book(self):
-
         for record in self:
-
-            if record._event_in_past():
-                continue
-
             resources = record.resource_ids.filtered(
                 lambda s: s.allow_double_book is False
             )
-
-            if not any(resources):
+            if record._event_in_past() or not any(resources):
                 continue
-
             overlaps = self.env['calendar.event'].search([
                 ('id', '!=', record.id),
-                ('resource_ids', '!=', False),
                 ('resource_ids', '!=', False),
                 ('start', '<', record.stop),
                 ('stop', '>', record.start),
             ], limit=1)
             for resource in overlaps.mapped(lambda s: s.resource_ids):
-                raise ValidationError(
-                    _(
-                        'The resource, %s, cannot be double-booked '
-                        'with any overlapping meetings or events.',
+                if resource in resources:
+                    raise ValidationError(
+                        _(
+                            'The resource, %s, cannot be double-booked '
+                            'with any overlapping meetings or events.',
+                        )
+                        % resource.name,
                     )
-                    % resource.name,
-                )
 
     @api.multi
     @api.constrains('resource_ids', 'categ_ids')
@@ -151,7 +144,6 @@ class CalendarEvent(models.Model):
                 continue
 
             for resource in record.resource_ids:
-
                 if not resource.calendar_id:
                     continue
 
@@ -209,7 +201,6 @@ class CalendarEvent(models.Model):
 
             event_start = fields.Datetime.from_string(record.start)
             event_stop = fields.Datetime.from_string(record.stop)
-
             event_days = record._get_event_date_list()
 
             for resource in record.resource_ids.filtered(
