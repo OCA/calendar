@@ -86,7 +86,7 @@ class CalendarEvent(models.Model):
             resources = record.resource_ids.filtered(
                 lambda s: s.allow_double_book is False
             )
-            if record._event_in_past() or not any(resources):
+            if record._event_in_past() or not resources:
                 continue
             overlaps = self.env['calendar.event'].search([
                 ('id', '!=', record.id),
