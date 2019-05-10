@@ -204,7 +204,7 @@ class CalendarEvent(models.Model):
             event_days = record._get_event_date_list()
 
             for resource in record.resource_ids.filtered(
-                    lambda s: s.calendar_id):
+                    'calendar_id'):
 
                 available_intervals = []
                 conflict_intervals = []
