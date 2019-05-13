@@ -7,8 +7,8 @@ from mock import patch
 from odoo import fields
 from odoo.exceptions import ValidationError
 
-from setup import Setup
-from setup import MOCK_FORMATS
+from .setup import Setup
+from .setup import MOCK_FORMATS
 
 
 class TestCalendarEvent(Setup):
