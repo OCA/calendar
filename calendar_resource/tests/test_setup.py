@@ -6,7 +6,7 @@ from mock import patch
 
 from odoo import fields
 
-from setup import Setup
+from .setup import Setup
 
 
 MOCK_DATETIME = 'odoo.addons.calendar_resource.tests.test_calendar_event.'\

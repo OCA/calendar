@@ -4,7 +4,7 @@
 
 from odoo import fields
 
-from setup import Setup
+from .setup import Setup
 
 
 class TestResourceCalendar(Setup):
