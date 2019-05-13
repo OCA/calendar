@@ -139,7 +139,6 @@ class CalendarEvent(models.Model):
     def _check_resource_ids_leaves(self):
 
         for record in self:
-
             if record._event_in_past():
                 continue
 
@@ -192,10 +191,11 @@ class CalendarEvent(models.Model):
 
     @api.multi
     @api.constrains('resource_ids', 'start', 'stop')
-    def _check_resource_ids_working_times(self):
-
+    def _check__a_resource_ids_working_times(self):
+        ResourceCalendar = self.env['resource.calendar']
+        import ipdb; ipdb.set_trace()
         for record in self:
-
+# for record in self.filtered(lambda x: not x._event_in_past()):
             if record._event_in_past():
                 continue
 
@@ -229,7 +229,6 @@ class CalendarEvent(models.Model):
                     else:
                         available_intervals += intervals
 
-                ResourceCalendar = self.env['resource.calendar']
 
                 if available_intervals and not record.allday:
                     conflict_intervals = ResourceCalendar.\
