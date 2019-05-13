@@ -143,9 +143,6 @@ class CalendarEvent(models.Model):
                 continue
 
             for resource in record.resource_ids:
-                if not resource.calendar_id:
-                    continue
-
                 if not resource.calendar_id.leave_ids:
                     continue
 
@@ -193,11 +190,7 @@ class CalendarEvent(models.Model):
     @api.constrains('resource_ids', 'start', 'stop')
     def _check__a_resource_ids_working_times(self):
         ResourceCalendar = self.env['resource.calendar']
-        import ipdb; ipdb.set_trace()
-        for record in self:
-# for record in self.filtered(lambda x: not x._event_in_past()):
-            if record._event_in_past():
-                continue
+        for record in self.filtered(lambda x: not x._event_in_past()):
 
             event_start = fields.Datetime.from_string(record.start)
             event_stop = fields.Datetime.from_string(record.stop)
