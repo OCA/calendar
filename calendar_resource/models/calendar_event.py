@@ -222,7 +222,6 @@ class CalendarEvent(models.Model):
                     else:
                         available_intervals += intervals
 
-
                 if available_intervals and not record.allday:
                     conflict_intervals = ResourceCalendar.\
                         _get_conflicting_unavailable_intervals(
