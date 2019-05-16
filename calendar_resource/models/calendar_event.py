@@ -108,10 +108,7 @@ class CalendarEvent(models.Model):
     @api.constrains('resource_ids', 'categ_ids')
     def _check_resource_ids_categ_ids(self):
 
-        for record in self:
-
-            if record._event_in_past():
-                continue
+        for record in self.filtered(lambda x: not x._event_in_past()):
 
             if not record.categ_ids or record._event_in_past():
                 continue
@@ -138,9 +135,7 @@ class CalendarEvent(models.Model):
     @api.constrains('resource_ids', 'start', 'stop')
     def _check_resource_ids_leaves(self):
 
-        for record in self:
-            if record._event_in_past():
-                continue
+        for record in self.filtered(lambda x: not x._event_in_past()):
 
             for resource in record.resource_ids:
                 if not resource.calendar_id.leave_ids:
