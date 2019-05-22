@@ -15,18 +15,41 @@ class Setup(TransactionCase):
 
     def setUp(self):
         super(Setup, self).setUp()
-        self.resource_1 = self.env.ref('resource.resource_analyst')
-        self.resource_2 = self.env.ref('resource.resource_designer')
+        self.resource_1 = self.env['resource.resource'].create({
+            'name': 'Analyst'
+            'allowed_event_types': [(6, 0, [
+                self.env.ref('calendar.categ_meet1'),
+                self.env.ref('calendar.categ_meet2'),
+                self.env.ref('calendar.categ_meet3'),
+                self.env.ref('calendar.categ_meet4'),
+                self.env.ref('calendar.categ_meet5')
+            ])]
+        })
+        self.resource_2 = self.env['resource.resource'].create({
+            'name': 'Resource'
+            'allowed_event_types': [(6, 0, [
+                self.env.ref('calendar.categ_meet1'),
+                self.env.ref('calendar.categ_meet2'),
+                self.env.ref('calendar.categ_meet3'),
+                self.env.ref('calendar.categ_meet4')
+            ])]
+        })
         self.calendar_1 = self.env.ref('calendar_resource.resource_calendar_1')
 
         self.resource_1.allow_double_book = False
 
         self.event_type_4 = self.env.ref('calendar.categ_meet4')
         self.event_type_5 = self.env.ref('calendar.categ_meet5')
-
-        self.leave_1 = self.env.ref(
-            'resource.resource_analyst_leaves_demoleave1'
-        )
+        self.calendar_40_h = self.env['resource.calendar'].create({
+            'name': '40 Hours/Week'
+        })
+        self.leave_1 = self.env.['resource.calendar.leaves'].create({
+            'name': '2 Hours On Leave',
+            'resource_id': self.env.ref('resource.resource_analyst'),
+            'date_from': '2019-03-07 08:00:00',
+            'date_to': '2019-03-07 11:00:00',
+            'calendar_id': self.calendar_40_h.id
+        })
 
         self.env.user.partner_id.tz = 'UTC'
         self.env.user.lang = 'en_US'
