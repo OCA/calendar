@@ -16,7 +16,7 @@ class Setup(TransactionCase):
     def setUp(self):
         super(Setup, self).setUp()
         self.resource_1 = self.env['resource.resource'].create({
-            'name': 'Analyst'
+            'name': 'Analyst',
             'allowed_event_types': [(6, 0, [
                 self.env.ref('calendar.categ_meet1'),
                 self.env.ref('calendar.categ_meet2'),
@@ -26,7 +26,7 @@ class Setup(TransactionCase):
             ])]
         })
         self.resource_2 = self.env['resource.resource'].create({
-            'name': 'Resource'
+            'name': 'Resource',
             'allowed_event_types': [(6, 0, [
                 self.env.ref('calendar.categ_meet1'),
                 self.env.ref('calendar.categ_meet2'),
@@ -43,7 +43,7 @@ class Setup(TransactionCase):
         self.calendar_40_h = self.env['resource.calendar'].create({
             'name': '40 Hours/Week'
         })
-        self.leave_1 = self.env.['resource.calendar.leaves'].create({
+        self.leave_1 = self.env['resource.calendar.leaves'].create({
             'name': '2 Hours On Leave',
             'resource_id': self.env.ref('resource.resource_analyst'),
             'date_from': '2019-03-07 08:00:00',
