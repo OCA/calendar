@@ -24,7 +24,6 @@
         "views/calendar_menu.xml",
     ],
     "demo": [
-        "demo/resource_resource_demo.xml",
         "demo/resource_calendar.xml",
         "demo/resource_calendar_attendance.xml",
     ],
