@@ -45,7 +45,7 @@ class Setup(TransactionCase):
         })
         self.leave_1 = self.env['resource.calendar.leaves'].create({
             'name': '2 Hours On Leave',
-            'resource_id': self.env.ref('resource.resource_analyst').id,
+            'resource_id': self.resource_1.id,
             'date_from': '2019-03-07 08:00:00',
             'date_to': '2019-03-07 11:00:00',
             'calendar_id': self.calendar_40_h.id
