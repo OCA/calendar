@@ -22,8 +22,7 @@ class Setup(TransactionCase):
                 self.env.ref('calendar.categ_meet2'.id,
                 self.env.ref('calendar.categ_meet3'.id,
                 self.env.ref('calendar.categ_meet4'.id,
-                self.env.ref('calendar.categ_meet5'.id
-            ])]
+                self.env.ref('calendar.categ_meet5'.id])]
         })
         self.resource_2 = self.env['resource.resource'].create({
             'name': 'Resource',
