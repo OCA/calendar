@@ -5,9 +5,10 @@
 from odoo import fields
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import ValidationError
+from .setup import Setup
 
 
-class TestResourceCalendarAttendance(TransactionCase):
+class TestResourceCalendarAttendance(TransactionCase, Setup):
 
     def setUp(self):
         super(TestResourceCalendarAttendance, self).setUp()
