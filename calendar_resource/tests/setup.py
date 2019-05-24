@@ -18,20 +18,21 @@ class Setup(TransactionCase):
         self.resource_1 = self.env['resource.resource'].create({
             'name': 'Analyst',
             'allowed_event_types': [(6, 0, [
-                self.env.ref('calendar.categ_meet1'.id,
-                self.env.ref('calendar.categ_meet2'.id,
-                self.env.ref('calendar.categ_meet3'.id,
-                self.env.ref('calendar.categ_meet4'.id,
-                self.env.ref('calendar.categ_meet5'.id])]
+                self.env.ref('calendar.categ_meet1').id,
+                self.env.ref('calendar.categ_meet2').id,
+                self.env.ref('calendar.categ_meet3').id,
+                self.env.ref('calendar.categ_meet4').id,
+                self.env.ref('calendar.categ_meet5').id]
+            )]
         })
         self.resource_2 = self.env['resource.resource'].create({
             'name': 'Resource',
             'allowed_event_types': [(6, 0, [
-                self.env.ref('calendar.categ_meet1'.id,
-                self.env.ref('calendar.categ_meet2'.id,
-                self.env.ref('calendar.categ_meet3'.id,
-                self.env.ref('calendar.categ_meet4'.id
-            ])]
+                self.env.ref('calendar.categ_meet1').id,
+                self.env.ref('calendar.categ_meet2').id,
+                self.env.ref('calendar.categ_meet3').id,
+                self.env.ref('calendar.categ_meet4').id]
+            )]
         })
         self.calendar_1 = self.env.ref('calendar_resource.resource_calendar_1')
 
