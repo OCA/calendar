@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_calendar_view_config" model="ir.actions.act_window">
+        <field name="name">calendar.view.config</field>
+        <field name="res_model">calendar.view.config</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="calendar_view_config_submenu"
+              name="Calendar View Config"
+              parent="base.menu_custom"
+              action="action_calendar_view_config"/>
+
+    <record id="calendar_view_config_form" model="ir.ui.view">
+        <field name="name">calendar.view.config</field>
+        <field name="model">calendar.view.config</field>
+        <field name="arch" type="xml">
+            <form string="calendar View Config">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="model_id"/>
+                        <field name="model_name"/>
+                        <field name="allow_calendar_tag_color"/>
+                        <field name="tag_field_id" attrs="{'invisible': [('allow_calendar_tag_color', '=', False)], 'required': [('allow_calendar_tag_color', '=', True)]}"/>
+                        <field name="color_field_id"  attrs="{'invisible': [('allow_calendar_tag_color', '=', False)], 'required': [('allow_calendar_tag_color', '=', True)]}"/>
+                        <field name="font_color_field_id" attrs="{'invisible': [('allow_calendar_tag_color', '=', False)], 'required': [('allow_calendar_tag_color', '=', True)]}"/>
+                        <field name="allow_calendar_hatched"/>
+                        <field name="calendar_state_field_id" attrs="{'invisible': [('allow_calendar_hatched', '=', False)], 'required': [('allow_calendar_hatched', '=', True)]}"/>
+                        <field name="hatched_states" attrs="{'invisible': [('allow_calendar_hatched', '=', False)]}"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="calendar_view_config_tree" model="ir.ui.view">
+        <field name="name">calendar.view.config</field>
+        <field name="model">calendar.view.config</field>
+        <field name="arch" type="xml">
+            <tree string="Calendar View Config">
+                <field name="name"/>
+                <field name="model_id"/>
+                <field name="model_name"/>
+                <field name="tag_field_id"/>
+                <field name="color_field_id"/>
+                <field name="font_color_field_id"/>
+                <field name="calendar_state_field_id"/>
+            </tree>
+        </field>
+    </record>
+
+</odoo>
