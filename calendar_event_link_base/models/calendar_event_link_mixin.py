@@ -26,7 +26,7 @@ class CalendarEventLinkMixin(models.AbstractModel):
         context = {
             "default_res_id": self.id,
             "default_res_model": self._name,
-            "default_name": self.name if "name" in self._fields else "",
+            "default_name": self.name_get()[0][1],
         }
         context.update(self.env.context)
         return {
