@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2018 Onestein
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+
+<odoo>
+    <record id="calendar_caldav_select_wizard_form" model="ir.ui.view">
+        <field name="model">calendar.caldav.select.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="user_id" invisible="1"/>
+
+                <group>
+                    <field name="user_caldav_calendar_ids">
+                        <tree editable="top" create="false" delete="false">
+                            <field name="caldav_name" readonly="1"/>
+                            <field name="sync"/>
+                        </tree>
+                    </field>
+                </group>
+
+                <footer>
+                    <button name="confirm" string="Synchronize" type="object"
+                            class="oe_highlight"/>
+                    or
+                    <button string="Cancel" class="oe_link" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="calendar_caldav_select_wizard_action">
+        <field name="name">Setup</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">calendar.caldav.select.wizard</field>
+        <field name="view_type">form</field>
+        <field name="view_id" ref="calendar_caldav_select_wizard_form"/>
+        <field name="target">new</field>
+    </record>
+</odoo>

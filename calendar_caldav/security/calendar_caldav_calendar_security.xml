@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2019 Onestein
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+
+<odoo>
+
+    <record id="rule_calendar_caldav_calendar" model="ir.rule">
+        <field name="name">User Caldav Calendar</field>
+        <field name="model_id" ref="model_calendar_caldav_calendar"/>
+        <field name="domain_force">[('user_id', '=', user.id)]</field>
+        <field name="groups" eval="[
+            (4, ref('base.group_user'))
+        ]"/>
+    </record>
+
+</odoo>
