@@ -8,6 +8,7 @@ from dateutil.relativedelta import relativedelta
 
 from odoo import fields, models
 from odoo.osv import expression
+from odoo.exceptions import UserError
 
 # Concept
 # open_slot is the range of time where the ressource can be book
@@ -64,10 +65,10 @@ class BookableMixin(models.AbstractModel):
             if not slot and load < capacity:
                 slot = [dt, None]
                 slots.append(slot)
-            elif slot and load >= capacity:
-                slot = None
             else:
                 slot[1] = dt
+                if load >= capacity:
+                    slot = None
         return slots
 
     def _prepare_bookable_slot(self, open_slot, start, stop):
@@ -104,6 +105,11 @@ class BookableMixin(models.AbstractModel):
                 slots += self._build_bookable_slot(open_slot, slot_start, slot_stop)
         return slots
 
+    def _get_domain_for_current_object(self):
+        return [
+            ("res_model", "=", self._name),
+            ("res_id", "=", self.id),
+        ]
     def _get_domain(self, start, stop):
         # be carefull we need to search for every slot (bookable and booked)
         # that exist in the range start/stop
@@ -114,9 +120,8 @@ class BookableMixin(models.AbstractModel):
         # In an other expression it's
         # - all slot that start in the range
         # - all slot that finish in the range
-        return [
-            ("res_model", "=", self._name),
-            ("res_id", "=", self.id),
+        domain = self._get_domain_for_current_object()
+        return expression.AND([domain , [
             "|",
             "&",
             ("start", ">=", start),
@@ -124,4 +129,47 @@ class BookableMixin(models.AbstractModel):
             "&",
             ("stop", ">", start),
             ("stop", "<=", stop),
-        ]
+        ]])
+
+    def _check_load(self, start, stop):
+        load_timeline = self._build_timeline_load(start, stop)
+        capacity = self._get_slot_capacity()
+        load = 0
+        for dt, load_delta in load_timeline:
+            load += load_delta
+            if load > capacity:
+                raise UserError("The slot is not available anymore")
+
+    def _prepare_booked_slot(self, vals):
+        vals.update({
+            "res_model_id": self.env["ir.model"].search([("model", "=", self._name)]).id,
+            "res_id": self.id,
+            "booking_type": "booked",
+            "start": fields.Datetime.to_datetime(vals["start"]),
+            "stop": fields.Datetime.to_datetime(vals["stop"]),
+            })
+        return vals
+
+    def _check_duration(self, start, stop):
+        duration = (stop - start).total_seconds() / 60.
+        if duration != self._get_slot_duration():
+            raise UserError("The slot duration is not valid")
+
+    def _check_on_open_slot(self, start, stop):
+        domain = self._get_domain_for_current_object()
+        domain = expression.AND([domain, [
+            ("start", "<=", start),
+            ("stop", ">=", stop),
+            ]])
+        open_slot = self.env["calendar.event"].search(domain)
+        if not open_slot:
+            raise UserError("The slot is not on a bookable zone")
+
+    def book_slot(self, vals):
+        self.ensure_one()
+        vals = self._prepare_booked_slot(vals)
+        self._check_on_open_slot(vals["start"], vals["stop"])
+        self._check_duration(vals["start"], vals["stop"])
+        slot = self.env["calendar.event"].create(vals)
+        self._check_load(vals["start"], vals["stop"])
+        return slot
