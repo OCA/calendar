@@ -4,7 +4,7 @@
 
 from odoo import fields
 from odoo.tests import SavepointCase
-
+from odoo.exceptions import UserError
 from .fake_model_loader import FakeModelLoader
 
 CALENDAR = [
@@ -14,9 +14,11 @@ CALENDAR = [
     ("2020-04-07 14:00:00", "2020-04-07 18:00:00"),
 ]
 
-# le get_available_time_slot est appeler sur quel object
+# le get_bookable_slot est appeler sur quel object
 # warehouse, personne (coiffeur), matériel (ressource)
 # plusieurs chose en même temps? (intersection de calendrier ou // de calendrier)
+
+to_string = fields.Datetime.to_string
 
 
 class TestBooking(SavepointCase, FakeModelLoader):
@@ -50,13 +52,20 @@ class TestBooking(SavepointCase, FakeModelLoader):
     def _convert_to_string(self, slots):
         for slot in slots:
             for key in ["start", "stop"]:
-                slot[key] = fields.Datetime.to_string(slot[key])
+                slot[key] = to_string(slot[key])
         return slots
 
     def _get_slot(self, start, stop):
         return self._convert_to_string(self.partner.get_bookable_slot(start, stop))
 
-    def test_get_available_time_slot_case_1(self):
+    def _book_slot(self, start, stop):
+        return self.partner.book_slot({
+            "start": start,
+            "stop": stop,
+            "name": "foo",
+            })
+
+    def test_get_bookable_slot_case_1(self):
         slots = self._get_slot("2020-04-06 08:00:00", "2020-04-06 18:00:00")
         expected = [
             {"start": "2020-04-06 08:00:00", "stop": "2020-04-06 09:30:00"},
@@ -66,7 +75,7 @@ class TestBooking(SavepointCase, FakeModelLoader):
         ]
         self.assertEqual(slots, expected)
 
-    def test_get_available_time_slot_case_2(self):
+    def test_get_bookable_slot_case_2(self):
         slots = self._get_slot("2020-04-06 09:00:00", "2020-04-06 17:00:00")
         expected = [
             {"start": "2020-04-06 09:00:00", "stop": "2020-04-06 10:30:00"},
@@ -76,7 +85,7 @@ class TestBooking(SavepointCase, FakeModelLoader):
         ]
         self.assertEqual(slots, expected)
 
-    def test_get_available_time_slot_case_3(self):
+    def test_get_bookable_slot_case_3(self):
         slots = self._get_slot("2020-04-06 09:00:00", "2020-04-06 15:00:00")
         expected = [
             {"start": "2020-04-06 09:00:00", "stop": "2020-04-06 10:30:00"},
@@ -84,7 +93,7 @@ class TestBooking(SavepointCase, FakeModelLoader):
         ]
         self.assertEqual(slots, expected)
 
-    def test_get_available_time_slot_case_4(self):
+    def test_get_bookable_slot_case_4(self):
         slots = self._get_slot("2020-04-06 11:00:00", "2020-04-06 18:00:00")
         expected = [
             {"start": "2020-04-06 14:00:00", "stop": "2020-04-06 15:30:00"},
@@ -92,7 +101,48 @@ class TestBooking(SavepointCase, FakeModelLoader):
         ]
         self.assertEqual(slots, expected)
 
-    def test_get_available_time_slot_case_5(self):
+    def test_get_bookable_slot_case_5(self):
         slots = self._get_slot("2020-04-06 11:00:00", "2020-04-06 15:00:00")
         expected = []
         self.assertEqual(slots, expected)
+
+    def test_get_bookable_slot_case_6(self):
+        slot = self._book_slot("2020-04-06 09:30:00", "2020-04-06 11:00:00")
+        slots = self._get_slot("2020-04-06 08:00:00", "2020-04-06 18:00:00")
+        expected = [
+            {"start": "2020-04-06 08:00:00", "stop": "2020-04-06 09:30:00"},
+            {"start": "2020-04-06 14:00:00", "stop": "2020-04-06 15:30:00"},
+            {"start": "2020-04-06 15:30:00", "stop": "2020-04-06 17:00:00"},
+        ]
+        self.assertEqual(slots, expected)
+
+    def test_get_bookable_slot_case_7(self):
+        slot = self._book_slot("2020-04-06 09:00:00", "2020-04-06 10:30:00")
+        slots = self._get_slot("2020-04-06 08:00:00", "2020-04-06 18:00:00")
+        expected = [
+            {"start": "2020-04-06 10:30:00", "stop": "2020-04-06 12:00:00"},
+            {"start": "2020-04-06 14:00:00", "stop": "2020-04-06 15:30:00"},
+            {"start": "2020-04-06 15:30:00", "stop": "2020-04-06 17:00:00"},
+        ]
+        self.assertEqual(slots, expected)
+
+    def test_book(self):
+        slot = self._book_slot("2020-04-06 08:00:00", "2020-04-06 09:30:00")
+        self.assertEqual(to_string(slot["start"]), "2020-04-06 08:00:00")
+        self.assertEqual(to_string(slot["stop"]), "2020-04-06 09:30:00")
+
+    def test_book_full(self):
+        slot = self._book_slot("2020-04-06 08:00:00", "2020-04-06 09:30:00")
+        with self.assertRaises(UserError) as err:
+            slot = self._book_slot("2020-04-06 08:00:00", "2020-04-06 09:30:00")
+        self.assertEqual("The slot is not available anymore", err.exception.name)
+
+    def test_book_on_close_slot(self):
+        with self.assertRaises(UserError) as err:
+            slot = self._book_slot("2020-04-06 07:00:00", "2020-04-06 08:30:00")
+        self.assertEqual("The slot is not on a bookable zone", err.exception.name)
+
+    def test_book_invalid_slot_duration(self):
+        with self.assertRaises(UserError) as err:
+            slot = self._book_slot("2020-04-06 08:00:00", "2020-04-06 08:30:00")
+        self.assertEqual("The slot duration is not valid", err.exception.name)
