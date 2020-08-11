@@ -206,8 +206,10 @@ class CalendarEvent(models.Model):
 
                 for day in event_days:
 
-                    datetime_start = datetime.combine(day, time.min, event_start.tzinfo)
-                    datetime_end = datetime.combine(day, time.max, event_stop.tzinfo)
+                    datetime_start = datetime.combine(day, time.min)
+                    datetime_start.tzinfo = event_start.tzinfo
+                    datetime_end = datetime.combine(day, time.max)
+                    datetime_end.tzinfo =  event_stop.tzinfo
 
                     intervals = \
                         resource.calendar_id._attendance_intervals(
