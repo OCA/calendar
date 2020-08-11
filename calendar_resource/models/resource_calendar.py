@@ -102,12 +102,10 @@ class ResourceCalendar(models.Model):
 
         """
 
-        start_datetime = datetime.combine(
-            start_date, time(00, 00, 00), tzinfo=utc,
-        )
-        end_datetime = datetime.combine(
-            end_date, time(23, 59, 59), tzinfo=utc,
-        )
+        start_datetime = datetime.combine(start_date, time(00, 00, 00))
+        start_datetime.replace(tzinfo=utc)
+        end_datetime = datetime.combine(end_date, time(23, 59, 59))
+        end_datetime.replace(tzinfo=utc)
 
         intervals = self._clean_datetime_intervals(intervals)
 
