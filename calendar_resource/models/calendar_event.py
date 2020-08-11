@@ -185,7 +185,6 @@ class CalendarEvent(models.Model):
     @api.multi
     @api.constrains('resource_ids', 'start', 'stop')
     def _check__a_resource_ids_working_times(self):
-        ResourceCalendar = self.env['resource.calendar']
         for record in self.filtered(lambda x: not x._event_in_past()):
 
             event_start = record.start
@@ -194,10 +193,8 @@ class CalendarEvent(models.Model):
             # Set timezone in UTC if no timezone is explicitly given
             if not event_start.tzinfo:
                 event_start = event_start.replace(tzinfo=utc)
-                #record.start = event_start
             if not event_stop.tzinfo:
                 event_stop = event_stop.replace(tzinfo=utc)
-                #record.stop = event_stop
 
             event_days = record._get_event_date_list()
 
@@ -255,9 +252,15 @@ class CalendarEvent(models.Model):
                     )
                 )
 
+
 class Resources(models.Model):
     _name = 'calendar.resources'
     _description = 'Calendar Resources'
 
-    user_id = fields.Many2one('res.users', 'Me', required=True, default=lambda self: self.env.user)
+    user_id = fields.Many2one(
+        'res.users',
+        'Me',
+        required=True,
+        default=lambda self: self.env.user
+    )
     resource_id = fields.Many2one('resource.resource', 'Resource', required=True)

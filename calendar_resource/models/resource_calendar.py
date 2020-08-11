@@ -3,7 +3,7 @@
 
 from datetime import datetime, time, timedelta
 
-from pytz import timezone, utc
+from pytz import utc
 from odoo import api, models
 
 

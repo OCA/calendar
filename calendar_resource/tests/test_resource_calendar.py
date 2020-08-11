@@ -2,8 +2,6 @@
 # Copyright 2018 Savoir-faire Linux
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-from odoo import fields
-
 from .setup import Setup, datetime_tz
 
 
@@ -33,9 +31,8 @@ class TestResourceCalendar(Setup):
         start = datetime_tz(2017, 3, 8, 17, 0, 0)
         end = datetime_tz(2017, 3, 9, 8, 0, 0)
         exp = [
-            (datetime_tz(2017, 3, 8, 16, 0,0), datetime_tz(2017, 3, 9, 9, 0, 0)),
+            (datetime_tz(2017, 3, 8, 16, 0, 0), datetime_tz(2017, 3, 9, 9, 0, 0))
         ]
-        #exp = self._intervals_to_dt(exp)
         self.assertEqual(
             exp,
             self.Calendar._get_conflicting_unavailable_intervals(
@@ -52,7 +49,6 @@ class TestResourceCalendar(Setup):
         exp = [
             (datetime_tz(2017, 3, 8, 16, 0, 0), datetime_tz(2017, 3, 9, 9, 0, 0)),
         ]
-        #exp = self._intervals_to_dt(exp)
         self.assertEqual(
             exp,
             self.Calendar._get_conflicting_unavailable_intervals(
@@ -69,7 +65,6 @@ class TestResourceCalendar(Setup):
         exp = [
             (datetime_tz(2017, 3, 6, 0, 0, 0), datetime_tz(2017, 3, 7, 0, 0, 0)),
         ]
-        # exp = self._intervals_to_dt(exp)
         self.assertEqual(
             exp,
             self.Calendar._get_conflicting_unavailable_intervals(
@@ -87,7 +82,6 @@ class TestResourceCalendar(Setup):
             (datetime_tz(2017, 3, 8, 16, 0, 0), datetime_tz(2017, 3, 9, 9, 0, 0)),
             (datetime_tz(2017, 3, 10, 0, 0, 0), datetime_tz(2017, 3, 11, 0, 0, 0)),
         ]
-        # exp = self._intervals_to_dt(exp)
         self.assertEqual(
             exp,
             self.Calendar._get_unavailable_intervals(

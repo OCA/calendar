@@ -4,7 +4,6 @@
 
 from mock import patch
 
-from odoo import fields
 from odoo.exceptions import ValidationError
 
 from .setup import Setup, datetime_str, datetime_tz

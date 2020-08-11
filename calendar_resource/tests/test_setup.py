@@ -4,9 +4,7 @@
 
 from mock import patch
 
-from odoo import fields
-
-from .setup import Setup, datetime_str, datetime_tz
+from .setup import Setup, datetime_str
 
 
 MOCK_DATETIME = 'odoo.addons.calendar_resource.tests.test_calendar_event.'\
@@ -56,15 +54,3 @@ class TestSetup(Setup):
             res,
             exp,
         )
-
-    # def test_intervals_to_dt(self):
-    #     """ Test changes string to datetime """
-    #     interval = [(datetime_tz(2017, 3, 7, 0, 0, 0), datetime_tz(2017, 3, 7, 16, 0, 0))]
-    #     exp = [(
-    #         fields.Datetime.from_string(interval[0][0]),
-    #         fields.Datetime.from_string(interval[0][1]),
-    #     )]
-    #     # res = self._intervals_to_dt(interval)
-    #     self.assertEqual(
-    #         exp, interval
-    #     )
