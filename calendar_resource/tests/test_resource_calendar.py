@@ -4,21 +4,21 @@
 
 from odoo import fields
 
-from .setup import Setup
+from .setup import Setup, datetime_tz
 
 
 class TestResourceCalendar(Setup):
 
     def test_get_unavailable_intervals_outside_both(self):
         """ Test returns intervals event outside both """
-        start = fields.Datetime.from_string('2017-03-06 00:00:00')
-        end = fields.Datetime.from_string('2017-03-12 23:59:59')
+        start = datetime_tz(2017, 3, 6, 0, 0, 0)
+        end = datetime_tz(2017, 3, 12, 23, 59, 59)
         exp = [
-            ('2017-03-06 00:00:00', '2017-03-07 00:00:00'),
-            ('2017-03-08 16:00:00', '2017-03-09 09:00:00'),
-            ('2017-03-10 00:00:00', '2017-03-13 00:00:00'),
+            (datetime_tz(2017, 3, 6, 0, 0, 0), datetime_tz(2017, 3, 7, 0, 0, 0)),
+            (datetime_tz(2017, 3, 8, 16, 0, 0), datetime_tz(2017, 3, 9, 9, 0, 0)),
+            (datetime_tz(2017, 3, 10, 0, 0, 0), datetime_tz(2017, 3, 13, 0, 0, 0)),
         ]
-        exp = self._intervals_to_dt(exp)
+        # exp = self._intervals_to_dt(exp)
         self.assertEqual(
             exp,
             self.Calendar._get_unavailable_intervals(
@@ -30,12 +30,12 @@ class TestResourceCalendar(Setup):
 
     def test_get_conflicting_intervals_inside_both(self):
         """ Test returns intervals event inside both """
-        start = fields.Datetime.from_string('2017-03-08 17:00:00')
-        end = fields.Datetime.from_string('2017-03-09 08:00:00')
+        start = datetime_tz(2017, 3, 8, 17, 0, 0)
+        end = datetime_tz(2017, 3, 9, 8, 0, 0)
         exp = [
-            ('2017-03-08 16:00:00', '2017-03-09 09:00:00'),
+            (datetime_tz(2017, 3, 8, 16, 0,0), datetime_tz(2017, 3, 9, 9, 0, 0)),
         ]
-        exp = self._intervals_to_dt(exp)
+        #exp = self._intervals_to_dt(exp)
         self.assertEqual(
             exp,
             self.Calendar._get_conflicting_unavailable_intervals(
@@ -47,12 +47,12 @@ class TestResourceCalendar(Setup):
 
     def test_get_conflicting_intervals_overlap_inside_left(self):
         """ Test returns intervals event overlap left """
-        start = fields.Datetime.from_string('2017-03-07 10:00:00')
-        end = fields.Datetime.from_string('2017-03-09 06:00:00')
+        start = datetime_tz(2017, 3, 7, 10, 0, 0)
+        end = datetime_tz(2017, 3, 9, 6, 0, 0)
         exp = [
-            ('2017-03-08 16:00:00', '2017-03-09 09:00:00'),
+            (datetime_tz(2017, 3, 8, 16, 0, 0), datetime_tz(2017, 3, 9, 9, 0, 0)),
         ]
-        exp = self._intervals_to_dt(exp)
+        #exp = self._intervals_to_dt(exp)
         self.assertEqual(
             exp,
             self.Calendar._get_conflicting_unavailable_intervals(
@@ -64,12 +64,12 @@ class TestResourceCalendar(Setup):
 
     def test_get_conflicting_intervals_overlap_outside_left(self):
         """ Test returns intervals event overlap left """
-        start = fields.Datetime.from_string('2017-03-06 10:00:00')
-        end = fields.Datetime.from_string('2017-03-07 06:00:00')
+        start = datetime_tz(2017, 3, 6, 10, 0, 0)
+        end = datetime_tz(2017, 3, 7, 6, 0, 0)
         exp = [
-            ('2017-03-06 00:00:00', '2017-03-07 00:00:00'),
+            (datetime_tz(2017, 3, 6, 0, 0, 0), datetime_tz(2017, 3, 7, 0, 0, 0)),
         ]
-        exp = self._intervals_to_dt(exp)
+        # exp = self._intervals_to_dt(exp)
         self.assertEqual(
             exp,
             self.Calendar._get_conflicting_unavailable_intervals(
@@ -81,13 +81,13 @@ class TestResourceCalendar(Setup):
 
     def test_get_unavailable_intervals_match_right(self):
         """ Test returns intervals event match right """
-        start = fields.Datetime.from_string('2017-03-09 09:00:00')
-        end = fields.Datetime.from_string('2017-03-10 00:00:00')
+        start = datetime_tz(2017, 3, 9, 9, 0, 0)
+        end = datetime_tz(2017, 3, 10, 0, 0, 0)
         exp = [
-            ('2017-03-08 16:00:00', '2017-03-09 09:00:00'),
-            ('2017-03-10 00:00:00', '2017-03-11 00:00:00'),
+            (datetime_tz(2017, 3, 8, 16, 0, 0), datetime_tz(2017, 3, 9, 9, 0, 0)),
+            (datetime_tz(2017, 3, 10, 0, 0, 0), datetime_tz(2017, 3, 11, 0, 0, 0)),
         ]
-        exp = self._intervals_to_dt(exp)
+        # exp = self._intervals_to_dt(exp)
         self.assertEqual(
             exp,
             self.Calendar._get_unavailable_intervals(
@@ -99,8 +99,8 @@ class TestResourceCalendar(Setup):
 
     def test_get_conflicting_intervals_match_right(self):
         """ Test returns intervals event match right """
-        start = fields.Datetime.from_string('2017-03-09 09:00:00')
-        end = fields.Datetime.from_string('2017-03-10 00:00:00')
+        start = datetime_tz(2017, 3, 9, 9, 0, 0)
+        end = datetime_tz(2017, 3, 10, 0, 0, 0)
         self.assertFalse(
             self.Calendar._get_conflicting_unavailable_intervals(
                 self.intervals,

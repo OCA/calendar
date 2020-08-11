@@ -5,3 +5,5 @@ access_resource_calendar_attendance_manager,resource.calendar.attendance.manager
 access_resource_calendar_leaves_manager,resource.calendar.leaves.manager,resource.model_resource_calendar_leaves,calendar_resource.group_resource_manager,1,1,1,1
 access_resource_calendar_user,resource.calendar.user,resource.model_resource_calendar,base.group_user,1,0,0,0
 access_resource_calendar_attendance_user,resource.calendar.attendance.user,resource.model_resource_calendar_attendance,base.group_user,1,0,0,0
+access_resource_calendar_resources_manager,resource.resource.manager,calendar_resource.model_calendar_resources,calendar_resource.group_resource_manager,1,1,1,1
+access_resource_calendar_resources_user,resource.resource.user,calendar_resource.model_calendar_resources,base.group_user,1,0,0,0

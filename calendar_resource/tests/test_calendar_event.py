@@ -7,7 +7,7 @@ from mock import patch
 from odoo import fields
 from odoo.exceptions import ValidationError
 
-from .setup import Setup
+from .setup import Setup, datetime_str, datetime_tz
 from .setup import MOCK_FORMATS
 
 
@@ -299,8 +299,8 @@ class TestCalendarEvent(Setup):
     def test_event_in_past_true(self):
         """ Test returns true if event in past """
         event = self._create_event({
-            'start': '2016-06-01 00:00:00',
-            'stop': '2016-06-02 00:00:00',
+            'start': datetime_str(2016, 6, 1, 0, 0, 0),
+            'stop': datetime_str(2016, 6, 2, 0, 0, 0),
         })
         self.assertTrue(
             event._event_in_past()
@@ -316,13 +316,13 @@ class TestCalendarEvent(Setup):
     def test_check_resource_leaves_datetime_in_past(self):
         """ Test no validationerror if event in the past """
         self.leave_1.write({
-            'date_from': '2015-04-10 12:00:00',
-            'date_to': '2015-05-12 14:00:00',
+            'date_from': datetime_str(2015, 4, 10, 12, 0, 0),
+            'date_to': datetime_str(2015, 5, 12, 14, 0, 0),
         })
         try:
             self._create_event({
-                'start': '2015-04-10 12:00:00',
-                'stop': '2015-05-12 12:00:00',
+                'start': datetime_str(2015, 4, 10, 12, 0, 0),
+                'stop': datetime_str(2015, 5, 12, 12, 0, 0),
                 'allday': True,
             })
             self.assertTrue(True)
@@ -379,13 +379,13 @@ class TestCalendarEvent(Setup):
         """ Test returns correct string """
         datetime_format.return_value = ('%Y-%m-%d', '%H:%M:%S')
         intervals = [
-            ('2017-03-07 00:00:00', '2017-03-07 16:00:00'),
-            ('2017-03-07 12:00:00', '2017-03-07 20:00:00'),
+            (datetime_str(2017, 3, 7, 0, 0, 0), datetime_str(2017, 3, 7, 16, 0, 0)),
+            (datetime_str(2017, 3, 7, 12, 0, 0), datetime_str(2017, 3, 7, 20, 0, 0)),
         ]
-        intervals_dt = self._intervals_to_dt([
-            ('2017-03-07 00:00:00', '2017-03-07 16:00:00'),
-            ('2017-03-07 12:00:00', '2017-03-07 20:00:00'),
-        ])
+        intervals_dt = [
+            (datetime_tz(2017, 3, 7, 0, 0, 0), datetime_tz(2017, 3, 7, 16, 0, 0)),
+            (datetime_tz(2017, 3, 7, 12, 0, 0), datetime_tz(2017, 3, 7, 20, 0, 0)),
+        ]
 
         args = {
             'start': intervals[0][0],
@@ -412,8 +412,8 @@ class TestCalendarEvent(Setup):
         self.resource_1.calendar_id = self.calendar_1
         try:
             self._create_event({
-                'start': '2017-03-06 00:00:00',
-                'stop': '2017-03-12 00:00:00',
+                'start': datetime_str(2017, 3, 6, 0, 0, 0),
+                'stop': datetime_str(2017, 3, 12, 0, 0, 0),
                 'allday': False,
             })
             self.assertTrue(True)
@@ -573,12 +573,14 @@ class TestCalendarEvent(Setup):
 
     def test_get_event_date_list(self):
         event = self._create_event({
-            'start': '2016-06-01 00:00:00',
-            'stop': '2016-06-03 00:00:00',
+            'start': datetime_str(2016, 6, 1, 0, 0, 0),
+            'stop': datetime_str(2016, 6, 3, 0, 0, 0),
         })
+        # event start and stop are stored as naive datetime
+        # event._get_event_date_list() returns naive datetimes as well
         exp = [
-            fields.Datetime.from_string('2016-06-01 00:00:00'),
-            fields.Datetime.from_string('2016-06-02 00:00:00'),
+            datetime_tz(2016, 6, 1, 0, 0, 0, tzinfo=None),
+            datetime_tz(2016, 6, 2, 0, 0, 0, tzinfo=None),
         ]
         self.assertEqual(
             exp,

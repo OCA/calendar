@@ -5,6 +5,7 @@
 from os import linesep
 from datetime import datetime, time, timedelta
 from dateutil.rrule import rrule, DAILY
+from pytz import utc
 
 from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
@@ -75,7 +76,7 @@ class CalendarEvent(models.Model):
     @api.multi
     def _event_in_past(self):
         self.ensure_one()
-        stop_datetime = fields.Datetime.from_string(self.stop)
+        stop_datetime = self.stop
         now_datetime = datetime.now()
         return stop_datetime < now_datetime
 
@@ -171,8 +172,8 @@ class CalendarEvent(models.Model):
 
         """
         self.ensure_one()
-        start_date = fields.Date.from_string(self.start)
-        stop_datetime = fields.Datetime.from_string(self.stop)
+        start_date = self.start.date()
+        stop_datetime = self.stop
 
         if stop_datetime.time() == time(0, 0):
             stop_datetime -= timedelta(days=1)
@@ -187,8 +188,17 @@ class CalendarEvent(models.Model):
         ResourceCalendar = self.env['resource.calendar']
         for record in self.filtered(lambda x: not x._event_in_past()):
 
-            event_start = fields.Datetime.from_string(record.start)
-            event_stop = fields.Datetime.from_string(record.stop)
+            event_start = record.start
+            event_stop = record.stop
+
+            # Set timezone in UTC if no timezone is explicitly given
+            if not event_start.tzinfo:
+                event_start = event_start.replace(tzinfo=utc)
+                #record.start = event_start
+            if not event_stop.tzinfo:
+                event_stop = event_stop.replace(tzinfo=utc)
+                #record.stop = event_stop
+
             event_days = record._get_event_date_list()
 
             for resource in record.resource_ids.filtered(
@@ -199,15 +209,14 @@ class CalendarEvent(models.Model):
 
                 for day in event_days:
 
-                    datetime_start = datetime.combine(day, time(00, 00, 00))
-                    datetime_end = datetime.combine(day, time(23, 59, 59))
+                    datetime_start = datetime.combine(day, time.min, event_start.tzinfo)
+                    datetime_end = datetime.combine(day, time.max, event_stop.tzinfo)
 
                     intervals = \
-                        resource.calendar_id._get_day_work_intervals(
-                            day_date=day,
-                            start_time=time(00, 00, 00),
-                            end_time=time(23, 59, 59),
-                            resource_id=resource.id,
+                        resource.calendar_id._attendance_intervals(
+                            datetime_start,
+                            datetime_end,
+                            resource=resource,
                         )
 
                     if not intervals:
@@ -218,7 +227,7 @@ class CalendarEvent(models.Model):
                         available_intervals += intervals
 
                 if available_intervals and not record.allday:
-                    conflict_intervals = ResourceCalendar.\
+                    conflict_intervals = resource.calendar_id.\
                         _get_conflicting_unavailable_intervals(
                             available_intervals, event_start, event_stop,
                         )
@@ -226,7 +235,7 @@ class CalendarEvent(models.Model):
                 if not conflict_intervals:
                     continue
 
-                conflict_intervals = ResourceCalendar.\
+                conflict_intervals = resource.calendar_id.\
                     _clean_datetime_intervals(
                         conflict_intervals,
                     )
@@ -245,3 +254,10 @@ class CalendarEvent(models.Model):
                         ),
                     )
                 )
+
+class Resources(models.Model):
+    _name = 'calendar.resources'
+    _description = 'Calendar Resources'
+
+    user_id = fields.Many2one('res.users', 'Me', required=True, default=lambda self: self.env.user)
+    resource_id = fields.Many2one('resource.resource', 'Resource', required=True)

@@ -17,6 +17,12 @@
               action="resource.action_resource_calendar_form"
               />
 
+    <menuitem id="resource.menu_resource_calendar_view"
+              name="Calendar"
+              parent="resource.menu_resource_config"
+              action="action_resource_event"
+              />
+
     <menuitem id="calendar_menu"
               name="Calendars"
               parent="calendar.mail_menu_calendar"

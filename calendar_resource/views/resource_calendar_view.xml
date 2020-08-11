@@ -1,0 +1,41 @@
+<?xml version = "1.0" encoding="utf-8"?>
+
+<odoo>
+
+    <record id="view_resource_event_calendar" model="ir.ui.view">
+        <field name="name">resource.events.calendar</field>
+        <field name="model">calendar.event</field>
+        <field name="arch" type="xml">
+            <calendar string="Resource Reservations" date_start="start" date_stop="stop" date_delay="duration" all_day="allday" color="partner_id">
+                <field name="name"/>
+                <field name="partner_ids"/>
+                <field name="resource_ids" write_model="calendar.resources" write_field="resource_id" avatar_field="image_small"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="action_resource_event" model="ir.actions.act_window">
+        <field name="name">Meetings</field>
+        <field name="res_model">calendar.event</field>
+        <field name="view_mode">calendar</field>
+        <field name="view_id" ref="view_resource_event_calendar"/>
+        <!-- <field name="search_view_id" ref="view_resource_event_search"/> -->
+        <field name="help" type="html">
+          <p class="o_view_nocontent_smiling_face">
+            Schedule a new meeting
+          </p><p>
+            The calendar is shared between employees and fully integrated with
+            other applications such as the employee leaves or the business
+            opportunities.
+          </p>
+        </field>
+    </record>
+    
+    <record id="action_resource_event_calendar" model="ir.actions.act_window.view">
+        <field name="act_window_id" ref="action_resource_event"/>
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">calendar</field>
+        <field name="view_id" ref="view_resource_event_calendar"/>
+    </record>
+
+</odoo>

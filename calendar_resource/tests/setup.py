@@ -3,6 +3,8 @@
 
 from datetime import datetime, timedelta
 
+from pytz import timezone, utc
+
 from odoo import fields
 from odoo.tests.common import TransactionCase
 
@@ -10,6 +12,18 @@ from odoo.tests.common import TransactionCase
 MOCK_FORMATS = 'odoo.addons.calendar.models.calendar.Meeting.'\
                '_get_date_formats'
 
+def datetime_tz(year, month, day, hour=0, minute=0, second=0, microsecond=0, tzinfo='UTC'):
+    """ Return a `datetime` object with a given timezone (if given). """
+    dt = datetime(year, month, day, hour, minute, second, microsecond)
+    return timezone(tzinfo).localize(dt) if tzinfo else dt
+
+
+def datetime_str(year, month, day, hour=0, minute=0, second=0, microsecond=0, tzinfo='UTC'):
+    """ Return a fields.Datetime value with the given timezone. """
+    dt = datetime(year, month, day, hour, minute, second, microsecond)
+    if tzinfo:
+        dt = timezone(tzinfo).localize(dt).astimezone(utc)
+    return fields.Datetime.to_string(dt)
 
 class Setup(TransactionCase):
 
@@ -23,7 +37,8 @@ class Setup(TransactionCase):
                 self.env.ref('calendar.categ_meet3').id,
                 self.env.ref('calendar.categ_meet4').id,
                 self.env.ref('calendar.categ_meet5').id]
-            )]
+            )],
+            'tz': 'UTC'
         })
         self.resource_2 = self.env['resource.resource'].create({
             'name': 'Resource',
@@ -32,7 +47,8 @@ class Setup(TransactionCase):
                 self.env.ref('calendar.categ_meet2').id,
                 self.env.ref('calendar.categ_meet3').id,
                 self.env.ref('calendar.categ_meet4').id]
-            )]
+            )],
+            'tz': 'UTC'
         })
         self.calendar_1 = self.env.ref('calendar_resource.resource_calendar_1')
 
@@ -46,8 +62,8 @@ class Setup(TransactionCase):
         self.leave_1 = self.env['resource.calendar.leaves'].create({
             'name': '2 Hours On Leave',
             'resource_id': self.resource_1.id,
-            'date_from': '2019-03-07 08:00:00',
-            'date_to': '2019-03-07 11:00:00',
+            'date_from': datetime_str(2019, 3, 7, 8, 0, 0),
+            'date_to': datetime_str(2019, 3, 7, 11, 0, 0),
             'calendar_id': self.calendar_40_h.id
         })
 
@@ -58,14 +74,14 @@ class Setup(TransactionCase):
         self.Event = self.env['calendar.event']
 
         self.intervals = [
-            ('2017-03-07 00:00:00', '2017-03-07 16:00:00'),
-            ('2017-03-07 12:00:00', '2017-03-07 20:00:00'),
-            ('2017-03-07 20:00:00', '2017-03-07 23:59:59'),
-            ('2017-03-08 00:00:00', '2017-03-08 16:00:00'),
-            ('2017-03-08 05:00:00', '2017-03-08 11:30:00'),
-            ('2017-03-09 09:00:00', '2017-03-09 23:59:00'),
+            (datetime_tz(2017, 3, 7, 0, 0, 0), datetime_tz(2017, 3, 7, 16, 0, 0)),
+            (datetime_tz(2017, 3, 7, 12, 0, 0), datetime_tz(2017, 3, 7, 20, 0, 0)),
+            (datetime_tz(2017, 3, 7, 20, 0, 0), datetime_tz(2017, 3, 7, 23, 59, 59)),
+            (datetime_tz(2017, 3, 8, 0, 0, 0), datetime_tz(2017, 3, 8, 16, 0, 0)),
+            (datetime_tz(2017, 3, 8, 5, 0, 0), datetime_tz(2017, 3, 8, 11, 30, 0)),
+            (datetime_tz(2017, 3, 9, 9, 0, 0), datetime_tz(2017, 3, 9, 23, 59, 0)),
         ]
-        self.intervals = self._intervals_to_dt(self.intervals)
+        # self.intervals = self._intervals_to_dt(self.intervals)
 
         # self.intervals are the same weekdays as the demo
         # attendances tied to demo data id: resource_calendar_1
@@ -80,23 +96,23 @@ class Setup(TransactionCase):
 
         # Overlaps removed and days rounded up
         self.cleaned_intervals = [
-            ('2017-03-07 00:00:00', '2017-03-08 16:00:00'),
-            ('2017-03-09 09:00:00', '2017-03-10 00:00:00'),
+            (datetime_tz(2017, 3, 7, 0, 0, 0), datetime_tz(2017, 3, 8, 16, 0, 0)),
+            (datetime_tz(2017, 3, 9, 9, 0, 0), datetime_tz(2017, 3, 10, 0, 0, 0)),
         ]
-        self.cleaned_intervals = self._intervals_to_dt(
-            self.cleaned_intervals,
-        )
+        # self.cleaned_intervals = self._intervals_to_dt(
+        #     self.cleaned_intervals,
+        # )
 
         self.unavailable_intervals = [
-            ('2017-03-06 00:00:00', '2017-03-07 00:00:00'),
-            ('2017-03-08 16:00:00', '2017-03-09 09:00:00'),
-            ('2017-03-10 00:00:00', '2017-03-13 00:00:00'),
+            (datetime_tz(2017, 3, 6, 0, 0, 0), datetime_tz(2017, 3, 7, 0, 0, 0)),
+            (datetime_tz(2017, 3, 8, 16, 0, 0), datetime_tz(2017, 3, 9, 9, 0, 0)),
+            (datetime_tz(2017, 3, 10, 0, 0, 0), datetime_tz(2017, 3, 13, 0, 0, 0)),
         ]
-        self.unavailable_intervals = self._intervals_to_dt(
-            self.unavailable_intervals,
-        )
+        # self.unavailable_intervals = self._intervals_to_dt(
+        #     self.unavailable_intervals,
+        # )
 
-    def _intervals_to_dt(self, intervals):
+    def _intervals_to_dt(self, intervals, tzinfo=None):
         """ Converts all intervals from string values to datetime.
 
         Args:

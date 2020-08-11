@@ -2,6 +2,8 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 from datetime import datetime, time, timedelta
+
+from pytz import timezone, utc
 from odoo import api, models
 
 
@@ -56,6 +58,15 @@ class ResourceCalendar(models.Model):
             start_datetime and end_datetime args.
 
         """
+        # tz = self.env.user.tz or 'UTC'
+        # tz_info = timezone(tz)
+
+        # Set timezone in UTC if no timezone is explicitly given
+        if not start_datetime.tzinfo:
+            start_datetime = start_datetime.replace(tzinfo=utc)
+        if not end_datetime.tzinfo:
+            end_datetime = end_datetime.replace(tzinfo=utc)
+
         unavailable_intervals = self._get_unavailable_intervals(
             intervals=intervals,
             start_date=start_datetime.date(),
@@ -90,11 +101,12 @@ class ResourceCalendar(models.Model):
                 of a calendar event.`
 
         """
+
         start_datetime = datetime.combine(
-            start_date, time(00, 00, 00),
+            start_date, time(00, 00, 00), tzinfo=utc,
         )
         end_datetime = datetime.combine(
-            end_date, time(23, 59, 59),
+            end_date, time(23, 59, 59), tzinfo=utc,
         )
 
         intervals = self._clean_datetime_intervals(intervals)

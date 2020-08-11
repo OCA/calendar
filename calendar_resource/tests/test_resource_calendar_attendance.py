@@ -13,7 +13,7 @@ class TestResourceCalendarAttendance(Setup):
         super(TestResourceCalendarAttendance, self).setUp()
         self.attendance_1 = self.env['resource.calendar.attendance'].create({
             'name': 'Monday morning',
-            'dayofweek': 0,
+            'dayofweek': '0',
             'hour_from': 8,
             'hour_to': 12,
             'calendar_id': self.calendar_40_h.id

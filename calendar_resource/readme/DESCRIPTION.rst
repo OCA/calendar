@@ -3,6 +3,7 @@ This module adds new features to facilitate resource management with meetings:
 * To attach resources to a meeting, go to `Calendar` => Click on a meeting => `Edit` =>
   `Edit` => add any related resources.
 * To edit or add a resource, go to `Calendar` => `Resources` => `Resources`.
+* To view resource's existing events, go to `Calendar` => `Resources` => `Calendar`.
 * This module can also prevent resources from being double-booked. Go to a resource
   and disable or enable `Allow Double Booking` (this is disabled by default). As a note, the same
   resource in a meeting that ends at 5pm and in a meeting that starts at 5pm on the same day
