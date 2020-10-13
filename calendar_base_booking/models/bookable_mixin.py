@@ -89,16 +89,17 @@ class BookableMixin(models.AbstractModel):
             start += relativedelta(minutes=delta)
         return bookable_slots
 
+    def get_open_slot(self, start, stop):
+        domain = self._get_domain(start, stop)
+        domain = expression.AND([domain, [("booking_type", "=", "bookable")]])
+        return self.env["calendar.event"].search(domain, order="start_date")
+
     def get_bookable_slot(self, start, stop):
         start = fields.Datetime.to_datetime(start)
         stop = fields.Datetime.to_datetime(stop)
 
         slots = []
-        domain = self._get_domain(start, stop)
-        available_domain = expression.AND([domain, [("booking_type", "=", "bookable")]])
-        for open_slot in self.env["calendar.event"].search(
-            available_domain, order="start_date"
-        ):
+        for open_slot in self.get_open_slot(start, stop):
             for slot_start, slot_stop in self._get_available_slot(
                 max(open_slot.start, start), min(open_slot.stop, stop)
             ):
