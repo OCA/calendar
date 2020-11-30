@@ -21,7 +21,7 @@ class Meeting(models.Model):
     def unlink(self):
         if self.project_task_id:
             self.project_task_id.\
-                message_post(_(body="%s has deleted the calendar event \
+                message_post(body=_("%s has deleted the calendar event \
                                 associated wtih this Task") %
                              self.env.user.name)
         return super().unlink()
