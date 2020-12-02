@@ -40,5 +40,5 @@ class ProjectTask(models.Model):
         return {
             "name": project_task.name,
             "start": project_task.planned_date_begin,
-            "stop": project_task.planned_date_end
+            "stop": project_task.planned_date_end,
         }
