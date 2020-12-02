@@ -1,0 +1,37 @@
+<odoo>
+    <t t-name="CalendarView.event.popover">
+        <div class="o_cw_body">
+            <ul class="list-group list-group-flush">
+                <li
+                    t-if="!widget.hideDate and widget.eventDate.date"
+                    class="list-group-item"
+                >
+                    <i class="fa fa-fw fa-calendar-o" />
+                    <b class="text-capitalize" t-esc="widget.eventDate.date" />
+                    <small t-if="widget.eventDate.duration">
+                        <b t-esc="_.str.sprintf('(%s)', widget.eventDate.duration)" />
+                    </small>
+                </li>
+                <li
+                    t-if="!widget.hideTime and widget.eventTime.time"
+                    class="list-group-item"
+                >
+                    <i class="fa fa-fw fa-clock-o" />
+                    <b t-esc="widget.eventTime.time" />
+                    <small t-if="widget.eventTime.duration">
+                        <b t-esc="_.str.sprintf('(%s)', widget.eventTime.duration)" />
+                    </small>
+                </li>
+            </ul>
+            <ul class="list-group list-group-flush o_cw_popover_fields_secondary" />
+            <div class="card-footer border-top">
+                <a href="#" class="btn btn-primary o_cw_popover_edit">Edit</a>
+                <a
+                    href="#"
+                    class="btn btn-secondary o_cw_popover_delete ml-2"
+                    confirm="Are you sure you want to delete?"
+                >Delete</a>
+            </div>
+        </div>
+    </t>
+</odoo>
