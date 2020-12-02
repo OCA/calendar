@@ -7,7 +7,7 @@ from odoo import _, fields, models
 class Meeting(models.Model):
     _inherit = "calendar.event"
 
-    project_task_id = fields.Many2one('project.task', 'Task')
+    project_task_id = fields.Many2one("project.task", "Task")
 
     def write(self, vals):
         res = super().write(vals)
@@ -20,8 +20,11 @@ class Meeting(models.Model):
 
     def unlink(self):
         if self.project_task_id:
-            self.project_task_id.\
-                message_post(body=_("%s has deleted the calendar event \
-                                associated wtih this Task") %
-                             self.env.user.name)
+            self.project_task_id.message_post(
+                body=_(
+                    "%s has deleted the calendar event \
+                                associated wtih this Task"
+                )
+                % self.env.user.name
+            )
         return super().unlink()

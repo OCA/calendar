@@ -5,13 +5,10 @@
     "version": "13.0.1.0.0",
     "license": "AGPL-3",
     "summary": "Synchronize Calendar Events and Project Tasks",
-    "author": "Open Source Integrators",
+    "author": "Open Source Integrators, Odoo Community Association (OCA)",
     "maintainer": "Open Source Integrators",
     "website": "https://www.opensourceintegrators.com",
-    "depends": [
-        "calendar",
-        "project"
-    ],
+    "depends": ["calendar", "project"],
     "data": [],
     "sequence": 0,
     "installable": True,
