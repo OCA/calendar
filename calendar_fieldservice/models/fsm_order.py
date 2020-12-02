@@ -7,7 +7,7 @@ from odoo import api, fields, models
 class FSMOrder(models.Model):
     _inherit = "fsm.order"
 
-    calendar_event_id = fields.Many2one('calendar.event', 'Calendar Event')
+    calendar_event_id = fields.Many2one("calendar.event", "Calendar Event")
 
     def write(self, vals):
         res = super().write(vals)
@@ -21,8 +21,8 @@ class FSMOrder(models.Model):
     @api.model
     def create(self, vals):
         res = super().create(vals)
-        if vals.get('scheduled_date_start') and vals.get('scheduled_date_end'):
-            event = self.env['calendar.event'].create(self.get_calendar_event_vals(res))
+        if vals.get("scheduled_date_start") and vals.get("scheduled_date_end"):
+            event = self.env["calendar.event"].create(self.get_calendar_event_vals(res))
             event.fsm_order_id = res.id
             res.calendar_event_id = event.id
         return res
@@ -33,12 +33,12 @@ class FSMOrder(models.Model):
             event_id = self.calendar_event_id.id
         res = super().unlink()
         if event_id:
-            self.env['calendar.event'].browse(event_id).unlink()
+            self.env["calendar.event"].browse(event_id).unlink()
         return res
 
     def get_calendar_event_vals(self, fsm_order):
         return {
-            'name': fsm_order.name,
-            'start': fsm_order.scheduled_date_start,
-            'stop': fsm_order.scheduled_date_end
+            "name": fsm_order.name,
+            "start": fsm_order.scheduled_date_start,
+            "stop": fsm_order.scheduled_date_end,
         }

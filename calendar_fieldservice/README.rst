@@ -27,11 +27,11 @@ Calendar FSM
 
 This module synchronizes FSM Orders and Calendar events mapping the following fields:
 
-FSM Order <--> Calendar Event
+FSM Order to Calendar Event
 -------------------------------
-scheduled_date_start <--> start
-scheduled_date_end <--> stop
-duration <--> duration
+scheduled_date_start to start
+scheduled_date_end to stop
+duration to duration
 
 When an FSM Order is created, a corresponding Calendar Event is created as well. When you edit any 
 of the fields above, the corresponding change will be reflected on the other object. When you delete 

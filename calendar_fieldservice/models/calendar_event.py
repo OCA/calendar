@@ -7,7 +7,7 @@ from odoo import _, fields, models
 class Meeting(models.Model):
     _inherit = "calendar.event"
 
-    fsm_order_id = fields.Many2one('fsm.order', 'FSM Order')
+    fsm_order_id = fields.Many2one("fsm.order", "FSM Order")
 
     def write(self, vals):
         res = super().write(vals)
@@ -20,8 +20,11 @@ class Meeting(models.Model):
 
     def unlink(self):
         if self.fsm_order_id:
-            self.fsm_order_id.\
-                message_post(body=_("%s has deleted the calendar event \
-                                associated wtih this FSM Order") %
-                             self.env.user.name)
+            self.fsm_order_id.message_post(
+                body=_(
+                    "%s has deleted the calendar event \
+                                associated wtih this FSM Order"
+                )
+                % self.env.user.name
+            )
         return super().unlink()
