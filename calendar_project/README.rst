@@ -27,10 +27,10 @@ Calendar Project
 
 This module synchronizes Project Task and Calendar events mapping the following fields:
 
-Project Task <--> Calendar Event
+Project Task to Calendar Event
 -------------------------------
-planned_date_begin <--> start
-planned_date_end <--> stop
+planned_date_begin to start
+planned_date_end to stop
 
 When a Project Task is created, a corresponding Calendar Event is created as well. When you edit any 
 of the fields above, the corresponding change will be reflected on the other object. When you delete 
