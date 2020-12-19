@@ -3,8 +3,9 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import fields
-from odoo.tests import SavepointCase
 from odoo.exceptions import UserError
+from odoo.tests import SavepointCase
+
 from .fake_model_loader import FakeModelLoader
 
 CALENDAR = [
@@ -59,11 +60,13 @@ class TestBooking(SavepointCase, FakeModelLoader):
         return self._convert_to_string(self.partner.get_bookable_slot(start, stop))
 
     def _book_slot(self, start, stop):
-        return self.partner.book_slot({
-            "start": start,
-            "stop": stop,
-            "name": "foo",
-            })
+        return self.partner.book_slot(
+            {
+                "start": start,
+                "stop": stop,
+                "name": "foo",
+            }
+        )
 
     def test_get_bookable_slot_case_1(self):
         slots = self._get_slot("2020-04-06 08:00:00", "2020-04-06 18:00:00")

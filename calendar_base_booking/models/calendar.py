@@ -21,6 +21,6 @@ class CalendarEvent(models.Model):
         if self.booking_type in ["bookable", "not_bookable"]:
             self.name = dict(
                 self._fields["booking_type"]._description_selection(self.env)
-                )[self.booking_type]
+            )[self.booking_type]
         else:
             self.name = ""
