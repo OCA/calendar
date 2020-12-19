@@ -2,11 +2,11 @@
 # @author Sébastien BEAU <sebastien.beau@akretion.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+from odoo_test_helper import FakeModelLoader
+
 from odoo import fields
 from odoo.exceptions import UserError
 from odoo.tests import SavepointCase
-
-from .fake_model_loader import FakeModelLoader
 
 CALENDAR = [
     ("2020-04-06 08:00:00", "2020-04-06 12:00:00"),
@@ -26,10 +26,12 @@ class TestBooking(SavepointCase, FakeModelLoader):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls._backup_registry(cls.env, "calendar_base_booking")
+        cls.loader = FakeModelLoader(cls.env, cls.__module__)
+        cls.loader.backup_registry()
         from .models import ResPartner
 
-        cls._update_registry([ResPartner])
+        cls.loader.update_registry((ResPartner,))
+
         cls.partner = cls.env["res.partner"].search([], limit=1)
         cls.partner.slot_capacity = 1
         cls.partner.slot_duration = 90
@@ -48,7 +50,7 @@ class TestBooking(SavepointCase, FakeModelLoader):
     @classmethod
     def tearDownClass(cls):
         super().tearDownClass()
-        cls._restore_registry()
+        cls.loader.restore_registry()
 
     def _convert_to_string(self, slots):
         for slot in slots:
@@ -110,7 +112,7 @@ class TestBooking(SavepointCase, FakeModelLoader):
         self.assertEqual(slots, expected)
 
     def test_get_bookable_slot_case_6(self):
-        slot = self._book_slot("2020-04-06 09:30:00", "2020-04-06 11:00:00")
+        self._book_slot("2020-04-06 09:30:00", "2020-04-06 11:00:00")
         slots = self._get_slot("2020-04-06 08:00:00", "2020-04-06 18:00:00")
         expected = [
             {"start": "2020-04-06 08:00:00", "stop": "2020-04-06 09:30:00"},
@@ -120,7 +122,7 @@ class TestBooking(SavepointCase, FakeModelLoader):
         self.assertEqual(slots, expected)
 
     def test_get_bookable_slot_case_7(self):
-        slot = self._book_slot("2020-04-06 09:00:00", "2020-04-06 10:30:00")
+        self._book_slot("2020-04-06 09:00:00", "2020-04-06 10:30:00")
         slots = self._get_slot("2020-04-06 08:00:00", "2020-04-06 18:00:00")
         expected = [
             {"start": "2020-04-06 10:30:00", "stop": "2020-04-06 12:00:00"},
@@ -135,17 +137,17 @@ class TestBooking(SavepointCase, FakeModelLoader):
         self.assertEqual(to_string(slot["stop"]), "2020-04-06 09:30:00")
 
     def test_book_full(self):
-        slot = self._book_slot("2020-04-06 08:00:00", "2020-04-06 09:30:00")
+        self._book_slot("2020-04-06 08:00:00", "2020-04-06 09:30:00")
         with self.assertRaises(UserError) as err:
-            slot = self._book_slot("2020-04-06 08:00:00", "2020-04-06 09:30:00")
+            self._book_slot("2020-04-06 08:00:00", "2020-04-06 09:30:00")
         self.assertEqual("The slot is not available anymore", err.exception.name)
 
     def test_book_on_close_slot(self):
         with self.assertRaises(UserError) as err:
-            slot = self._book_slot("2020-04-06 07:00:00", "2020-04-06 08:30:00")
+            self._book_slot("2020-04-06 07:00:00", "2020-04-06 08:30:00")
         self.assertEqual("The slot is not on a bookable zone", err.exception.name)
 
     def test_book_invalid_slot_duration(self):
         with self.assertRaises(UserError) as err:
-            slot = self._book_slot("2020-04-06 08:00:00", "2020-04-06 08:30:00")
+            self._book_slot("2020-04-06 08:00:00", "2020-04-06 08:30:00")
         self.assertEqual("The slot duration is not valid", err.exception.name)

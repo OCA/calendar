@@ -6,7 +6,7 @@ from collections import defaultdict
 
 from dateutil.relativedelta import relativedelta
 
-from odoo import fields, models
+from odoo import _, fields, models
 from odoo.exceptions import UserError
 from odoo.osv import expression
 
@@ -142,10 +142,10 @@ class BookableMixin(models.AbstractModel):
         load_timeline = self._build_timeline_load(start, stop)
         capacity = self._get_slot_capacity()
         load = 0
-        for dt, load_delta in load_timeline:
+        for _dt, load_delta in load_timeline:
             load += load_delta
             if load > capacity:
-                raise UserError("The slot is not available anymore")
+                raise UserError(_("The slot is not available anymore"))
 
     def _prepare_booked_slot(self, vals):
         vals.update(
@@ -164,7 +164,7 @@ class BookableMixin(models.AbstractModel):
     def _check_duration(self, start, stop):
         duration = (stop - start).total_seconds() / 60.0
         if duration != self._get_slot_duration():
-            raise UserError("The slot duration is not valid")
+            raise UserError(_("The slot duration is not valid"))
 
     def _check_on_open_slot(self, start, stop):
         domain = self._get_domain_for_current_object()
@@ -179,7 +179,7 @@ class BookableMixin(models.AbstractModel):
         )
         open_slot = self.env["calendar.event"].search(domain)
         if not open_slot:
-            raise UserError("The slot is not on a bookable zone")
+            raise UserError(_("The slot is not on a bookable zone"))
 
     def book_slot(self, vals):
         self.ensure_one()
