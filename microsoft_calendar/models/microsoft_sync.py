@@ -1,3 +1,5 @@
+# flake8: noqa
+# pylint: skip-file
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import logging
@@ -29,6 +31,11 @@ MAX_RECURRENT_EVENT = 720
 # It is particularly important for event creation , otherwise the event might be created
 # twice in Microsoft if the first creation crashed in Odoo.
 def after_commit(func):
+    return func
+
+
+# TODO
+def _TODO():
     @wraps(func)
     def wrapped(self, *args, **kwargs):
         dbname = self.env.cr.dbname

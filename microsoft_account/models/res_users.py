@@ -1,8 +1,10 @@
+# flake8: noqa
+# pylint: skip-file
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from datetime import timedelta
 
-from odoo import _, api, fields, models
+from odoo import fields, models
 
 
 class User(models.Model):

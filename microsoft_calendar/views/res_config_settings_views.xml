@@ -7,31 +7,41 @@
         <field name="model">res.config.settings</field>
         <field name="inherit_id" ref="base_setup.res_config_settings_view_form" />
         <field name="arch" type="xml">
-            <div id="msg_module_microsoft_calendar" position="replace">
-                <div
-                    class="content-group"
-                    attrs="{'invisible': [('module_microsoft_calendar','=',False)]}"
-                >
-                    <div class="mt16 row">
-                        <label
-                            for="cal_microsoft_client_id"
-                            string="Client ID"
-                            class="col-3 col-lg-3 o_light_label"
-                        />
-                        <field name="cal_microsoft_client_id" nolabel="1" />
-                        <label
-                            for="cal_microsoft_client_secret"
-                            string="Client Secret"
-                            class="col-3 col-lg-3 o_light_label"
-                        />
-                        <field
-                            name="cal_microsoft_client_secret"
-                            password="True"
-                            nolabel="1"
-                        />
+            <xpath expr="//div[@name='integration']" position="inside">
+                <div class="col-12 col-lg-6 o_setting_box">
+                    <div class="o_setting_left_pane">
+                        <field name="module_microsoft_calendar" />
+                    </div>
+                    <div class="o_setting_right_pane">
+                        <label for="module_microsoft_calendar" />
+                        <div class="text-muted">
+                            Synchronize your calendar with Outlook Calendar
+                        </div>
+                        <div
+                            class="content-group"
+                            attrs="{'invisible': [('module_microsoft_calendar','=',False)]}"
+                        >
+                            <label
+                                for="cal_microsoft_client_id"
+                                string="Client ID"
+                                class="o_light_label"
+                            />
+                            <field name="cal_microsoft_client_id" nolabel="1" />
+                            <br />
+                            <label
+                                for="cal_microsoft_client_secret"
+                                string="Client Secret"
+                                class="o_light_label"
+                            />
+                            <field
+                                name="cal_microsoft_client_secret"
+                                password="True"
+                                nolabel="1"
+                            />
+                        </div>
                     </div>
                 </div>
-            </div>
+            </xpath>
         </field>
     </record>
 </odoo>

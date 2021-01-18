@@ -1,8 +1,8 @@
+# flake8: noqa
+# pylint: skip-file
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from collections import abc
 from typing import Iterator, Mapping
-
-from odoo.api import model
 
 
 class MicrosoftEvent(abc.Set):

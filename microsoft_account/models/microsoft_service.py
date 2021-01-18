@@ -1,3 +1,5 @@
+# flake8: noqa
+# pylint: skip-file
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import json
@@ -120,7 +122,7 @@ class MicrosoftService(models.AbstractModel):
             access_token = response.get("access_token")
             refresh_token = response.get("refresh_token")
             ttl = response.get("expires_in")
-            return access_token, refresh_token, ttl
+            return access_token, refresh_token, int(ttl)
         except requests.HTTPError:
             error_msg = _(
                 "Something went wrong during your token generation. Maybe your Authorization Code is invalid"

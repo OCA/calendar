@@ -1,10 +1,12 @@
+# flake8: noqa
+# pylint: skip-file
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import pytz
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
 
-from odoo import _, api, fields, models
+from odoo import _ as org_t, api, fields, models
 from odoo.exceptions import UserError
 
 ATTENDEE_CONVERTER_O2M = {
@@ -21,6 +23,15 @@ ATTENDEE_CONVERTER_M2O = {
     "organizer": "accepted",
 }
 MAX_RECURRENT_EVENT = 720
+
+
+def _(to_translate, *args, **kwargs):
+    result = org_t(to_translate)
+    if args:
+        result = result % args
+    if kwargs:
+        result = result % kwargs
+    return result
 
 
 class Meeting(models.Model):
@@ -68,7 +79,7 @@ class Meeting(models.Model):
             previous_event_before_write = self.recurrence_id.calendar_event_ids.filtered(
                 lambda e: e.start.date() < self.start.date() and e != self
             )
-            new_start = parse(values["start"]).date()
+            new_start = values["start"].date()
             previous_event_after_write = self.recurrence_id.calendar_event_ids.filtered(
                 lambda e: e.start.date() < new_start and e != self
             )
@@ -210,12 +221,8 @@ class Meeting(models.Model):
             else:
                 # Create new attendees
                 partner = self.env["res.partner"].find_or_create(email)
-                commands_attendee += [
-                    (0, 0, {"state": state, "partner_id": partner.id})
-                ]
-                commands_partner += [(4, partner.id)]
-                if attendee.get("emailAddress").get("name") and not partner.name:
-                    partner.name = attendee.get("emailAddress").get("name")
+                commands_attendee += [(0, 0, {"state": state, "partner_id": partner})]
+                commands_partner += [(4, partner)]
         for odoo_attendee in attendees_by_emails.values():
             # Remove old attendees
             if odoo_attendee.email not in emails:

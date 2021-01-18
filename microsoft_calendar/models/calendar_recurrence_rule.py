@@ -1,6 +1,6 @@
+# flake8: noqa
+# pylint: skip-file
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-
-import re
 
 from odoo import api, fields, models
 

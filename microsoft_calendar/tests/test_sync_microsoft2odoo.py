@@ -1,6 +1,8 @@
+# flake8: noqa
+# pylint: skip-file
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from datetime import date, datetime
+from datetime import datetime
 
 import pytz
 from dateutil.relativedelta import relativedelta

@@ -1,3 +1,4 @@
+/* eslint-disable */
 odoo.define("microsoft_calendar.CalendarView", function(require) {
     "use strict";
 
@@ -5,9 +6,9 @@ odoo.define("microsoft_calendar.CalendarView", function(require) {
     var Dialog = require("web.Dialog");
     var framework = require("web.framework");
     const CalendarView = require("calendar.CalendarView");
-    const CalendarRenderer = require("calendar.CalendarRenderer");
-    const CalendarController = require("calendar.CalendarController");
-    const CalendarModel = require("calendar.CalendarModel");
+    const CalendarRenderer = require("web.CalendarRenderer");
+    const CalendarController = require("web.CalendarController");
+    const CalendarModel = require("web.CalendarModel");
     const viewRegistry = require("web.view_registry");
 
     var _t = core._t;

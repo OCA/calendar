@@ -1,3 +1,5 @@
+# flake8: noqa
+# pylint: skip-file
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import json
@@ -5,8 +7,6 @@ import logging
 
 import requests
 from werkzeug import urls
-
-from odoo import _, api
 
 from odoo.addons.microsoft_account.models.microsoft_service import TIMEOUT
 from odoo.addons.microsoft_calendar.utils.microsoft_event import MicrosoftEvent
