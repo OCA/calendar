@@ -19,4 +19,5 @@
     "installable": True,
     "auto_install": False,
     "post_init_hook": "init_initiating_microsoft_uuid",
+    "external_dependencies": {"python": ["freezegun"]},
 }
