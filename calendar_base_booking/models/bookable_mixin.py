@@ -65,7 +65,7 @@ class BookableMixin(models.AbstractModel):
             if not slot and load < capacity:
                 slot = [dt, None]
                 slots.append(slot)
-            else:
+            elif slot:
                 slot[1] = dt
                 if load >= capacity:
                     slot = None

@@ -131,6 +131,16 @@ class TestBooking(SavepointCase, FakeModelLoader):
         ]
         self.assertEqual(slots, expected)
 
+    def test_get_bookable_slot_case_8(self):
+        self._book_slot("2020-04-06 08:00:00", "2020-04-06 09:30:00")
+        slots = self._get_slot("2020-04-06 08:00:00", "2020-04-06 18:00:00")
+        expected = [
+            {"start": "2020-04-06 09:30:00", "stop": "2020-04-06 11:00:00"},
+            {"start": "2020-04-06 14:00:00", "stop": "2020-04-06 15:30:00"},
+            {"start": "2020-04-06 15:30:00", "stop": "2020-04-06 17:00:00"},
+        ]
+        self.assertEqual(slots, expected)
+
     def test_book(self):
         slot = self._book_slot("2020-04-06 08:00:00", "2020-04-06 09:30:00")
         self.assertEqual(to_string(slot["start"]), "2020-04-06 08:00:00")
