@@ -2,5 +2,5 @@ from odoo import models
 
 
 class CalendarSchedulable(models.AbstractModel):
-    pass
+    _name = 'calendar.schedulable'
 
