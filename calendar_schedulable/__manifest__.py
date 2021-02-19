@@ -7,10 +7,10 @@
     'summary': 'Mixin to allow scheduling for a model',
     'description': "",
     'website': 'https://github.com/oca/calendar',
-    'depends': ['base'],
+    'depends': ['hr'],
     'data': [
     ],
     'installable': True,
-    'application': True,
+    'application': False,
 }
 
