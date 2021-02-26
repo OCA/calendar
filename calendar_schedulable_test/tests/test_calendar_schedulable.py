@@ -40,4 +40,3 @@ class CalendarSchedulableTest(TransactionCase):
         self.assertEquals(self.partner_2.employee_domain_ids, jth+admin)
         self.assertEquals(self.partner_7.employee_domain_ids, admin)
         self.assertEquals(self.partner_1.employee_domain_ids, jth)
-

@@ -35,7 +35,9 @@ class CalendarSchedulable(models.AbstractModel):
                                  default=fields.Datetime.now,
                                  index=True, copy=False)
     date_end = fields.Datetime(string='Ending Date', index=True, copy=False)
-    date_assign = fields.Datetime(string='Assigning Date', index=True, copy=False, readonly=True)
+    date_assign = fields.Datetime(
+        string='Assigning Date', index=True, copy=False, readonly=True
+    )
     date_deadline = fields.Date(string='Deadline', index=True, copy=False)
 
     @api.multi
