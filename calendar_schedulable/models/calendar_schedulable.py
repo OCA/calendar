@@ -3,16 +3,15 @@ from odoo import models, fields, api
 
 class CalendarSchedulable(models.AbstractModel):
     _name = 'calendar.schedulable'
-    _inherit = ['mail.thread']
     employee_domain_ids = fields.Many2many(
         compute='_compute_employee_domain_ids',
         comodel_name='hr.employee',
-        string="Employees",
+        string="Available Employees",
     )
     employee_scheduling_ids = fields.Many2many(
         compute='_compute_employee_scheduling_ids',
         comodel_name='hr.employee',
-        string="Employees",
+        string="Employees Scheduling",
     )
     employee_id = fields.Many2one(
         comodel_name='hr.employee',
@@ -37,7 +36,7 @@ class CalendarSchedulable(models.AbstractModel):
                                  index=True, copy=False)
     date_end = fields.Datetime(string='Ending Date', index=True, copy=False)
     date_assign = fields.Datetime(string='Assigning Date', index=True, copy=False, readonly=True)
-    date_deadline = fields.Date(string='Deadline', index=True, copy=False, track_visibility='onchange')
+    date_deadline = fields.Date(string='Deadline', index=True, copy=False)
 
     @api.multi
     @api.depends('employee_ids.category_ids',
