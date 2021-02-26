@@ -15,7 +15,11 @@ TODO: add repo description.
 
 [//]: # (addons)
 
-This part will be replaced when running the oca-gen-addons-table script from OCA/maintainer-tools.
+Available addons
+----------------
+addon | version | summary
+--- | --- | ---
+[calendar_partner_color](calendar_partner_color/) | 14.0.0.0.0 | Adapt calendar color based on partner's color
 
 [//]: # (end addons)
 
