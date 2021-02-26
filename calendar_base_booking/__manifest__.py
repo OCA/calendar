@@ -1,0 +1,18 @@
+{
+    "name": "Calendar Base Booking",
+    "summary": "Base module for adding booking feature",
+    "version": "14.0.1.0.0",
+    "development_status": "Alpha",
+    "category": "Calendar",
+    "website": "https://github.com/OCA/calendar",
+    "author": "Akretion, Odoo Community Association (OCA)",
+    "maintainers": ["sebastienbeau"],
+    "license": "AGPL-3",
+    "application": False,
+    "installable": True,
+    "external_dependencies": {"python": [], "bin": []},
+    "depends": ["calendar"],
+    "data": [],
+    "demo": [],
+    "qweb": [],
+}
