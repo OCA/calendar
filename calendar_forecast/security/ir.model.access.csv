@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_calendar_forecast_user,access_calendar_forecast,model_calendar_forecast,base.group_user,1,1,1,1
+access_calendar_forecast_user_task,access_calendar_forecast_task,model_calendar_schedulable_task_line,base.group_user,1,1,1,1

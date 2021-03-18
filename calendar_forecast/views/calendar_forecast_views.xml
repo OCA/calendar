@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2018 Eficent Business and IT Consulting Services, S.L.
+    Copyright 2018-2020 Brainbean Apps (https://brainbeanapps.com)
+    Copyright 2018-2019 Onestein (<https://www.onestein.eu>)
+    License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
+-->
+<odoo>
+
+    <record id="calendar_forecast_tree" model="ir.ui.view">
+        <field name="name">calendar.forecast.tree</field>
+        <field name="model">calendar.forecast</field>
+        <field name="arch" type="xml">
+            <tree
+                string="Forecasts"
+
+                decoration-bf="message_needaction == True"
+            >
+                <field name="employee_id"/>
+                <field name="name" string="Period"/>
+                <field name="department_id" invisible="1"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="total_time" widget="float_time"/>
+                <field name="message_needaction" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="calendar_forecast_tree_my" model="ir.ui.view">
+        <field name="name">calendar.forecast.tree.my</field>
+        <field name="model">calendar.forecast</field>
+        <field name="inherit_id" ref="calendar_forecast_tree"/>
+        <field name="mode">primary</field>
+        <field name="priority">1000</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='employee_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="calendar_forecast_form" model="ir.ui.view">
+        <field name="name">calendar.forecast.form</field>
+        <field name="model">calendar.forecast</field>
+        <field name="arch" type="xml">
+            <form string="Forecast">
+                <field name="user_id" invisible="1"/>
+
+                <sheet>
+                    <div class="oe_title">
+                        <label for="employee_id" class="oe_edit_only"/>
+                        <h1><field name="employee_id" class="oe_inline" placeholder="Employee's Name"/></h1>
+                    </div>
+                    <group>
+                        <group name="dates">
+                            <label for="date_start" string="Forecast Period"/>
+                            <div style="display: inline;"><field name="date_start" class="oe_inline"/> to <field name="date_end" class="oe_inline"/></div>
+                        </group>
+                        <group name="details">
+                            <field name="company_id" groups="base.group_multi_company" force_save="1"/>
+                            <field name="department_id" invisible="1"/>
+                            <field
+                                name="add_line_project_id"
+                                domain="[('company_id', '=', company_id), ('allow_timesheets', '=', True)]"
+                            />
+                        </group>
+
+                    </group>
+                    <notebook>
+                        <page string="Summary">
+                            <group name="Forecast" class="calendar_forecast_summary">
+                                <field name="line_ids" nolabel="1" attrs="{'readonly': False}"
+                                       widget="x2many_2d_matrix"
+                                       field_x_axis="value_x"
+                                       field_y_axis="value_y"
+                                       field_value="unit_amount"
+                                       x_axis_clickable="0"
+                                       y_axis_clickable="1">
+                                    <!-- Well this is embarrassing... we need to set a huge limit for records to be fetched in
+                                    order to make sure that all rows are going to be displayed. At least until we find a method to
+                                    dynamically define the limit.-->
+                                    <tree limit="1000000">
+                                        <field name="value_x"/>
+                                        <field name="value_y"/>
+                                        <field name="unit_amount" widget="float_time"/>
+                                        <field name="forecast_id"/>
+                                        <field name="date"/>
+                                        <field name="project_id"/>
+                                        <field name="task_id"/>
+                                        <field name="company_id" groups="base.group_multi_company"/>
+                                        <field name="employee_id"/>
+                                        <field name="new_line_id" invisible="1"/>
+                                        <!--  Don't remove last fields, they are technically needed for the widget to work properly.-->
+                                    </tree>
+                                </field>
+                                <group class="oe_edit_only">
+
+                                    <field
+                                        name="add_line_task_id"
+                                        attrs="{'invisible': [('add_line_project_id', '=', False)]}"
+                                        context="{'default_project_id': add_line_project_id}"
+                                    />
+                                    <button name="button_add_line"
+                                            type="object"
+                                            string="Add new line"
+                                            class="oe_highlight"
+                                            attrs="{'invisible': [('add_line_project_id', '=', False)]}"
+                                    />
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Details">
+                            <field
+                                name="timesheet_ids"
+                                nolabel="1"
+                                context="{'user_id': user_id}">
+                                <tree editable="bottom" string="Forecast Activities">
+                                    <field name="period"/>
+                                    <field name="project_id" required="1"/>
+                                    <field name="id" domain="[('project_id', '=', project_id)]" context="{'default_project_id': project_id}"/>
+                                    <field name="self"/>
+                                    <field name="unit_amount" widget="float_time" string="Hours" sum="Hours"/>
+                                    <field name="user_id" invisible="1"/>
+                                </tree>
+                                <form string="Forecast Activities">
+                                    <group>
+                                        <field name="period"/>
+                                        <field name="name"/>
+                                        <field name="project_id" required="1"/>
+                                        <field name="id" domain="[('project_id', '=', project_id)]" context="{'default_project_id': project_id}"/>
+                                        <field name="unit_amount" widget="float_time" string="Hours"/>
+                                        <field name="user_id" invisible="1"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="calendar_forecast_form_my" model="ir.ui.view">
+        <field name="name">calendar.forecast.form.my</field>
+        <field name="model">calendar.forecast</field>
+        <field name="inherit_id" ref="calendar_forecast_form"/>
+        <field name="mode">primary</field>
+        <field name="priority">1000</field>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('oe_title')]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_calendar_forecast_kanban" model="ir.ui.view">
+        <field name="name">calendar.forecast.kanban</field>
+        <field name="model">calendar.forecast</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile" create="0">
+                <field name="employee_id"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="complete_name"/>
+                <field name="total_time"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click container">
+                            <div class="row no-gutters">
+                                <div class="col-2">
+                                    <img t-att-src="kanban_image('hr.employee', 'image_small', record.employee_id.raw_value)"
+                                        t-att-title="record.employee_id.value"
+                                        t-att-alt="record.employee_id.value"
+                                        width="40" height="40"
+                                        class="oe_kanban_avatar float-left mr4"/>
+                                </div>
+                                <div class="col-10">
+                                    <strong class="o_kanban_record_title"><t t-esc="record.employee_id.value"/></strong>
+                                    <div class="text-muted o_kanban_record_subtitle">
+                                        <t t-esc="record.complete_name.value"/>
+                                    </div>
+                                    <div class="o_dropdown_kanban dropdown" groups="base.group_user">
+                                        <a role="button" class="dropdown-toggle o-no-caret btn" data-toggle="dropdown" href="#" aria-label="Dropdown menu" title="Dropdown menu">
+                                            <span class="fa fa-ellipsis-v"/>
+                                        </a>
+                                        <div class="dropdown-menu" role="menu">
+                                            <a t-if="widget.editable" role="menuitem" type="edit" class="dropdown-item">Edit</a>
+                                            <a t-if="widget.deletable" role="menuitem" type="delete" class="dropdown-item">Delete</a>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row no-gutters justify-content-end">
+                                <div class="col-3"><span class="text-muted text-nowrap">Period</span></div>
+                                <div class="col-7"><t t-esc="record.date_start.value"/> - <t t-esc="record.date_end.value"/></div>
+                                <div class="w-100"></div>
+                                <div class="col-3"><span class="text-muted text-nowrap">Total time</span></div>
+                                <div class="col-7"><t t-esc="record.total_time.value" t-options="{'widget': 'float_time'}"/></div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_calendar_forecast_filter" model="ir.ui.view">
+        <field name="name">calendar.forecast.filter</field>
+        <field name="model">calendar.forecast</field>
+        <field name="arch" type="xml">
+            <search string="Search Forecast">
+                <field name="date_start"/>
+                <filter name="message_needaction" string="Unread Messages" domain="[('message_needaction','=',True)]"/>
+                <field name="employee_id"/>
+                <field name="department_id"/>
+                <group expand="0" string="Group By">
+                    <filter name="groupby_employees" string="Employees" domain="[]" context="{'group_by':'employee_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="act_calendar_forecast_my_timesheets" model="ir.actions.act_window">
+        <field name="name">My Forecasts</field>
+        <field name="res_model">calendar.forecast</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="domain">[('employee_id.user_id', '=', uid)]</field>
+        <field name="search_view_id" ref="view_calendar_forecast_filter"/>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+             New timesheet sheet.
+            </p><p>
+             You must record timesheets in the sheet every day and confirm at the end
+             of the reporting period. Once the timesheet sheet is confirmed, it should be
+             validated by a reviewer.
+            </p><p>
+             Forecasts can also be invoiced to customers, depending on
+             the configuration of each project's related contract.
+            </p>
+        </field>
+    </record>
+
+    <record id="act_calendar_forecast_my_timesheets_tree" model="ir.actions.act_window.view">
+        <field name="view_mode">tree</field>
+        <field name="sequence" eval="4"/>
+        <field name="view_id" ref="calendar_forecast_tree_my"/>
+        <field name="act_window_id" ref="act_calendar_forecast_my_timesheets"/>
+    </record>
+
+    <record id="act_calendar_forecast_my_timesheets_form" model="ir.actions.act_window.view">
+        <field name="view_mode">form</field>
+        <field name="sequence" eval="5"/>
+        <field name="view_id" ref="calendar_forecast_form_my"/>
+        <field name="act_window_id" ref="act_calendar_forecast_my_timesheets"/>
+    </record>
+
+    <record id="act_calendar_forecast_all_timesheets" model="ir.actions.act_window">
+        <field name="name">All Forecasts</field>
+        <field name="res_model">calendar.forecast</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="search_view_id" ref="view_calendar_forecast_filter"/>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+             Forecasts.
+            </p><p>
+             Employees must record timesheets in the sheet every day and confirm at the end
+             of the reporting period. Once the timesheet sheet is confirmed, it should be
+             validated by a reviewer.
+            </p><p>
+             Forecasts can also be invoiced to customers, depending on
+             the configuration of each project's related contract.
+            </p>
+        </field>
+    </record>
+
+    <menuitem
+        id="menu_forecast_root"
+        name="Forecast"
+        parent="hr_timesheet.timesheet_menu_root"
+        sequence="12"
+    />
+    <menuitem
+        action="act_calendar_forecast_my_timesheets"
+        id="menu_act_calendar_forecast_my_timesheets"
+        parent="menu_forecast_root"
+        sequence="5"
+    />
+
+    <menuitem
+        action="act_calendar_forecast_all_timesheets"
+        id="menu_act_calendar_forecast_all_timesheets"
+        parent="menu_forecast_root"
+        sequence="6"
+        groups="hr_timesheet.group_timesheet_manager"
+    />
+
+
+</odoo>
