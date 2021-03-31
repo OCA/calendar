@@ -52,6 +52,13 @@ class Forecast(models.Model):
         context_dependent=True,
     )
 
+    project_id = fields.Many2one(
+        comodel_name="project.project",
+        string="Select Project",
+        required=True,
+        readonly=False,
+    )
+
     date_start = fields.Date(
         string="Date From",
         default=lambda self: self._default_date_start(),
@@ -93,12 +100,6 @@ class Forecast(models.Model):
         readonly=False,
     )
 
-    project_id = fields.Many2one(
-        comodel_name="project.project",
-        string="Select Project",
-        help="If selected, the associated project is added "
-        "to the timesheet sheet when clicked the button.",
-    )
     add_line_employee_id = fields.Many2one(
         comodel_name="hr.employee",
         default=lambda self: self._default_employee(),
@@ -200,7 +201,7 @@ class Forecast(models.Model):
         "date_start",
         "date_end",
         "company_id",
-        "add_line_employee_id",
+        "project_id",
     )
     def _check_overlapping_sheets(self):
         for sheet in self:
