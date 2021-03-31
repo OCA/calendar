@@ -11,23 +11,20 @@
         <field name="name">calendar.forecast.tree</field>
         <field name="model">calendar.forecast</field>
         <field name="arch" type="xml">
-            <tree
-                string="Forecasts"
-
-                decoration-bf="message_needaction == True"
-            >
-                <field name="employee_id"/>
+            <tree string="Forecasts" >
+                <!-- <field name="employee_id" invisible="1"/> -->
+                <!-- <field name="project_id" />  -->
                 <field name="name" string="Period"/>
-                <field name="department_id" invisible="1"/>
+                <!-- <field name="department_id" invisible="1"/> -->
                 <field name="date_start"/>
                 <field name="date_end"/>
                 <field name="total_time" widget="float_time"/>
-                <field name="message_needaction" invisible="1"/>
+                <!-- <field name="message_needaction" invisible="1"/> -->
             </tree>
         </field>
     </record>
 
-    <record id="calendar_forecast_tree_my" model="ir.ui.view">
+    <!-- <record id="calendar_forecast_tree_my" model="ir.ui.view">
         <field name="name">calendar.forecast.tree.my</field>
         <field name="model">calendar.forecast</field>
         <field name="inherit_id" ref="calendar_forecast_tree"/>
@@ -38,19 +35,22 @@
                 <attribute name="invisible">1</attribute>
             </xpath>
         </field>
-    </record>
+    </record> -->
 
     <record id="calendar_forecast_form" model="ir.ui.view">
         <field name="name">calendar.forecast.form</field>
         <field name="model">calendar.forecast</field>
         <field name="arch" type="xml">
             <form string="Forecast">
-                <field name="user_id" invisible="1"/>
 
                 <sheet>
                     <div class="oe_title">
-                        <label for="employee_id" class="oe_edit_only"/>
-                        <h1><field name="employee_id" class="oe_inline" placeholder="Employee's Name"/></h1>
+                        <label for="project_id" class="oe_edit_only"/>
+                        <h1>
+                          <field
+                              name="project_id"
+                              domain="[('company_id', '=', company_id), ('allow_timesheets', '=', True)]"
+                          /></h1>
                     </div>
                     <group>
                         <group name="dates">
@@ -59,16 +59,33 @@
                         </group>
                         <group name="details">
                             <field name="company_id" groups="base.group_multi_company" force_save="1"/>
-                            <field name="department_id" invisible="1"/>
-                            <field
-                                name="add_line_project_id"
-                                domain="[('company_id', '=', company_id), ('allow_timesheets', '=', True)]"
-                            />
+                            <!-- <field name="department_id" invisible="1"/> -->
+                            <!-- <field name="add_line_employee_id" class="oe_inline" placeholder="Employee's Name"/> -->
                         </group>
 
                     </group>
                     <notebook>
                         <page string="Summary">
+                          <group class="oe_edit_only">
+
+                              <field
+                                  name="add_line_task_id"
+                                  attrs="{'invisible': [('project_id', '=', False)]}"
+                                  context="{'default_project_id': project_id}"
+                              />
+                              <field name="add_line_employee_id" placeholder="Employee's Name"
+                                     attrs="{'invisible': ['|',('add_line_task_id', '=', False),'&amp;', ('add_line_task_id', '!=', False), ('add_line_employee_category_id', '!=', False)]}"/>
+                              <field
+                                  name="add_line_employee_category_id"
+                                  attrs="{'invisible': [('add_line_task_id', '=', False)]}"
+                              />
+                              <button name="button_add_line"
+                                      type="object"
+                                      string="Add new line"
+                                      class="oe_highlight"
+                                      attrs="{'invisible': [('add_line_task_id', '=', False)]}"
+                              />
+                          </group>
                             <group name="Forecast" class="calendar_forecast_summary">
                                 <field name="line_ids" nolabel="1" attrs="{'readonly': False}"
                                        widget="x2many_2d_matrix"
@@ -86,7 +103,6 @@
                                         <field name="unit_amount" widget="float_time"/>
                                         <field name="forecast_id"/>
                                         <field name="date"/>
-                                        <field name="project_id"/>
                                         <field name="task_id"/>
                                         <field name="company_id" groups="base.group_multi_company"/>
                                         <field name="employee_id"/>
@@ -94,58 +110,47 @@
                                         <!--  Don't remove last fields, they are technically needed for the widget to work properly.-->
                                     </tree>
                                 </field>
-                                <group class="oe_edit_only">
 
-                                    <field
-                                        name="add_line_task_id"
-                                        attrs="{'invisible': [('add_line_project_id', '=', False)]}"
-                                        context="{'default_project_id': add_line_project_id}"
-                                    />
-                                    <button name="button_add_line"
-                                            type="object"
-                                            string="Add new line"
-                                            class="oe_highlight"
-                                            attrs="{'invisible': [('add_line_project_id', '=', False)]}"
-                                    />
-                                </group>
                             </group>
                         </page>
                         <page string="Details">
                             <field
                                 name="timesheet_ids"
-                                nolabel="1"
-                                context="{'user_id': user_id}">
+                                nolabel="1">
+                                <!-- context="{'user_id': task_id.user_id}"> -->
                                 <tree editable="bottom" string="Forecast Activities">
-                                    <field name="period"/>
-                                    <field name="project_id" required="1"/>
-                                    <field name="id" domain="[('project_id', '=', project_id)]" context="{'default_project_id': project_id}"/>
-                                    <field name="self"/>
+                                    <field name="employee_domain_ids" invisible="1"/>
+                                    <field name="id" />
+                                    <field name="date"/>
+                                    <field name="task_id" required="1"/>
+                                    <field name="employee_id" required="1"/>
                                     <field name="unit_amount" widget="float_time" string="Hours" sum="Hours"/>
-                                    <field name="user_id" invisible="1"/>
+                                    <!-- <field name="user_id" invisible="1"/> -->
                                 </tree>
                                 <form string="Forecast Activities">
                                     <group>
-                                        <field name="period"/>
-                                        <field name="name"/>
-                                        <field name="project_id" required="1"/>
-                                        <field name="id" domain="[('project_id', '=', project_id)]" context="{'default_project_id': project_id}"/>
+                                        <field name="employee_domain_ids" invisible="1"/>
+                                        <field name="id" />
+                                        <field name="date"/>
+                                        <field name="task_id" required="1"/>
+                                        <field name="employee_id" required="1"/>
                                         <field name="unit_amount" widget="float_time" string="Hours"/>
-                                        <field name="user_id" invisible="1"/>
+                                        <!-- <field name="user_id" invisible="1"/> -->
                                     </group>
                                 </form>
                             </field>
                         </page>
                     </notebook>
                 </sheet>
-                <div class="oe_chatter">
+                <!-- <div class="oe_chatter">
                     <field name="message_follower_ids" widget="mail_followers"/>
                     <field name="message_ids" widget="mail_thread"/>
-                </div>
+                </div> -->
             </form>
         </field>
     </record>
 
-    <record id="calendar_forecast_form_my" model="ir.ui.view">
+    <!-- <record id="calendar_forecast_form_my" model="ir.ui.view">
         <field name="name">calendar.forecast.form.my</field>
         <field name="model">calendar.forecast</field>
         <field name="inherit_id" ref="calendar_forecast_form"/>
@@ -156,14 +161,14 @@
                 <attribute name="invisible">1</attribute>
             </xpath>
         </field>
-    </record>
+    </record> -->
 
     <record id="view_calendar_forecast_kanban" model="ir.ui.view">
         <field name="name">calendar.forecast.kanban</field>
         <field name="model">calendar.forecast</field>
         <field name="arch" type="xml">
             <kanban class="o_kanban_mobile" create="0">
-                <field name="employee_id"/>
+                <field name="project_id"/>
                 <field name="date_start"/>
                 <field name="date_end"/>
                 <field name="complete_name"/>
@@ -216,11 +221,11 @@
         <field name="arch" type="xml">
             <search string="Search Forecast">
                 <field name="date_start"/>
-                <filter name="message_needaction" string="Unread Messages" domain="[('message_needaction','=',True)]"/>
-                <field name="employee_id"/>
-                <field name="department_id"/>
+                <!-- <filter name="message_needaction" string="Unread Messages" domain="[('message_needaction','=',True)]"/> -->
+                <field name="project_id"/>
+                <!-- <field name="department_id"/> -->
                 <group expand="0" string="Group By">
-                    <filter name="groupby_employees" string="Employees" domain="[]" context="{'group_by':'employee_id'}"/>
+                    <filter name="groupby_employees" string="Employees" domain="[]" context="{'group_by':'project_id'}"/>
                 </group>
             </search>
         </field>
@@ -231,7 +236,7 @@
         <field name="res_model">calendar.forecast</field>
         <field name="view_type">form</field>
         <field name="view_mode">tree,kanban,form</field>
-        <field name="domain">[('employee_id.user_id', '=', uid)]</field>
+        <!-- <field name="domain">[('employee_id.user_id', '=', uid)]</field> -->
         <field name="search_view_id" ref="view_calendar_forecast_filter"/>
         <field name="help" type="html">
             <p class="oe_view_nocontent_create">
@@ -247,7 +252,7 @@
         </field>
     </record>
 
-    <record id="act_calendar_forecast_my_timesheets_tree" model="ir.actions.act_window.view">
+    <!-- <record id="act_calendar_forecast_my_timesheets_tree" model="ir.actions.act_window.view">
         <field name="view_mode">tree</field>
         <field name="sequence" eval="4"/>
         <field name="view_id" ref="calendar_forecast_tree_my"/>
@@ -259,7 +264,7 @@
         <field name="sequence" eval="5"/>
         <field name="view_id" ref="calendar_forecast_form_my"/>
         <field name="act_window_id" ref="act_calendar_forecast_my_timesheets"/>
-    </record>
+    </record> -->
 
     <record id="act_calendar_forecast_all_timesheets" model="ir.actions.act_window">
         <field name="name">All Forecasts</field>
@@ -284,15 +289,15 @@
     <menuitem
         id="menu_forecast_root"
         name="Forecast"
-        parent="hr_timesheet.timesheet_menu_root"
+        parent="project.menu_main_pm"
         sequence="12"
     />
-    <menuitem
+    <!-- <menuitem
         action="act_calendar_forecast_my_timesheets"
         id="menu_act_calendar_forecast_my_timesheets"
         parent="menu_forecast_root"
         sequence="5"
-    />
+    /> -->
 
     <menuitem
         action="act_calendar_forecast_all_timesheets"

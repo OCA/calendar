@@ -36,19 +36,26 @@ class CalendarSchedulable(models.AbstractModel):
         comodel_name="hr.employee",
         string="Employees",
     )
-    scheduled_date_start = fields.Date(
-        string="Starting Date", default=fields.Date.today, index=True, copy=False
-    )
-    scheduled_date_end = fields.Date(string="Ending Date", index=True, copy=False)
-    date_assign = fields.Datetime(
-        string="Assigning Date", index=True, copy=False, readonly=True
-    )
-    date_deadline = fields.Date(string="Deadline", index=True, copy=False)
+    # date_start = fields.Date(
+    #     string="Scheduled Starting Date",
+    #     compute="_compute_start_date",
+    # )
+    # date_end = fields.Date(
+    #     string="Scheduled  Ending Date", index=True, copy=False
+    # )
+    # date_assign = fields.Datetime(
+    #     string="Assigning Date", index=True, copy=False, readonly=True
+    # )
+    date = fields.Date(string="Date", index=True, copy=False)
 
     unit_amount = fields.Float(
         string="Quantity",
         default=0.0,
     )
+
+    # @api.multi
+    # @api.depends("task_id.date_end", "employee_category_id")
+    # def _compute_start_date(self):
 
     @api.multi
     @api.depends("employee_ids.category_ids", "employee_category_id")
@@ -61,11 +68,11 @@ class CalendarSchedulable(models.AbstractModel):
             record.employee_domain_ids = emp.ids
 
     @api.multi
-    @api.depends("date_end", "employee_id", "employee_domain_ids")
+    @api.depends("task_id.date_end", "employee_id", "employee_domain_ids")
     def _compute_employee_scheduling_ids(self):
         for record in self:
             employees = record.employee_id
-            if record.date_end or not record.employee_id:
+            if record.task_id.date_end or not record.employee_id:
                 employees = record.employee_domain_ids
             record.employee_scheduling_ids = employees
 
@@ -76,13 +83,18 @@ class CalendarSchedulable(models.AbstractModel):
 
 
 class SchedulableTaskLine(models.Model):
-    _inherit = ["project.task", "calendar.schedulable.abstract"]
+    _inherit = ["calendar.schedulable.abstract"]
     _name = "calendar.schedulable.task.line"
-    _rec_name = "scheduled_date_start"
+    _rec_name = "task_id"
 
     forecast_id = fields.Many2one(
         comodel_name="calendar.forecast",
         string="Sheet",
+    )
+
+    task_id = fields.Many2one(
+        comodel_name="project.task",
+        string="Task",
     )
 
     period = fields.Char(
@@ -91,12 +103,15 @@ class SchedulableTaskLine(models.Model):
     )
 
     @api.multi
-    @api.depends("scheduled_date_start", "scheduled_date_end")
+    @api.depends("task_id.date_start", "task_id.date_end")
     def _compute_period(self):
+        # import ipdb
+        #
+        # ipdb.set_trace()
         for record in self:
-            record.period = _("Period %s - %s") % (
-                record.scheduled_date_start,
-                record.scheduled_date_end,
+            record.period = _("Period <%s - %s>") % (
+                record.forecast_id.date_start,
+                record.forecast_id.date_end,
             )
 
     @api.multi
@@ -104,10 +119,8 @@ class SchedulableTaskLine(models.Model):
         """ Hook for extensions """
         self.ensure_one()
         return [
-            ("date_end", ">=", self.scheduled_date_end),
-            ("date_start", "<=", self.scheduled_date_start),
-            ("employee_id", "=", self.employee_id.id),
-            ("company_id", "in", [self.company_id.id, False]),
+            ("add_line_employee_id", "=", self.employee_id.id),
+            ("company_id", "in", [self.task_id.company_id.id, False]),
         ]
 
     @api.multi
@@ -121,21 +134,20 @@ class SchedulableTaskLine(models.Model):
 
     def _compute_sheet(self):
         """Links the timesheet line to the corresponding sheet"""
-        for timesheet in self.filtered("project_id"):
+        for timesheet in self.filtered("task_id"):
             sheet = timesheet._determine_sheet()
-
-            timesheet.scheduled_date_end = sheet.date_end
+            # timesheet.scheduled_date_end = sheet.date_end
             if timesheet.forecast_id != sheet:
                 timesheet.forecast_id = sheet
 
     @api.multi
-    @api.constrains("company_id", "forecast_id")
+    @api.constrains("task_id", "forecast_id")
     def _check_company_id_forecast_id(self):
         for aal in self.sudo():
             if (
-                aal.company_id
+                aal.task_id.company_id
                 and aal.forecast_id.company_id
-                and aal.company_id != aal.forecast_id.company_id
+                and aal.task_id.company_id != aal.forecast_id.company_id
             ):
                 raise ValidationError(
                     _(
@@ -146,14 +158,17 @@ class SchedulableTaskLine(models.Model):
                         % (
                             aal.forecast_id.complete_name,
                             aal.forecast_id.company_id.name,
-                            aal.name,
-                            aal.company_id.name,
+                            aal.task_id.name,
+                            aal.task_id.company_id.name,
                         )
                     )
                 )
 
     @api.model
     def create(self, values):
+        # import ipdb
+        #
+        # ipdb.set_trace()
         if not self.env.context.get("sheet_create") and "forecast_id" in values:
             del values["forecast_id"]
         res = super().create(values)
@@ -190,7 +205,6 @@ class SchedulableTaskLine(models.Model):
             "unit_amount",
             "user_id",
             "employee_id",
-            "department_id",
             "company_id",
             "task_id",
             "project_id",
