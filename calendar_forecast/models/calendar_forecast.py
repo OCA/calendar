@@ -155,6 +155,7 @@ class Forecast(models.Model):
 
     @api.depends("timesheet_ids.unit_amount")
     def _compute_total_time(self):
+
         for sheet in self:
             sheet.total_time = sum(sheet.mapped("timesheet_ids.unit_amount"))
 
@@ -284,12 +285,12 @@ class Forecast(models.Model):
     def _get_timesheet_sheet_lines_domain(self):
         self.ensure_one()
         return [
-            ("task_id.date_end", "<=", self.date_end),
-            ("task_id.date_start", ">=", self.date_start),
-            # ("employee_id", "=", self.employee_id.id),
-            # ("task_id.company_id", "=", self._get_timesheet_sheet_company().id),
-            ("task_id.project_id", "!=", False),
-            # ("task_id.project_id", "=", self.project_id.id),
+            ("date", "<=", self.date_end),
+            ("date", ">=", self.date_start),
+            ("employee_id", "=", self.add_line_employee_id.id),
+            ("task_id.company_id", "=", self._get_timesheet_sheet_company().id),
+            ("forecast_id.project_id", "!=", False),
+            ("forecast_id.project_id", "=", self.project_id.id),
         ]
 
     @api.multi
@@ -305,7 +306,7 @@ class Forecast(models.Model):
             for key in sorted(matrix, key=lambda key: self._get_matrix_sortby(key)):
                 vals_list.append(sheet._get_default_sheet_line(matrix, key))
                 # if sheet.state in ["new", "draft"]:
-                #     sheet.clean_timesheets(matrix[key])
+                sheet.clean_timesheets(matrix[key])
 
             sheet.line_ids = ForecastLine.create(vals_list)
 
@@ -327,7 +328,7 @@ class Forecast(models.Model):
             employee_or_category_id = aal.employee_id
 
         return {
-            "date": aal.forecast_id.date_start,
+            "date": aal.date,
             "employee_or_category_id": employee_or_category_id,
             "task_id": aal.task_id.id,
         }
@@ -348,9 +349,13 @@ class Forecast(models.Model):
     @api.multi
     def _get_data_matrix(self):
         self.ensure_one()
+
         MatrixKey = self._matrix_key()
         matrix = {}
         empty_line = self.env["calendar.schedulable.task.line"]
+        # import ipdb
+        #
+        # ipdb.set_trace()
         for line in self.timesheet_ids:
             key = MatrixKey(**self._get_matrix_key_values_for_line(line))
             if key not in matrix:
@@ -369,15 +374,15 @@ class Forecast(models.Model):
         return matrix
 
     def _compute_timesheet_ids(self):
-        AccountAnalyticLines = self.env["calendar.schedulable.task.line"]
+        SchedulableTaskLines = self.env["calendar.schedulable.task.line"]
 
         for sheet in self:
             domain = sheet._get_timesheet_sheet_lines_domain()
-            timesheets = AccountAnalyticLines.search(domain)
+            timesheets = SchedulableTaskLines.search(domain)
             sheet.link_timesheets_to_sheet(timesheets)
             sheet.timesheet_ids = timesheets
 
-    @api.onchange("date_start", "date_end")
+    @api.onchange("date_start", "date_end", "project_id")
     def _onchange_scope(self):
         self._compute_timesheet_ids()
 
@@ -443,6 +448,7 @@ class Forecast(models.Model):
 
     @api.multi
     def write(self, vals):
+
         # self._check_employee_user_link(vals)
         res = super().write(vals)
         for rec in self:
@@ -503,34 +509,35 @@ class Forecast(models.Model):
         while start != end:
             start += relativedelta(days=1)
             dates.append(start)
+
         return dates
 
     @api.multi
     def _get_line_name(self, employee_or_category_id, task_id=None, **kwargs):
         self.ensure_one()
 
-        task_id = self.env["project.task"].search([("id", "in", [task_id])])
+        task = self.env["project.task"].search([("id", "in", [task_id])])
         if isinstance(employee_or_category_id, type(self.env["hr.employee"])):
             return "%s - Empl: %s" % (
-                task_id.name_get()[0][1],
+                task.name_get()[0][1],
                 employee_or_category_id.name_get()[0][1],
             )
         elif isinstance(
             employee_or_category_id, type(self.env["hr.employee.category"])
         ):
             return "%s - Cat: %s" % (
-                task_id.name_get()[0][1],
+                task.name_get()[0][1],
                 employee_or_category_id.name_get()[0][1],
             )
 
-        return task_id.name_get()[0][1]
+        return task.name_get()[0][1]
 
     @api.multi
     def _get_new_line_unique_id(self):
         """ Hook for extensions """
         self.ensure_one()
         return {
-            "project_id": self.project_id,
+            # "project_id": self.project_id,
             "task_id": self.add_line_task_id,
         }
 
@@ -558,15 +565,18 @@ class Forecast(models.Model):
             "name": empty_name,
             "employee_id": self.add_line_employee_id.id,
             "task_id": self.add_line_task_id.id,
+            # "project_id": self.project_id.id,
             "forecast_id": self.id,
             "unit_amount": 0.0,
         }
 
     def add_line(self):
+
         if not self.project_id:
             return
         values = self._prepare_empty_analytic_line()
         new_line_unique_id = self._get_new_line_unique_id()
+
         existing_unique_ids = list(
             set([frozenset(line.get_unique_id().items()) for line in self.line_ids])
         )
@@ -584,6 +594,7 @@ class Forecast(models.Model):
                 aal.write({"forecast_id": self.id})
 
     def clean_timesheets(self, timesheets):
+
         repeated = timesheets.filtered(lambda t: t.name == empty_name)
         if len(repeated) > 1 and self.id:
             return repeated.merge_timesheets()
@@ -607,6 +618,7 @@ class Forecast(models.Model):
 
     def delete_empty_lines(self, delete_empty_rows=False):
         self.ensure_one()
+
         for name in list(set(self.line_ids.mapped("value_y"))):
             rows = self.line_ids.filtered(lambda l: l.value_y == name)
             if not rows:
@@ -629,6 +641,7 @@ class Forecast(models.Model):
 
     @api.multi
     def _update_analytic_lines_from_new_lines(self, vals):
+
         self.ensure_one()
         new_line_ids_list = []
         for line in vals.get("line_ids", []):
@@ -649,6 +662,7 @@ class Forecast(models.Model):
     @api.model
     def _prepare_new_line(self, line):
         """ Hook for extensions """
+
         return {
             "forecast_id": line.forecast_id.id,
             "date": line.date,
@@ -666,12 +680,14 @@ class Forecast(models.Model):
         return (
             line_a.project_id.id == line_b.project_id.id
             and line_a.task_id.id == line_b.task_id.id
+            and line_a.employee_id.id == line_b.employee_id.id
             and line_a.date == line_b.date
         )
 
     @api.multi
     def add_new_line(self, line):
         self.ensure_one()
+
         new_line_model = self.env["calendar.forecast.new.analytic.line"]
         new_line = self.new_line_ids.filtered(
             lambda l: self._is_compatible_new_line(l, line)
@@ -788,23 +804,26 @@ class ForecastNewAnalyticLine(models.TransientModel):
     _inherit = "calendar.forecast.line.abstract"
     _description = "Forecast New Analytic Line"
 
-    # @api.model
-    # def _is_similar_analytic_line(self, aal):
-    #     """ Hook for extensions """
-    #     return (
-    #         aal.scheduled_date_start == self.date
-    #         and aal.project_id.id == self.project_id.id
-    #         and aal.id == self.task_id.id
-    #     )
+    @api.model
+    def _is_similar_analytic_line(self, aal):
+        """ Hook for extensions """
+        return (
+            aal.date == self.date
+            and aal.project_id.id == self.project_id.id
+            and aal.id == self.task_id.id
+        )
 
     @api.model
     def _update_analytic_lines(self):
         sheet = self.forecast_id
+        # import ipdb
+        #
+        # ipdb.set_trace()
         # timesheets = sheet.timesheet_ids.filtered(
         #     lambda aal: self._is_similar_analytic_line(aal)
         # )
         timesheets = sheet.timesheet_ids
-        new_ts = timesheets.filtered(lambda t: t.task_id.name == empty_name)
+        new_ts = timesheets.filtered(lambda t: t.name == empty_name)
         amount = sum(t.unit_amount for t in timesheets)
 
         diff_amount = self.unit_amount - amount

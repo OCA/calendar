@@ -46,7 +46,11 @@ class CalendarSchedulable(models.AbstractModel):
     # date_assign = fields.Datetime(
     #     string="Assigning Date", index=True, copy=False, readonly=True
     # )
-    date = fields.Date(string="Date", index=True, copy=False)
+    date = fields.Date(
+        string="Date",
+        required=True,
+        index=True,
+    )
 
     unit_amount = fields.Float(
         string="Quantity",
@@ -102,6 +106,21 @@ class SchedulableTaskLine(models.Model):
         context_dependent=True,
     )
 
+    name = fields.Char(
+        compute="_compute_name",
+        context_dependent=True,
+    )
+
+    @api.depends("task_id.name", "employee_id", "employee_category_id")
+    def _compute_name(self):
+        for sheet in self:
+
+            name = "%s - Empl: %s" % (
+                sheet.task_id.name_get()[0][1],
+                sheet.employee_id.name_get()[0][1],
+            )
+            sheet.name = name
+
     @api.multi
     @api.depends("task_id.date_start", "task_id.date_end")
     def _compute_period(self):
@@ -119,7 +138,6 @@ class SchedulableTaskLine(models.Model):
         """ Hook for extensions """
         self.ensure_one()
         return [
-            ("add_line_employee_id", "=", self.employee_id.id),
             ("company_id", "in", [self.task_id.company_id.id, False]),
         ]
 
@@ -166,11 +184,16 @@ class SchedulableTaskLine(models.Model):
 
     @api.model
     def create(self, values):
-        # import ipdb
-        #
-        # ipdb.set_trace()
+        import ipdb
+
+        ipdb.set_trace()
         if not self.env.context.get("sheet_create") and "forecast_id" in values:
             del values["forecast_id"]
+        if "date" not in values:
+            forecast = self.env["calendar.forecast"].search(
+                [("id", "in", [values["forecast_id"]])]
+            )
+            values["date"] = forecast.date_start
         res = super().create(values)
         res._compute_sheet()
         return res
@@ -181,6 +204,7 @@ class SchedulableTaskLine(models.Model):
 
     @api.multi
     def write(self, values):
+
         res = super().write(values)
         if self._timesheet_should_compute_sheet(values):
             self._compute_sheet()
@@ -218,6 +242,9 @@ class SchedulableTaskLine(models.Model):
 
     @api.multi
     def merge_timesheets(self):
+        import ipdb
+
+        ipdb.set_trace()
         unit_amount = sum([t.unit_amount for t in self])
         amount = sum([t.amount for t in self])
         self[0].write(
