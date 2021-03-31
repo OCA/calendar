@@ -101,6 +101,7 @@ class Forecast(models.Model):
     )
     add_line_employee_id = fields.Many2one(
         comodel_name="hr.employee",
+        default=lambda self: self._default_employee(),
         string="Select Employee",
         help="The associated employee is added "
         "to the timesheet sheet when clicked the button.",
