@@ -124,9 +124,6 @@ class SchedulableTaskLine(models.Model):
     @api.multi
     @api.depends("task_id.date_start", "task_id.date_end")
     def _compute_period(self):
-        # import ipdb
-        #
-        # ipdb.set_trace()
         for record in self:
             record.period = _("Period <%s - %s>") % (
                 record.forecast_id.date_start,
@@ -184,9 +181,7 @@ class SchedulableTaskLine(models.Model):
 
     @api.model
     def create(self, values):
-        import ipdb
 
-        ipdb.set_trace()
         if not self.env.context.get("sheet_create") and "forecast_id" in values:
             del values["forecast_id"]
         if "date" not in values:
@@ -242,15 +237,13 @@ class SchedulableTaskLine(models.Model):
 
     @api.multi
     def merge_timesheets(self):
-        import ipdb
 
-        ipdb.set_trace()
         unit_amount = sum([t.unit_amount for t in self])
-        amount = sum([t.amount for t in self])
+        # amount = sum([t.amount for t in self])
         self[0].write(
             {
                 "unit_amount": unit_amount,
-                "amount": amount,
+                # "amount": amount,
             }
         )
         self[1:].unlink()

@@ -353,9 +353,7 @@ class Forecast(models.Model):
         MatrixKey = self._matrix_key()
         matrix = {}
         empty_line = self.env["calendar.schedulable.task.line"]
-        # import ipdb
-        #
-        # ipdb.set_trace()
+
         for line in self.timesheet_ids:
             key = MatrixKey(**self._get_matrix_key_values_for_line(line))
             if key not in matrix:
@@ -653,6 +651,7 @@ class Forecast(models.Model):
             # of model 'calendar.forecast.new.analytic.line'.
             if line[0] == 1 and line[2] and line[2].get("new_line_id"):
                 new_line_ids_list += [line[2].get("new_line_id")]
+
         for new_line in self.new_line_ids.exists():
             if new_line.id in new_line_ids_list:
                 new_line._update_analytic_lines()
@@ -808,44 +807,29 @@ class ForecastNewAnalyticLine(models.TransientModel):
     def _is_similar_analytic_line(self, aal):
         """ Hook for extensions """
         return (
-            aal.date == self.date
-            and aal.project_id.id == self.project_id.id
-            and aal.id == self.task_id.id
+            aal.task_id == self.task_id
+            and aal.employee_id == self.employee_id
+            and aal.date == self.date
         )
 
     @api.model
     def _update_analytic_lines(self):
         sheet = self.forecast_id
-        # import ipdb
-        #
-        # ipdb.set_trace()
-        # timesheets = sheet.timesheet_ids.filtered(
-        #     lambda aal: self._is_similar_analytic_line(aal)
-        # )
-        timesheets = sheet.timesheet_ids
-        new_ts = timesheets.filtered(lambda t: t.name == empty_name)
-        amount = sum(t.unit_amount for t in timesheets)
 
-        diff_amount = self.unit_amount - amount
-        if len(new_ts) > 1:
-            new_ts = new_ts.merge_timesheets()
-            sheet._sheet_write("timesheet_ids", sheet.timesheet_ids.exists())
-        if not diff_amount:
-            return
-        if new_ts:
-            unit_amount = new_ts.unit_amount + diff_amount
-            if unit_amount:
-                new_ts.write({"unit_amount": unit_amount})
-            else:
-                new_ts.unlink()
-                sheet._sheet_write("timesheet_ids", sheet.timesheet_ids.exists())
+        timesheets = sheet.timesheet_ids.filtered(
+            lambda aal: self._is_similar_analytic_line(aal)
+        )
+
+        if timesheets:
+            # if cell already exists, we just overwrite
+            timesheets.merge_timesheets()
+            timesheets.write({"unit_amount": self.unit_amount})
         else:
             new_ts_values = sheet._prepare_new_line(self)
             new_ts_values.update(
                 {
-                    "name": empty_name,
-                    "unit_amount": diff_amount,
+                    "unit_amount": self.unit_amount,
                 }
             )
-
+            #
             self.env["calendar.schedulable.task.line"]._sheet_create(new_ts_values)
