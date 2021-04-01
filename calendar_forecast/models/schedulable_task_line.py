@@ -36,16 +36,7 @@ class CalendarSchedulable(models.AbstractModel):
         comodel_name="hr.employee",
         string="Employees",
     )
-    # date_start = fields.Date(
-    #     string="Scheduled Starting Date",
-    #     compute="_compute_start_date",
-    # )
-    # date_end = fields.Date(
-    #     string="Scheduled  Ending Date", index=True, copy=False
-    # )
-    # date_assign = fields.Datetime(
-    #     string="Assigning Date", index=True, copy=False, readonly=True
-    # )
+
     date = fields.Date(
         string="Date",
         required=True,

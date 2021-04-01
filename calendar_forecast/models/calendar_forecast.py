@@ -535,7 +535,8 @@ class Forecast(models.Model):
         """ Hook for extensions """
         self.ensure_one()
         return {
-            # "project_id": self.project_id,
+            "employee_id": self.add_line_employee_id,
+            "employee_category_id": self.add_line_employee_category_id,
             "task_id": self.add_line_task_id,
         }
 
@@ -747,13 +748,18 @@ class AbstractForecastLine(models.AbstractModel):
         comodel_name="hr.employee",
         string="Employee",
     )
+    employee_category_id = fields.Many2one(
+        comodel_name="hr.employee.category",
+        string="Employee category",
+    )
 
     @api.multi
     def get_unique_id(self):
         """ Hook for extensions """
         self.ensure_one()
         return {
-            "project_id": self.project_id,
+            "employee_id": self.employee_id,
+            "employee_category_id": self.employee_category_id,
             "task_id": self.task_id,
         }
 
@@ -819,11 +825,16 @@ class ForecastNewAnalyticLine(models.TransientModel):
         timesheets = sheet.timesheet_ids.filtered(
             lambda aal: self._is_similar_analytic_line(aal)
         )
+        empty_ts = sheet.timesheet_ids.filtered(lambda t: t.unit_amount == 0)
+        empty_ts.unlink()
 
         if timesheets:
             # if cell already exists, we just overwrite
             timesheets.merge_timesheets()
-            timesheets.write({"unit_amount": self.unit_amount})
+            if not self.unit_amount:
+                timesheets.unlink()
+            else:
+                timesheets.write({"unit_amount": self.unit_amount})
         else:
             new_ts_values = sheet._prepare_new_line(self)
             new_ts_values.update(
