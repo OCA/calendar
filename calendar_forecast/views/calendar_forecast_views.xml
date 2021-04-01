@@ -123,7 +123,7 @@
                                     <field name="id" />
                                     <field name="date"/>
                                     <field name="task_id" required="1"/>
-                                    <field name="employee_id" required="1"/>
+                                    <field name="employee_or_category" required="1"/>
                                     <field name="unit_amount" widget="float_time" string="Hours" sum="Hours"/>
                                     <!-- <field name="user_id" invisible="1"/> -->
                                 </tree>
@@ -134,6 +134,7 @@
                                         <field name="date"/>
                                         <field name="task_id" required="1"/>
                                         <field name="employee_id" required="1"/>
+                                        <field name="employee_category_id" required="1"/>
                                         <field name="unit_amount" widget="float_time" string="Hours"/>
                                         <!-- <field name="user_id" invisible="1"/> -->
                                     </group>

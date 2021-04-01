@@ -22,7 +22,6 @@ empty_name = "/"
 class Forecast(models.Model):
     _name = "calendar.forecast"
     _description = "Forecast"
-    # _inherit = ["mail.thread", "mail.activity.mixin", "portal.mixin"]
     _table = "calendar_forecast"
     _order = "id desc"
     _rec_name = "complete_name"
@@ -194,44 +193,7 @@ class Forecast(models.Model):
             ("id", "!=", self.id),
             ("date_start", "<=", self.date_end),
             ("date_end", ">=", self.date_start),
-            # ("employee_id", "=", self.employee_id.id),
-            ("company_id", "=", self._get_timesheet_sheet_company().id),
         ]
-
-    @api.constrains(
-        "date_start",
-        "date_end",
-        "company_id",
-        "project_id",
-    )
-    def _check_overlapping_sheets(self):
-        for sheet in self:
-            overlapping_sheets = self.search(sheet._get_overlapping_sheet_domain())
-            if overlapping_sheets:
-                raise ValidationError(
-                    _(
-                        "You cannot have 2 or more forecast that overlap!\n"
-                        'Please use the menu "Forecast" '
-                        "to avoid this problem.\nConflicting sheets:\n - %s"
-                        % ("\n - ".join(overlapping_sheets.mapped("complete_name")),)
-                    )
-                )
-
-    # @api.multi
-    # @api.constrains("company_id", "add_line_employee_id")
-    # def _check_company_id_employee_id(self):
-    #     for rec in self.sudo():
-    #         if (
-    #             rec.company_id
-    #             and rec.add_line_employee_id.company_id
-    #             and rec.company_id != rec.add_line_employee_id.company_id
-    #         ):
-    #             raise ValidationError(
-    #                 _(
-    #                     "The Company in the Forecast and in "
-    #                     "the Employee must be the same."
-    #                 )
-    #             )
 
     @api.multi
     @api.constrains("company_id", "project_id")
@@ -288,6 +250,7 @@ class Forecast(models.Model):
             ("date", "<=", self.date_end),
             ("date", ">=", self.date_start),
             ("employee_id", "=", self.add_line_employee_id.id),
+            ("employee_category_id", "=", self.add_line_employee_category_id.id),
             ("task_id.company_id", "=", self._get_timesheet_sheet_company().id),
             ("forecast_id.project_id", "!=", False),
             ("forecast_id.project_id", "=", self.project_id.id),
@@ -313,7 +276,7 @@ class Forecast(models.Model):
     @api.model
     def _matrix_key_attributes(self):
         """ Hook for extensions """
-        return ["date", "employee_or_category_id", "task_id"]
+        return ["date", "employee_id", "employee_category_id", "task_id"]
 
     @api.model
     def _matrix_key(self):
@@ -322,14 +285,16 @@ class Forecast(models.Model):
     @api.model
     def _get_matrix_key_values_for_line(self, aal):
         """ Hook for extensions """
-        if aal.employee_category_id:
-            employee_or_category_id = aal.employee_category_id
-        else:
-            employee_or_category_id = aal.employee_id
+        #
+        # if aal.employee_category_id:
+        #     employee_or_category_id = aal.employee_category_id
+        # else:
+        #     employee_or_category_id = aal.employee_id
 
         return {
             "date": aal.date,
-            "employee_or_category_id": employee_or_category_id,
+            "employee_id": aal.employee_id.id,
+            "employee_category_id": aal.employee_category_id.id,
             "task_id": aal.task_id.id,
         }
 
@@ -414,21 +379,6 @@ class Forecast(models.Model):
                 },
             }
 
-    # @api.model
-    # def _check_employee_user_link(self, vals):
-    #     if "add_line_employee_id" in vals:
-    #         employee = self.env["hr.employee"].browse(vals["add_line_employee_id"])
-    #         if not employee.user_id:
-    #             raise UserError(
-    #                 _(
-    #                     "In order to create a sheet for this employee, you must"
-    #                     " link him/her to an user: %s"
-    #                 )
-    #                 % (employee.name,)
-    #             )
-    #         return employee.user_id.id
-    #     return False
-
     @api.multi
     def copy(self, default=None):
         if not self.env.context.get("allow_copy_timesheet"):
@@ -447,7 +397,6 @@ class Forecast(models.Model):
     @api.multi
     def write(self, vals):
 
-        # self._check_employee_user_link(vals)
         res = super().write(vals)
         for rec in self:
             if not self.env.context.get("sheet_write"):
@@ -455,11 +404,6 @@ class Forecast(models.Model):
                 if "project_id" not in vals:
                     rec.delete_empty_lines(True)
         return res
-
-    # def _get_informables(self):
-    #     """ Hook for extensions """
-    #     self.ensure_one()
-    #     return self.add_line_employee_id.parent_id.user_id.partner_id
 
     def _get_subscribers(self):
         """ Hook for extensions """
@@ -511,21 +455,25 @@ class Forecast(models.Model):
         return dates
 
     @api.multi
-    def _get_line_name(self, employee_or_category_id, task_id=None, **kwargs):
+    def _get_line_name(
+        self, employee_id=None, employee_category_id=None, task_id=None, **kwargs
+    ):
         self.ensure_one()
 
         task = self.env["project.task"].search([("id", "in", [task_id])])
-        if isinstance(employee_or_category_id, type(self.env["hr.employee"])):
-            return "%s - Empl: %s" % (
-                task.name_get()[0][1],
-                employee_or_category_id.name_get()[0][1],
+        if employee_category_id:
+            employee_category = self.env["hr.employee.category"].search(
+                [("id", "in", [employee_category_id])]
             )
-        elif isinstance(
-            employee_or_category_id, type(self.env["hr.employee.category"])
-        ):
             return "%s - Cat: %s" % (
                 task.name_get()[0][1],
-                employee_or_category_id.name_get()[0][1],
+                employee_category.name_get()[0][1],
+            )
+        elif employee_id:
+            employee = self.env["hr.employee"].search([("id", "in", [employee_id])])
+            return "%s - Empl: %s" % (
+                task.name_get()[0][1],
+                employee.name_get()[0][1],
             )
 
         return task.name_get()[0][1]
@@ -549,9 +497,9 @@ class Forecast(models.Model):
             "value_y": self._get_line_name(**key._asdict()),
             "date": key.date,
             "task_id": key.task_id,
-            "employee_id": key.employee_or_category_id.id,
+            "employee_id": key.employee_id,
+            "employee_category_id": key.employee_category_id,
             "unit_amount": sum(t.unit_amount for t in matrix[key]),
-            # "employee_id": self.employee_id.id,
             "company_id": self.company_id.id,
         }
         if self.id:
@@ -563,6 +511,7 @@ class Forecast(models.Model):
         return {
             "name": empty_name,
             "employee_id": self.add_line_employee_id.id,
+            "employee_category_id": self.add_line_employee_category_id.id,
             "task_id": self.add_line_task_id.id,
             # "project_id": self.project_id.id,
             "forecast_id": self.id,
@@ -574,6 +523,7 @@ class Forecast(models.Model):
         if not self.project_id:
             return
         values = self._prepare_empty_analytic_line()
+
         new_line_unique_id = self._get_new_line_unique_id()
 
         existing_unique_ids = list(
@@ -666,10 +616,8 @@ class Forecast(models.Model):
         return {
             "forecast_id": line.forecast_id.id,
             "date": line.date,
-            "project_id": line.project_id.id,
             "task_id": line.task_id.id,
             "unit_amount": line.unit_amount,
-            "company_id": line.company_id.id,
             "employee_id": line.employee_id.id,
         }
 
@@ -825,16 +773,13 @@ class ForecastNewAnalyticLine(models.TransientModel):
         timesheets = sheet.timesheet_ids.filtered(
             lambda aal: self._is_similar_analytic_line(aal)
         )
-        empty_ts = sheet.timesheet_ids.filtered(lambda t: t.unit_amount == 0)
-        empty_ts.unlink()
-
         if timesheets:
             # if cell already exists, we just overwrite
-            timesheets.merge_timesheets()
+            timesheets.exists().merge_timesheets()
             if not self.unit_amount:
-                timesheets.unlink()
+                timesheets.exists().unlink()
             else:
-                timesheets.write({"unit_amount": self.unit_amount})
+                timesheets.exists().write({"unit_amount": self.unit_amount})
         else:
             new_ts_values = sheet._prepare_new_line(self)
             new_ts_values.update(
@@ -844,3 +789,6 @@ class ForecastNewAnalyticLine(models.TransientModel):
             )
             #
             self.env["calendar.schedulable.task.line"]._sheet_create(new_ts_values)
+
+        empty_ts = sheet.timesheet_ids.filtered(lambda t: t.unit_amount == 0)
+        empty_ts.unlink()

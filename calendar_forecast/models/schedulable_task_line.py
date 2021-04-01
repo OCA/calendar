@@ -36,6 +36,10 @@ class CalendarSchedulable(models.AbstractModel):
         comodel_name="hr.employee",
         string="Employees",
     )
+    employee_or_category = fields.Char(
+        compute="_compute_employee_or_category",
+        context_dependent=True,
+    )
 
     date = fields.Date(
         string="Date",
@@ -71,6 +75,19 @@ class CalendarSchedulable(models.AbstractModel):
                 employees = record.employee_domain_ids
             record.employee_scheduling_ids = employees
 
+    @api.multi
+    @api.depends("employee_id", "employee_category_id")
+    def _compute_employee_or_category(self):
+        for record in self:
+            if record.employee_id:
+                record.employee_or_category = record.employee_id.name_get()[0][1]
+            elif record.employee_category_id:
+                record.employee_or_category = record.employee_category_id.name_get()[0][
+                    1
+                ]
+            else:
+                record.employee_or_category = ""
+
     @api.onchange("employee_domain_ids")
     def _onchange_employee_domain_ids(self):
         if self.employee_id not in self.employee_domain_ids:
@@ -105,11 +122,18 @@ class SchedulableTaskLine(models.Model):
     @api.depends("task_id.name", "employee_id", "employee_category_id")
     def _compute_name(self):
         for sheet in self:
-
-            name = "%s - Empl: %s" % (
-                sheet.task_id.name_get()[0][1],
-                sheet.employee_id.name_get()[0][1],
-            )
+            if sheet.employee_id:
+                name = "%s - Empl: %s" % (
+                    sheet.task_id.name_get()[0][1],
+                    sheet.employee_id.name_get()[0][1],
+                )
+            elif sheet.employee_category_id:
+                return "%s - Cat: %s" % (
+                    sheet.task_id.name_get()[0][1],
+                    sheet.employee_category_id.name_get()[0][1],
+                )
+            else:
+                name = sheet.task_id.name_get()[0][1]
             sheet.name = name
 
     @api.multi
