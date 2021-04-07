@@ -1,5 +1,7 @@
 # Copyright 2018 Eficent Business and IT Consulting Services, S.L.
 # Copyright 2018-2019 Brainbean Apps (https://brainbeanapps.com)
+# Copyright 2020 César López Ramírez <cesar.lopez@coopdevs.org>
+# Copyright 2021 Iván García <kapis@riseup.net>
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 from odoo import api, fields, models, _
@@ -51,10 +53,6 @@ class CalendarSchedulable(models.AbstractModel):
         string="Quantity",
         default=0.0,
     )
-
-    # @api.multi
-    # @api.depends("task_id.date_end", "employee_category_id")
-    # def _compute_start_date(self):
 
     @api.multi
     @api.depends("employee_ids.category_ids", "employee_category_id")
@@ -166,7 +164,6 @@ class SchedulableTaskLine(models.Model):
         """Links the timesheet line to the corresponding sheet"""
         for timesheet in self.filtered("task_id"):
             sheet = timesheet._determine_sheet()
-            # timesheet.scheduled_date_end = sheet.date_end
             if timesheet.forecast_id != sheet:
                 timesheet.forecast_id = sheet
 
@@ -254,11 +251,9 @@ class SchedulableTaskLine(models.Model):
     def merge_timesheets(self):
 
         unit_amount = sum([t.unit_amount for t in self])
-        # amount = sum([t.amount for t in self])
         self[0].write(
             {
                 "unit_amount": unit_amount,
-                # "amount": amount,
             }
         )
         self[1:].unlink()

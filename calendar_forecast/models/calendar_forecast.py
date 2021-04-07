@@ -1,6 +1,9 @@
 # Copyright 2018 Eficent Business and IT Consulting Services, S.L.
 # Copyright 2018-2020 Brainbean Apps (https://brainbeanapps.com)
 # Copyright 2018-2019 Onestein (<https://www.onestein.eu>)
+# Copyright 2020 César López Ramírez <cesar.lopez@coopdevs.org>
+# Copyright 2021 Iván García <kapis@riseup.net>
+
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 import babel.dates
