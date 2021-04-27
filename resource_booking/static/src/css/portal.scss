@@ -1,0 +1,8 @@
+/* Copyright 2021 Tecnativa - Jairo Llopis
+ * License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). */
+
+// Too many available slots? Allow scrolling
+.slots-dropdown {
+    max-height: 40vh;
+    overflow: auto;
+}
