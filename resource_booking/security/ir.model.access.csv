@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+resource_booking_combination_user,Permission to read resource booking combinations,model_resource_booking_combination,group_user,1,0,0,0
+resource_booking_combination_manager,Permission to write resource booking combinations,model_resource_booking_combination,group_manager,1,1,1,1
+resource_booking_type_user,Permission to read resource booking types,model_resource_booking_type,group_user,1,0,0,0
+resource_booking_type_manager,Permission to write resource booking types,model_resource_booking_type,group_manager,1,1,1,1
+resource_booking_portal,Resource bookings for portal,model_resource_booking,base.group_portal,1,0,0,0
+resource_booking_user,Resource bookings for users,model_resource_booking,group_user,1,1,1,0
+resource_booking_manager,Resource bookings for managers,model_resource_booking,group_manager,1,1,1,1
+resource_resource_manager,Permission to write resources,resource.model_resource_resource,group_manager,1,1,1,1
+resource_booking_type_combination_rel_user,Permission to read resource booking type combination relations for users,model_resource_booking_type_combination_rel,group_user,1,0,0,0
+resource_booking_type_combination_rel_manager,Permission to read resource booking type combination relations for managers,model_resource_booking_type_combination_rel,group_manager,1,1,1,1
