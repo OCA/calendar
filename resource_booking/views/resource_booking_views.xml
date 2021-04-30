@@ -100,10 +100,12 @@
                 <filter name="is_mine" string="Involving me" domain="[('involves_me', '=', True)]"/>
                 <filter name="is_pending" string="Pending" domain="[('state', '=', 'pending')]"></filter>
                 <filter name="is_scheduled" string="Scheduled or confirmed" domain="[('state', 'in', ['scheduled', 'confirmed'])]"></filter>
+                <filter name="filter_date" string="Start date" date="start"/>
                 <group expand="0" name="groupby" string="Group By">
                     <filter string="State" name="groupby_state" context="{'group_by': 'state'}" />
                     <filter string="Type" name="groupby_type_id" context="{'group_by': 'type_id'}" />
                     <filter string="Combination" name="groupby_combination_id" context="{'group_by': 'combination_id'}" />
+                    <filter string="Start" name="groupby_start" context="{'group_by': 'start'}" />
                 </group>
             </search>
         </field>
