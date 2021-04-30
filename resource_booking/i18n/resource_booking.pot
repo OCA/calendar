@@ -900,12 +900,18 @@ msgstr ""
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__start
+#: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_view_search
 msgid "Start"
 msgstr ""
 
 #. module: resource_booking
 #: sql_constraint:resource.booking:0
 msgid "Start and stop must be filled or emptied together."
+msgstr ""
+
+#. module: resource_booking
+#: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_view_search
+msgid "Start date"
 msgstr ""
 
 #. module: resource_booking
