@@ -304,3 +304,49 @@ class BackendCase(SavepointCase):
         # Everyone's free at 9
         rb_f.start = datetime(2021, 3, 1, 9)
         self.assertTrue(rb_f.combination_id)
+
+    def test_change_calendar_after_bookings_exist(self):
+        """Calendar changes can be done only if they introduce no conflicts."""
+        rbc_mon = self.rbcs[0]
+        cal_mon = self.r_calendars[0]
+        # There's a booking for last monday
+        past_booking = self.env["resource.booking"].create(
+            {
+                "combination_id": rbc_mon.id,
+                "partner_id": self.partner.id,
+                "start": "2021-02-22 08:00:00",
+                "stop": "2021-02-22 08:30:00",
+                "type_id": self.rbt.id,
+            }
+        )
+        past_booking.action_confirm()
+        self.assertEqual(past_booking.state, "confirmed")
+        # There's another one for next monday, confirmed too
+        future_booking = self.env["resource.booking"].create(
+            {
+                "combination_id": rbc_mon.id,
+                "partner_id": self.partner.id,
+                "start": "2021-03-01 08:00:00",
+                "stop": "2021-03-01 08:30:00",
+                "type_id": self.rbt.id,
+            }
+        )
+        future_booking.action_confirm()
+        self.assertEqual(future_booking.state, "confirmed")
+        # Now, it's impossible for me to change the resource calendar
+        with self.assertRaises(ValidationError), self.env.cr.savepoint():
+            with Form(cal_mon) as cal_mon_f:
+                with cal_mon_f.attendance_ids.edit(0) as att_mon_f:
+                    att_mon_f.hour_from = 9
+        # But let's unconfirm future boooking
+        future_booking.action_unschedule()
+        with Form(future_booking) as future_booking_f:
+            future_booking_f.start = "2021-03-01 08:00:00"
+        self.assertEqual(future_booking.state, "scheduled")
+        # Now I should be able to change the resource calendar
+        with Form(cal_mon) as cal_mon_f:
+            with cal_mon_f.attendance_ids.edit(0) as att_mon_f:
+                att_mon_f.hour_from = 9
+        # However, now I shouldn't be able to confirm future booking
+        with self.assertRaises(ValidationError), self.env.cr.savepoint():
+            future_booking.action_confirm()
