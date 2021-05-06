@@ -19,6 +19,8 @@ class ResourceCalendar(models.Model):
         """Scheduled bookings must have no conflicts."""
         bookings = self.env["resource.booking"].search(
             [
+                ("state", "=", "confirmed"),
+                ("stop", ">=", fields.Datetime.now()),
                 "|",
                 ("combination_id.forced_calendar_id", "in", self.ids),
                 ("combination_id.resource_ids.calendar_id", "in", self.ids),
