@@ -14,13 +14,13 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: resource_booking
-#: code:addons/resource_booking/models/resource_booking.py:359
+#: code:addons/resource_booking/models/resource_booking.py:362
 #, python-format
 msgid "%(partner)s - %(type)s"
 msgstr ""
 
 #. module: resource_booking
-#: code:addons/resource_booking/models/resource_booking.py:358
+#: code:addons/resource_booking/models/resource_booking.py:361
 #, python-format
 msgid "%(partner)s - %(type)s - %(time)s"
 msgstr ""
@@ -238,7 +238,7 @@ msgid "Canceled"
 msgstr ""
 
 #. module: resource_booking
-#: code:addons/resource_booking/models/resource_booking.py:263
+#: code:addons/resource_booking/models/resource_booking.py:266
 #, python-format
 msgid "Cannot schedule these bookings because no resources are selected for them:\n"
 "\n"
@@ -246,7 +246,7 @@ msgid "Cannot schedule these bookings because no resources are selected for them
 msgstr ""
 
 #. module: resource_booking
-#: code:addons/resource_booking/models/resource_booking.py:285
+#: code:addons/resource_booking/models/resource_booking.py:288
 #, python-format
 msgid "Cannot schedule these bookings because they do not fit in their type or resources calendars, or because all resources are busy:\n"
 "\n"
@@ -647,7 +647,7 @@ msgid "No free slots found this month."
 msgstr ""
 
 #. module: resource_booking
-#: code:addons/resource_booking/models/resource_booking.py:390
+#: code:addons/resource_booking/models/resource_booking.py:393
 #, python-format
 msgid "No resource combinations available on %s"
 msgstr ""
@@ -750,7 +750,7 @@ msgid "Requester Advice"
 msgstr ""
 
 #. module: resource_booking
-#: code:addons/resource_booking/models/resource_booking.py:445
+#: code:addons/resource_booking/models/resource_booking.py:448
 #, python-format
 msgid "Requesting partner"
 msgstr ""
@@ -848,7 +848,7 @@ msgid "Schedule"
 msgstr ""
 
 #. module: resource_booking
-#: code:addons/resource_booking/models/resource_booking.py:465
+#: code:addons/resource_booking/models/resource_booking.py:468
 #, python-format
 msgid "Schedule booking"
 msgstr ""
