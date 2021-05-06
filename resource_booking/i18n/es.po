@@ -18,13 +18,13 @@ msgstr ""
 "X-Generator: Weblate 4.3.2\n"
 
 #. module: resource_booking
-#: code:addons/resource_booking/models/resource_booking.py:359
+#: code:addons/resource_booking/models/resource_booking.py:362
 #, python-format
 msgid "%(partner)s - %(type)s"
 msgstr "%(partner)s - %(type)s"
 
 #. module: resource_booking
-#: code:addons/resource_booking/models/resource_booking.py:358
+#: code:addons/resource_booking/models/resource_booking.py:361
 #, python-format
 msgid "%(partner)s - %(type)s - %(time)s"
 msgstr "%(partner)s - %(type)s - %(time)s"
@@ -260,7 +260,7 @@ msgid "Canceled"
 msgstr "Cancelado"
 
 #. module: resource_booking
-#: code:addons/resource_booking/models/resource_booking.py:263
+#: code:addons/resource_booking/models/resource_booking.py:266
 #, python-format
 msgid ""
 "Cannot schedule these bookings because no resources are selected for them:\n"
@@ -273,7 +273,7 @@ msgstr ""
 "- %s"
 
 #. module: resource_booking
-#: code:addons/resource_booking/models/resource_booking.py:285
+#: code:addons/resource_booking/models/resource_booking.py:288
 #, python-format
 msgid ""
 "Cannot schedule these bookings because they do not fit in their type or "
@@ -689,7 +689,7 @@ msgid "No free slots found this month."
 msgstr "No quedan huecos libres este mes."
 
 #. module: resource_booking
-#: code:addons/resource_booking/models/resource_booking.py:390
+#: code:addons/resource_booking/models/resource_booking.py:393
 #, python-format
 msgid "No resource combinations available on %s"
 msgstr "No hay combinaciones de recursos disponibles en %s"
@@ -800,7 +800,7 @@ msgid "Requester Advice"
 msgstr "Aviso al solicitante"
 
 #. module: resource_booking
-#: code:addons/resource_booking/models/resource_booking.py:445
+#: code:addons/resource_booking/models/resource_booking.py:448
 #, python-format
 msgid "Requesting partner"
 msgstr "Solicitante"
@@ -899,7 +899,7 @@ msgid "Schedule"
 msgstr "Horario"
 
 #. module: resource_booking
-#: code:addons/resource_booking/models/resource_booking.py:465
+#: code:addons/resource_booking/models/resource_booking.py:468
 #, python-format
 msgid "Schedule booking"
 msgstr "Agendar reserva/cita"
