@@ -350,3 +350,31 @@ class BackendCase(SavepointCase):
         # However, now I shouldn't be able to confirm future booking
         with self.assertRaises(ValidationError), self.env.cr.savepoint():
             future_booking.action_confirm()
+
+    def test_notification_tz(self):
+        """Mail notification TZ is the same as resource.booking.type always."""
+        # Configure RBT with Madrid calendar, but partner has other TZ
+        self.r_calendars.write({"tz": "Europe/Madrid"})
+        self.partner.tz = "Australia/Sydney"
+        rb = self.env["resource.booking"].create(
+            {
+                "combination_id": self.rbcs[0].id,
+                "partner_id": self.partner.id,
+                "start": "2021-03-01 08:00:00",  # 09:00 in Madrid
+                "stop": "2021-03-01 08:30:00",
+                "type_id": self.rbt.id,
+            }
+        )
+        rb.action_confirm()
+        invitation_mail = self.env["mail.mail"].search(
+            [
+                ("state", "=", "outgoing"),
+                (
+                    "subject",
+                    "=",
+                    "Invitation to some customer - Test resource booking type",
+                ),
+            ]
+        )
+        # Invitation must display Madrid TZ (CET)
+        self.assertIn("09:00:00 CET", invitation_mail.body)
