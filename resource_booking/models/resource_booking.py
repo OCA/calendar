@@ -271,7 +271,13 @@ class ResourceBooking(models.Model):
             )
         # Ensure all bookings fit in their type and resources calendars
         unfitting_bookings = has_meeting
+        now = fields.Datetime.now()
         for booking in has_meeting:
+            # Ignore if the event already happened
+            already_happened = booking.stop and booking.stop < now
+            if already_happened:
+                unfitting_bookings -= booking
+                continue
             meeting_dates = tuple(
                 fields.Datetime.context_timestamp(self, booking[field])
                 for field in ("start", "stop")
