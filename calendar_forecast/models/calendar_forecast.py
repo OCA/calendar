@@ -12,9 +12,7 @@ import re
 from collections import namedtuple
 from datetime import datetime, time
 from dateutil.relativedelta import relativedelta, SU
-from dateutil.rrule import MONTHLY, WEEKLY
-
-from odoo import api, fields, models, SUPERUSER_ID, _
+from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
 
 _logger = logging.getLogger(__name__)
@@ -577,9 +575,9 @@ class Forecast(models.Model):
                 continue
             row = fields.first(rows)
             if delete_empty_rows and self._is_add_line(row):
-                check = any([l.unit_amount for l in rows])
+                check = any([r.unit_amount for r in rows])
             else:
-                check = not all([l.unit_amount for l in rows])
+                check = not all([r.unit_amount for r in rows])
             if not check:
                 continue
             row_lines = self.timesheet_ids.filtered(
