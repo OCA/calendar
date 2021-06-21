@@ -73,10 +73,10 @@ class Forecast(models.Model):
         index=True,
         readonly=False,
     )
-    timesheet_ids = fields.One2many(
+    timeforecast_ids = fields.One2many(
         comodel_name="calendar.schedulable.task.line",
         inverse_name="forecast_id",
-        string="Timesheets",
+        string="Timeforecasts",
         readonly=False,
     )
     line_ids = fields.One2many(
@@ -105,19 +105,19 @@ class Forecast(models.Model):
         default=lambda self: self._default_employee(),
         string="Select Employee",
         help="The associated employee is added "
-        "to the timesheet sheet when clicked the button.",
+        "to the timeforecast sheet when clicked the button.",
     )
     add_line_task_id = fields.Many2one(
         comodel_name="project.task",
         string="Select Task",
         help="The associated task is added "
-        "to the timesheet sheet when clicked the button.",
+        "to the timeforecast sheet when clicked the button.",
     )
     add_line_employee_category_id = fields.Many2one(
         comodel_name="hr.employee.category",
         string="Select Employee Category",
         help="If selected, the associated employee category id is added "
-        "to the timesheet sheet when clicked the button.",
+        "to the timeforecast sheet when clicked the button.",
     )
     total_time = fields.Float(
         compute="_compute_total_time",
@@ -153,11 +153,11 @@ class Forecast(models.Model):
                     period_end,
                 )
 
-    @api.depends("timesheet_ids.unit_amount")
+    @api.depends("timeforecast_ids.unit_amount")
     def _compute_total_time(self):
 
         for sheet in self:
-            sheet.total_time = sum(sheet.mapped("timesheet_ids.unit_amount"))
+            sheet.total_time = sum(sheet.mapped("timeforecast_ids.unit_amount"))
 
     @api.depends("name", "project_id")
     def _compute_complete_name(self):
@@ -229,7 +229,7 @@ class Forecast(models.Model):
                 )
 
     @api.multi
-    def _get_timesheet_sheet_company(self):
+    def _get_timeforecast_sheet_company(self):
         self.ensure_one()
         employee = self.add_line_employee_id
         company = employee.company_id
@@ -240,19 +240,19 @@ class Forecast(models.Model):
     # @api.onchange("employee_id")
     # def _onchange_employee_id(self):
     #     if self.employee_id:
-    #         company = self._get_timesheet_sheet_company()
+    #         company = self._get_timeforecast_sheet_company()
     #         self.company_id = company
     #         self.department_id = self.employee_id.department_id
 
     @api.multi
-    def _get_timesheet_sheet_lines_domain(self):
+    def _get_timeforecast_sheet_lines_domain(self):
         self.ensure_one()
         return [
             ("date", "<=", self.date_end),
             ("date", ">=", self.date_start),
             ("employee_id", "=", self.add_line_employee_id.id),
             ("employee_category_id", "=", self.add_line_employee_category_id.id),
-            ("task_id.company_id", "=", self._get_timesheet_sheet_company().id),
+            ("task_id.company_id", "=", self._get_timeforecast_sheet_company().id),
             ("forecast_id.project_id", "!=", False),
             ("forecast_id.project_id", "=", self.project_id.id),
         ]
@@ -270,7 +270,7 @@ class Forecast(models.Model):
             for key in sorted(matrix, key=lambda key: self._get_matrix_sortby(key)):
                 vals_list.append(sheet._get_default_sheet_line(matrix, key))
                 # if sheet.state in ["new", "draft"]:
-                sheet.clean_timesheets(matrix[key])
+                sheet.clean_timeforecasts(matrix[key])
 
             sheet.line_ids = ForecastLine.create(vals_list)
 
@@ -320,7 +320,7 @@ class Forecast(models.Model):
         matrix = {}
         empty_line = self.env["calendar.schedulable.task.line"]
 
-        for line in self.timesheet_ids:
+        for line in self.timeforecast_ids:
             key = MatrixKey(**self._get_matrix_key_values_for_line(line))
             if key not in matrix:
                 matrix[key] = empty_line
@@ -337,31 +337,31 @@ class Forecast(models.Model):
                     matrix[key] = empty_line
         return matrix
 
-    def _compute_timesheet_ids(self):
+    def _compute_timeforecast_ids(self):
         SchedulableTaskLines = self.env["calendar.schedulable.task.line"]
 
         for sheet in self:
-            domain = sheet._get_timesheet_sheet_lines_domain()
-            timesheets = SchedulableTaskLines.search(domain)
-            sheet.link_timesheets_to_sheet(timesheets)
-            sheet.timesheet_ids = timesheets
+            domain = sheet._get_timeforecast_sheet_lines_domain()
+            timeforecasts = SchedulableTaskLines.search(domain)
+            sheet.link_timeforecasts_to_sheet(timeforecasts)
+            sheet.timeforecast_ids = timeforecasts
 
     @api.onchange("date_start", "date_end", "project_id")
     def _onchange_scope(self):
-        self._compute_timesheet_ids()
+        self._compute_timeforecast_ids()
 
     @api.onchange("date_start", "date_end")
     def _onchange_dates(self):
         if self.date_start > self.date_end:
             self.date_end = self.date_start
 
-    @api.onchange("timesheet_ids")
-    def _onchange_timesheets(self):
+    @api.onchange("timeforecast_ids")
+    def _onchange_timeforecasts(self):
         self._compute_line_ids()
 
     @api.onchange("project_id")
     def onchange_add_project_id(self):
-        """Load the project to the timesheet sheet"""
+        """Load the project to the timeforecast sheet"""
         if self.project_id:
 
             return {
@@ -369,7 +369,7 @@ class Forecast(models.Model):
                     "add_line_task_id": [
                         ("project_id", "=", self.project_id.id),
                         ("company_id", "=", self.company_id.id),
-                        ("id", "not in", self.timesheet_ids.ids),
+                        ("id", "not in", self.timeforecast_ids.ids),
                     ],
                 },
             }
@@ -382,7 +382,7 @@ class Forecast(models.Model):
 
     @api.multi
     def copy(self, default=None):
-        if not self.env.context.get("allow_copy_timesheet"):
+        if not self.env.context.get("allow_copy_timeforecast"):
             raise UserError(_("You cannot duplicate a sheet."))
         return super().copy(default=default)
 
@@ -412,7 +412,7 @@ class Forecast(models.Model):
         subscribers = self._get_informables()
         return subscribers
 
-    def _timesheet_subscribe_users(self):
+    def _timeforecast_subscribe_users(self):
         for sheet in self.sudo():
             subscribers = sheet._get_subscribers()
             if subscribers:
@@ -533,22 +533,22 @@ class Forecast(models.Model):
         if existing_unique_ids:
             self.delete_empty_lines(False)
         if frozenset(new_line_unique_id.items()) not in existing_unique_ids:
-            self.timesheet_ids |= self.env[
+            self.timeforecast_ids |= self.env[
                 "calendar.schedulable.task.line"
             ]._sheet_create(values)
 
-    def link_timesheets_to_sheet(self, timesheets):
+    def link_timeforecasts_to_sheet(self, timeforecasts):
         self.ensure_one()
         if self.id:
-            for aal in timesheets.filtered(lambda a: not a.forecast_id):
+            for aal in timeforecasts.filtered(lambda a: not a.forecast_id):
                 aal.write({"forecast_id": self.id})
 
-    def clean_timesheets(self, timesheets):
+    def clean_timeforecasts(self, timeforecasts):
 
-        repeated = timesheets.filtered(lambda t: t.name == empty_name)
+        repeated = timeforecasts.filtered(lambda t: t.name == empty_name)
         if len(repeated) > 1 and self.id:
-            return repeated.merge_timesheets()
-        return timesheets
+            return repeated.merge_timeforecasts()
+        return timeforecasts
 
     @api.multi
     def _is_add_line(self, row):
@@ -580,14 +580,14 @@ class Forecast(models.Model):
                 check = not all([r.unit_amount for r in rows])
             if not check:
                 continue
-            row_lines = self.timesheet_ids.filtered(
+            row_lines = self.timeforecast_ids.filtered(
                 lambda aal: self._is_line_of_row(aal, row)
             )
             row_lines.filtered(
                 lambda t: t.task_id.name == empty_name and not t.unit_amount
             ).unlink()
-            if self.timesheet_ids != self.timesheet_ids.exists():
-                self._sheet_write("timesheet_ids", self.timesheet_ids.exists())
+            if self.timeforecast_ids != self.timeforecast_ids.exists():
+                self._sheet_write("timeforecast_ids", self.timeforecast_ids.exists())
 
     @api.multi
     def _update_analytic_lines_from_new_lines(self, vals):
@@ -771,16 +771,16 @@ class ForecastNewAnalyticLine(models.TransientModel):
     def _update_analytic_lines(self):
         sheet = self.forecast_id
 
-        timesheets = sheet.timesheet_ids.filtered(
+        timeforecasts = sheet.timeforecast_ids.filtered(
             lambda aal: self._is_similar_analytic_line(aal)
         )
-        if timesheets:
+        if timeforecasts:
             # if cell already exists, we just overwrite
-            timesheets.exists().merge_timesheets()
+            timeforecasts.exists().merge_timeforecasts()
             if not self.unit_amount:
-                timesheets.exists().unlink()
+                timeforecasts.exists().unlink()
             else:
-                timesheets.exists().write({"unit_amount": self.unit_amount})
+                timeforecasts.exists().write({"unit_amount": self.unit_amount})
         else:
             new_ts_values = sheet._prepare_new_line(self)
             new_ts_values.update(
@@ -791,5 +791,5 @@ class ForecastNewAnalyticLine(models.TransientModel):
             #
             self.env["calendar.schedulable.task.line"]._sheet_create(new_ts_values)
 
-        empty_ts = sheet.timesheet_ids.filtered(lambda t: t.unit_amount == 0)
+        empty_ts = sheet.timeforecast_ids.filtered(lambda t: t.unit_amount == 0)
         empty_ts.unlink()

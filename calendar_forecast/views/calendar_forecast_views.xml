@@ -35,7 +35,7 @@
                         <h1>
                           <field
                               name="project_id"
-                              domain="[('company_id', '=', company_id), ('allow_timesheets', '=', True)]"
+                              domain="[('company_id', '=', company_id), ('allow_timeforecasts', '=', True)]"
                           /></h1>
                     </div>
                     <group>
@@ -99,7 +99,7 @@
                         </page>
                         <page string="Details">
                             <field
-                                name="timesheet_ids"
+                                name="timeforecast_ids"
                                 nolabel="1">
                                 <tree editable="bottom" string="Forecast Activities">
                                     <field name="employee_domain_ids" invisible="1"/>
@@ -143,7 +143,7 @@
         </field>
     </record>
 
-    <record id="act_calendar_forecast_my_timesheets" model="ir.actions.act_window">
+    <record id="act_calendar_forecast_my_timeforecasts" model="ir.actions.act_window">
         <field name="name">My Forecasts</field>
         <field name="res_model">calendar.forecast</field>
         <field name="view_type">form</field>
@@ -152,10 +152,10 @@
         <field name="search_view_id" ref="view_calendar_forecast_filter"/>
         <field name="help" type="html">
             <p class="oe_view_nocontent_create">
-             New timesheet sheet.
+             New timeforecast sheet.
             </p><p>
-             You must record timesheets in the sheet every day and confirm at the end
-             of the reporting period. Once the timesheet sheet is confirmed, it should be
+             You must record timeforecasts in the sheet every day and confirm at the end
+             of the reporting period. Once the timeforecast sheet is confirmed, it should be
              validated by a reviewer.
             </p><p>
              Forecasts can also be invoiced to customers, depending on
@@ -164,7 +164,7 @@
         </field>
     </record>
 
-    <record id="act_calendar_forecast_all_timesheets" model="ir.actions.act_window">
+    <record id="act_calendar_forecast_all_timeforecasts" model="ir.actions.act_window">
         <field name="name">All Forecasts</field>
         <field name="res_model">calendar.forecast</field>
         <field name="view_type">form</field>
@@ -174,8 +174,8 @@
             <p class="oe_view_nocontent_create">
              Forecasts.
             </p><p>
-             Employees must record timesheets in the sheet every day and confirm at the end
-             of the reporting period. Once the timesheet sheet is confirmed, it should be
+             Employees must record timeforecasts in the sheet every day and confirm at the end
+             of the reporting period. Once the timeforecast sheet is confirmed, it should be
              validated by a reviewer.
             </p><p>
              Forecasts can also be invoiced to customers, depending on
@@ -192,11 +192,11 @@
     />
 
     <menuitem
-        action="act_calendar_forecast_all_timesheets"
-        id="menu_act_calendar_forecast_all_timesheets"
+        action="act_calendar_forecast_all_timeforecasts"
+        id="menu_act_calendar_forecast_all_timeforecasts"
         parent="menu_forecast_root"
         sequence="6"
-        groups="hr_timesheet.group_timesheet_manager"
+        groups="hr_timeforecast.group_timeforecast_manager"
     />
 
 

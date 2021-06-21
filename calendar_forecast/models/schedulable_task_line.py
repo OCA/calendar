@@ -5,7 +5,6 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 from odoo import api, fields, models, _
-from odoo.exceptions import ValidationError
 
 
 class CalendarSchedulable(models.AbstractModel):
@@ -159,11 +158,11 @@ class SchedulableTaskLine(models.Model):
         )
 
     def _compute_sheet(self):
-        """Links the timesheet line to the corresponding sheet"""
-        for timesheet in self.filtered("task_id"):
-            sheet = timesheet._determine_sheet()
-            if timesheet.forecast_id != sheet:
-                timesheet.forecast_id = sheet
+        """Links the timeforecast line to the corresponding sheet"""
+        for timeforecast in self.filtered("task_id"):
+            sheet = timeforecast._determine_sheet()
+            if timeforecast.forecast_id != sheet:
+                timeforecast.forecast_id = sheet
 
     @api.model
     def create(self, values):
@@ -187,22 +186,22 @@ class SchedulableTaskLine(models.Model):
     def write(self, values):
 
         res = super().write(values)
-        if self._timesheet_should_compute_sheet(values):
+        if self._timeforecast_should_compute_sheet(values):
             self._compute_sheet()
         return res
 
     @api.model
-    def _timesheet_should_check_write(self, values):
+    def _timeforecast_should_check_write(self, values):
         """ Hook for extensions """
-        return bool(set(self._get_timesheet_protected_fields()) & set(values.keys()))
+        return bool(set(self._get_timeforecast_protected_fields()) & set(values.keys()))
 
     @api.model
-    def _timesheet_should_compute_sheet(self, values):
+    def _timeforecast_should_compute_sheet(self, values):
         """ Hook for extensions """
         return any(f in self._get_sheet_affecting_fields() for f in values)
 
     @api.model
-    def _get_timesheet_protected_fields(self):
+    def _get_timeforecast_protected_fields(self):
         """ Hook for extensions """
         return [
             "name",
@@ -222,7 +221,7 @@ class SchedulableTaskLine(models.Model):
         return ["date", "employee_id", "project_id", "company_id"]
 
     @api.multi
-    def merge_timesheets(self):
+    def merge_timeforecasts(self):
 
         unit_amount = sum([t.unit_amount for t in self])
         self[0].write(
