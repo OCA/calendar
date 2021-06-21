@@ -86,7 +86,7 @@ class Forecast(models.Model):
         readonly=False,
     )
     new_line_ids = fields.One2many(
-        comodel_name="calendar.forecast.new.analytic.line",
+        comodel_name="calendar.forecast.new.data.line",
         inverse_name="forecast_id",
         string="Temporary Forecast",
         readonly=False,
@@ -401,7 +401,7 @@ class Forecast(models.Model):
         res = super().write(vals)
         for rec in self:
             if not self.env.context.get("sheet_write"):
-                rec._update_analytic_lines_from_new_lines(vals)
+                rec._update_data_lines_from_new_lines(vals)
                 if "project_id" not in vals:
                     rec.delete_empty_lines(True)
         return res
@@ -508,7 +508,7 @@ class Forecast(models.Model):
         return values
 
     @api.model
-    def _prepare_empty_analytic_line(self):
+    def _prepare_empty_data_line(self):
         return {
             "name": empty_name,
             "employee_id": self.add_line_employee_id.id,
@@ -523,7 +523,7 @@ class Forecast(models.Model):
 
         if not self.project_id:
             return
-        values = self._prepare_empty_analytic_line()
+        values = self._prepare_empty_data_line()
 
         new_line_unique_id = self._get_new_line_unique_id()
 
@@ -590,7 +590,7 @@ class Forecast(models.Model):
                 self._sheet_write("timeforecast_ids", self.timeforecast_ids.exists())
 
     @api.multi
-    def _update_analytic_lines_from_new_lines(self, vals):
+    def _update_data_lines_from_new_lines(self, vals):
 
         self.ensure_one()
         new_line_ids_list = []
@@ -600,13 +600,13 @@ class Forecast(models.Model):
             # is a computed field. We capture the value of 'new_line_ids'
             # in the proposed dict before it disappears.
             # This field holds the ids of the transient records
-            # of model 'calendar.forecast.new.analytic.line'.
+            # of model 'calendar.forecast.new.data.line'.
             if line[0] == 1 and line[2] and line[2].get("new_line_id"):
                 new_line_ids_list += [line[2].get("new_line_id")]
 
         for new_line in self.new_line_ids.exists():
             if new_line.id in new_line_ids_list:
-                new_line._update_analytic_lines()
+                new_line._update_data_lines()
         self.new_line_ids.exists().unlink()
         self._sheet_write("new_line_ids", self.new_line_ids.exists())
 
@@ -637,7 +637,7 @@ class Forecast(models.Model):
     def add_new_line(self, line):
         self.ensure_one()
 
-        new_line_model = self.env["calendar.forecast.new.analytic.line"]
+        new_line_model = self.env["calendar.forecast.new.data.line"]
         new_line = self.new_line_ids.filtered(
             lambda l: self._is_compatible_new_line(l, line)
         )
@@ -753,13 +753,13 @@ class ForecastLine(models.TransientModel):
         return sheet
 
 
-class ForecastNewAnalyticLine(models.TransientModel):
-    _name = "calendar.forecast.new.analytic.line"
+class ForecastNewDataLine(models.TransientModel):
+    _name = "calendar.forecast.new.data.line"
     _inherit = "calendar.forecast.line.abstract"
-    _description = "Forecast New Analytic Line"
+    _description = "Forecast New Data Line"
 
     @api.model
-    def _is_similar_analytic_line(self, aal):
+    def _is_similar_data_line(self, aal):
         """ Hook for extensions """
         return (
             aal.task_id == self.task_id
@@ -768,11 +768,11 @@ class ForecastNewAnalyticLine(models.TransientModel):
         )
 
     @api.model
-    def _update_analytic_lines(self):
+    def _update_data_lines(self):
         sheet = self.forecast_id
 
         timeforecasts = sheet.timeforecast_ids.filtered(
-            lambda aal: self._is_similar_analytic_line(aal)
+            lambda aal: self._is_similar_data_line(aal)
         )
         if timeforecasts:
             # if cell already exists, we just overwrite
