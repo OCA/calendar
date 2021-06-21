@@ -165,30 +165,6 @@ class SchedulableTaskLine(models.Model):
             if timesheet.forecast_id != sheet:
                 timesheet.forecast_id = sheet
 
-    @api.multi
-    @api.constrains("task_id", "forecast_id")
-    def _check_company_id_forecast_id(self):
-        for aal in self.sudo():
-            if (
-                aal.task_id.company_id
-                and aal.forecast_id.company_id
-                and aal.task_id.company_id != aal.forecast_id.company_id
-            ):
-                raise ValidationError(
-                    _(
-                        "You cannot create a timesheet of a different company "
-                        "than the one of the timesheet sheet:"
-                        "\n - %s of %s"
-                        "\n - %s of %s"
-                        % (
-                            aal.forecast_id.complete_name,
-                            aal.forecast_id.company_id.name,
-                            aal.task_id.name,
-                            aal.task_id.company_id.name,
-                        )
-                    )
-                )
-
     @api.model
     def create(self, values):
 
