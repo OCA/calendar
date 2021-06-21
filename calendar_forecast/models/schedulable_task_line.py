@@ -80,9 +80,7 @@ class CalendarSchedulable(models.AbstractModel):
             if record.employee_id:
                 record.employee_or_category = record.employee_id.name_get()[0][1]
             elif record.employee_category_id:
-                record.employee_or_category = record.employee_category_id.name_get()[0][
-                    1
-                ]
+                record.employee_or_category = record.employee_category_id.name_get()[0][1]
             else:
                 record.employee_or_category = ""
 
