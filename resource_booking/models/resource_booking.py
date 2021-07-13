@@ -2,16 +2,16 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 import calendar
-
-from datetime import datetime, timedelta
 from contextlib import suppress
+from datetime import datetime, timedelta
 
 from dateutil.relativedelta import relativedelta
 
 from odoo import _, api, fields, models
-from odoo.addons.resource.models.resource import Intervals
 from odoo.exceptions import ValidationError
 from odoo.osv.expression import NEGATIVE_TERM_OPERATORS
+
+from odoo.addons.resource.models.resource import Intervals
 
 
 class ResourceBooking(models.Model):
@@ -51,10 +51,7 @@ class ResourceBooking(models.Model):
         ondelete="set null",
         help="Meeting confirmed for this booking.",
     )
-    categ_ids = fields.Many2many(
-        string="Tags",
-        comodel_name="calendar.event.type",
-    )
+    categ_ids = fields.Many2many(string="Tags", comodel_name="calendar.event.type",)
     combination_id = fields.Many2one(
         comodel_name="resource.booking.combination",
         string="Resources combination",
@@ -74,9 +71,7 @@ class ResourceBooking(models.Model):
         track_visibility="onchange",
         help="Who requested this booking?",
     )
-    requester_advice = fields.Text(
-        related="type_id.requester_advice", readonly=True
-    )
+    requester_advice = fields.Text(related="type_id.requester_advice", readonly=True)
     involves_me = fields.Boolean(
         compute="_compute_involves_me", search="_search_involves_me"
     )
