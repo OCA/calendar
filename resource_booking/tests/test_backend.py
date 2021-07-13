@@ -1,10 +1,13 @@
 # Copyright 2021 Tecnativa - Jairo Llopis
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
-from freezegun import freeze_time
-from odoo.tests.common import SavepointCase, Form
-from odoo.exceptions import ValidationError
-from odoo import fields
 from datetime import datetime
+
+from freezegun import freeze_time
+
+from odoo import fields
+from odoo.exceptions import ValidationError
+from odoo.tests.common import Form, SavepointCase
+
 from .common import create_test_data
 
 _2dt = fields.Datetime.to_datetime
