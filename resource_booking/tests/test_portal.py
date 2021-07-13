@@ -1,12 +1,14 @@
 # Copyright 2021 Tecnativa - Jairo Llopis
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
-from odoo.tests.common import HttpCase
-from .common import create_test_data
-from lxml.html import fromstring
 from datetime import datetime
 
 from freezegun import freeze_time
+from lxml.html import fromstring
+
+from odoo.tests.common import HttpCase
+
+from .common import create_test_data
 
 
 @freeze_time("2021-02-26 09:00:00", tick=True)
@@ -178,8 +180,7 @@ class PortalCase(HttpCase):
         for attendee in booking_public.meeting_id.attendee_ids:
             self.assertTrue(attendee.partner_id)
             self.assertIn(
-                attendee.partner_id,
-                self.partner | self.users[0].partner_id,
+                attendee.partner_id, self.partner | self.users[0].partner_id,
             )
             self.assertEqual(
                 attendee.state,

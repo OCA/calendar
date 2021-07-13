@@ -15,8 +15,10 @@
     "installable": True,
     "external_dependencies": {
         "python": [
-            "cssselect",  # Used implicitly
-            "freezegun",  # Only for tests
+            # Used implicitly
+            "cssselect",
+            # Only for tests
+            "freezegun",
         ],
     },
     "depends": [
@@ -37,7 +39,5 @@
         "views/resource_booking_views.xml",
         "views/menus.xml",
     ],
-    "demo": [
-        "demo/res_users_demo.xml",
-    ],
+    "demo": ["demo/res_users_demo.xml",],
 }

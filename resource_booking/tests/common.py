@@ -34,16 +34,8 @@ def create_test_data(obj):
     obj.r_calendars = obj.env["resource.calendar"].create(
         [
             {"name": "Mon", "attendance_ids": attendances[:1], "tz": "UTC"},
-            {
-                "name": "Tue",
-                "attendance_ids": attendances[1:],
-                "tz": "UTC",
-            },
-            {
-                "name": "MonTue",
-                "attendance_ids": attendances,
-                "tz": "UTC",
-            },
+            {"name": "Tue", "attendance_ids": attendances[1:], "tz": "UTC",},
+            {"name": "MonTue", "attendance_ids": attendances, "tz": "UTC",},
         ]
     )
     # Create one material resource for each of those calendars; same order

@@ -5,10 +5,12 @@ from datetime import datetime
 from urllib.parse import quote_plus
 
 from dateutil.parser import isoparse
-from odoo.addons.portal.controllers import portal
+
 from odoo.exceptions import AccessError, MissingError, ValidationError
 from odoo.http import request, route
 from odoo.tests.common import Form
+
+from odoo.addons.portal.controllers import portal
 
 
 class CustomerPortal(portal.CustomerPortal):
@@ -131,7 +133,7 @@ class CustomerPortal(portal.CustomerPortal):
                 booking_form.start = when_naive
         except ValidationError as error:
             url = booking_sudo.get_portal_url(
-                suffix="/schedule/{0:%Y/%m}".format(when_tz_aware),
+                suffix="/schedule/{:%Y/%m}".format(when_tz_aware),
                 query_string="&error={}".format(quote_plus(error.name)),
             )
             return request.redirect(url)
