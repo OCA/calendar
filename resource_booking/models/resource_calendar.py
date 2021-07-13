@@ -2,9 +2,11 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 from pytz import UTC
+
 from odoo import api, fields, models
-from odoo.addons.resource.models.resource import Intervals
+
 from odoo.addons.calendar.models.calendar import calendar_id2real_id
+from odoo.addons.resource.models.resource import Intervals
 
 
 class Busy(Exception):
