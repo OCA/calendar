@@ -294,6 +294,7 @@ class BackendCase(SavepointCase):
         ce_f.rrule_type = "weekly"
         ce_f.end_type = "count"
         ce_f.count = 2
+        ce_f.mo = True
         ce_f.save()
         # Cannot book next Monday at 8
         rb_f = Form(self.env["resource.booking"])

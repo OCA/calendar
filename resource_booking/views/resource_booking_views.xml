@@ -14,8 +14,9 @@
                 quick_add="false"
                 color="combination_id"
             >
-                <field name="name" />
-                <field name="partner_id" avatar_field="image_small" />
+                <field name="name" invisible="True" />
+                <field name="partner_id" avatar_field="image_128" />
+                <field name="type_id" />
                 <field name="combination_id" />
             </calendar>
         </field>
@@ -107,6 +108,13 @@
                     <field name="state" widget="statusbar" />
                 </header>
                 <sheet>
+                    <field name="active" invisible="1" />
+                    <widget
+                        name="web_ribbon"
+                        title="Archived"
+                        bg_color="bg-danger"
+                        attrs="{'invisible': [('active', '=', True)]}"
+                    />
                     <div class="oe_button_box" name="button_box">
                         <button
                             name="action_open_portal"
@@ -115,34 +123,6 @@
                             icon="fa-globe"
                         >
                             <span>Preview</span>
-                        </button>
-                        <!-- Using attrs=invisible trick to make archive=cancel -->
-                        <button
-                            name="toggle_active"
-                            type="object"
-                            class="oe_stat_button"
-                            icon="fa-archive"
-                            attrs="{'invisible': [('active', '=', True), ('meeting_id', '!=', False)]}"
-                        >
-                            <field
-                                name="active"
-                                widget="boolean_button"
-                                options='{"terminology": "archive"}'
-                            />
-                        </button>
-                        <button
-                            name="action_cancel"
-                            type="object"
-                            class="oe_stat_button"
-                            icon="fa-archive"
-                            attrs="{'invisible': ['!', '&amp;', ('active', '=', True), ('meeting_id', '!=', False)]}"
-                            confirm="This will remove the associated meeting to unschedule the booking. Are you sure?"
-                        >
-                            <field
-                                name="active"
-                                widget="boolean_button"
-                                options='{"terminology": "archive"}'
-                            />
                         </button>
                     </div>
                     <group name="main">
