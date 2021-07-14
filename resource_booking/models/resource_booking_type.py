@@ -97,7 +97,7 @@ class ResourceBookingType(models.Model):
 
     @api.model
     def _default_company(self):
-        return self.env["res.company"]._company_default_get()
+        return self.env.company
 
     @api.model
     def _default_resource_calendar(self):

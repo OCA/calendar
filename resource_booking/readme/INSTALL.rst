@@ -5,7 +5,7 @@ To install this module, you need to install these dependencies:
 
 When someone is a manager, he will have access to *Resource Bookings >
 Configuration*, where he will be able to configure resources, leaves and
-schedules. This menu is just provided as a commodity. However, if you want to
+schedules. This menu is just provided as a shortcut. However, if you want to
 manage that stuff more comfortably:
 
 * To manage human resources, install `hr <https://apps.odoo.com/app/employees>`__.

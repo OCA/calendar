@@ -37,7 +37,7 @@ class PortalCase(HttpCase):
 
     def _url_xml(self, url, data=None, timeout=10):
         """Open an URL and return the lxml etree object resulting from its content."""
-        response = self.url_open(url, data, timeout)
+        response = self.url_open(url, data, timeout=timeout)
         return fromstring(response.content)
 
     def test_portal_no_bookings(self):

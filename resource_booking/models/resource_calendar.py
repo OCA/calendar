@@ -56,7 +56,7 @@ class ResourceCalendar(models.Model):
         )
         for event in all_events:
             real_event = self.env["calendar.event"].browse(
-                calendar_id2real_id(event.id), all_events._prefetch
+                calendar_id2real_id(event.id)
             )
             # Is the event the same one we're currently checking?
             if real_event.resource_booking_ids.id == analyzed_booking_id:
@@ -83,19 +83,29 @@ class ResourceCalendar(models.Model):
                 # Add the matched event as a busy interval
                 intervals.append(
                     (
-                        fields.Datetime.context_timestamp(event, event.start),
-                        fields.Datetime.context_timestamp(event, event.stop),
-                        event,
+                        fields.Datetime.context_timestamp(
+                            event, fields.Datetime.to_datetime(event.start)
+                        ),
+                        fields.Datetime.context_timestamp(
+                            event, fields.Datetime.to_datetime(event.stop)
+                        ),
+                        resource,
                     )
                 )
         return Intervals(intervals)
 
-    # TODO Override _leave_intervals_batch in v13
-    def _leave_intervals(self, start_dt, end_dt, resource=None, domain=None):
+    def _leave_intervals_batch(
+        self, start_dt, end_dt, resources=None, domain=None, tz=None
+    ):
         """Count busy meetings as leaves if required by context."""
-        result = super()._leave_intervals(start_dt, end_dt, resource, domain)
-        if resource and self.env.context.get("analyzing_booking"):
-            result |= self._calendar_event_busy_intervals(
-                start_dt, end_dt, resource, self.env.context["analyzing_booking"]
-            )
+        result = super()._leave_intervals_batch(start_dt, end_dt, resources, domain, tz)
+        if self.env.context.get("analyzing_booking"):
+            for resource_id in result:
+                # TODO Make this work in batch too
+                result[resource_id] |= self._calendar_event_busy_intervals(
+                    start_dt,
+                    end_dt,
+                    self.env["resource.resource"].browse(resource_id),
+                    self.env.context["analyzing_booking"],
+                )
         return result

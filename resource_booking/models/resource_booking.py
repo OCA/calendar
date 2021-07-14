@@ -40,7 +40,7 @@ class ResourceBooking(models.Model):
         ),
     ]
 
-    active = fields.Boolean(index=True, default=True)
+    active = fields.Boolean(default=True)
     meeting_id = fields.Many2one(
         comodel_name="calendar.event",
         string="Meeting",
@@ -51,15 +51,24 @@ class ResourceBooking(models.Model):
         ondelete="set null",
         help="Meeting confirmed for this booking.",
     )
-    categ_ids = fields.Many2many(string="Tags", comodel_name="calendar.event.type",)
+    categ_ids = fields.Many2many(
+        string="Tags",
+        comodel_name="calendar.event.type",
+        compute="_compute_categ_ids",
+        store=True,
+        readonly=False,
+    )
     combination_id = fields.Many2one(
         comodel_name="resource.booking.combination",
         string="Resources combination",
+        compute="_compute_combination_id",
         copy=False,
         domain="[('type_rel_ids.type_id', 'in', [type_id])]",
         index=True,
+        readonly=False,
         states={"scheduled": [("required", True)], "confirmed": [("required", True)]},
-        track_visibility="onchange",
+        store=True,
+        tracking=True,
     )
     name = fields.Char(compute="_compute_name")
     partner_id = fields.Many2one(
@@ -68,15 +77,15 @@ class ResourceBooking(models.Model):
         index=True,
         ondelete="cascade",
         required=True,
-        track_visibility="onchange",
+        tracking=True,
         help="Who requested this booking?",
     )
     requester_advice = fields.Text(related="type_id.requester_advice", readonly=True)
     involves_me = fields.Boolean(
         compute="_compute_involves_me", search="_search_involves_me"
     )
-    is_modifiable = fields.Boolean(compute="_compute_overdue")
-    is_overdue = fields.Boolean(compute="_compute_overdue")
+    is_modifiable = fields.Boolean(compute="_compute_is_modifiable")
+    is_overdue = fields.Boolean(compute="_compute_is_overdue")
     state = fields.Selection(
         [
             ("pending", "Pending"),
@@ -88,7 +97,7 @@ class ResourceBooking(models.Model):
         store=True,
         default="pending",
         index=True,
-        track_visibility="onchange",
+        tracking=True,
         help=(
             "Pending: No meeting scheduled.\n"
             "Scheduled: The requester has not confirmed attendance yet.\n"
@@ -103,7 +112,7 @@ class ResourceBooking(models.Model):
         inverse="_inverse_dates",
         store=True,
         track_sequence=200,
-        track_visibility="onchange",
+        tracking=True,
     )
     stop = fields.Datetime(
         compute="_compute_dates",
@@ -112,7 +121,7 @@ class ResourceBooking(models.Model):
         inverse="_inverse_dates",
         store=True,
         track_sequence=210,
-        track_visibility="onchange",
+        tracking=True,
     )
     type_id = fields.Many2one(
         comodel_name="resource.booking.type",
@@ -120,7 +129,7 @@ class ResourceBooking(models.Model):
         index=True,
         ondelete="cascade",
         required=True,
-        track_visibility="onchange",
+        tracking=True,
     )
 
     def _compute_access_url(self):
@@ -129,13 +138,28 @@ class ResourceBooking(models.Model):
             one.access_url = "/my/bookings/%d" % one.id
         return result
 
+    @api.depends("type_id")
+    def _compute_categ_ids(self):
+        """Copy default tags from RBT when changing it."""
+        for one in self:
+            if one.type_id:
+                one.categ_ids = one.type_id.categ_ids
+
+    @api.depends("start", "stop", "type_id")
+    def _compute_combination_id(self):
+        """Select best combination candidate when changing booking dates."""
+        for one in self:
+            # Useless without the interval
+            if one.start and one.stop:
+                one.combination_id = one._get_best_combination()
+
     @api.depends("combination_id", "partner_id")
     def _compute_involves_me(self):
         """Indicate if the booking involves you."""
-        mine = self.search([("involves_me", "=", True)])
-        alien = self - mine
-        alien.update({"involves_me": False})
-        mine.update({"involves_me": True})
+        self.involves_me = False
+        domain = self._search_involves_me("=", True)
+        mine = self.filtered_domain(domain)
+        mine.involves_me = True
 
     def _search_involves_me(self, operator, value):
         """Fast search of own bookings."""
@@ -154,23 +178,30 @@ class ResourceBooking(models.Model):
         return ["!"] + domain
 
     @api.depends("start")
-    def _compute_overdue(self):
-        """Indicate if booking is overdue and modifiable."""
-        is_manager = self.env.user.has_group(
-            "resource_booking.group_manager"
-        ) and not self.env.context.get("using_portal")
+    def _compute_is_overdue(self):
+        """Indicate if booking is overdue."""
         now = fields.Datetime.now()
         for one in self:
             # You can always modify it if there's no meeting yet
             if not one.start:
                 one.is_overdue = False
-                one.is_modifiable = True
                 continue
             anticipation = timedelta(hours=one.type_id.modifications_deadline)
             deadline = one.start - anticipation
             one.is_overdue = now > deadline
-            # Managers can always modify bookings
-            one.is_modifiable = is_manager or not one.is_overdue
+
+    @api.depends("is_overdue")
+    @api.depends_context("uid", "using_portal")
+    def _compute_is_modifiable(self):
+        """Indicate if the booking is modifiable."""
+        self.is_modifiable = True
+        is_manager = not self.env.context.get(
+            "using_portal"
+        ) and self.env.user.has_group("resource_booking.group_manager")
+        # Managers can always modify overdue bookings
+        if not is_manager:
+            overdue = self.filtered("is_overdue")
+            overdue.is_modifiable = False
 
     @api.depends("partner_id", "type_id", "meeting_id")
     def _compute_name(self):
@@ -183,7 +214,7 @@ class ResourceBooking(models.Model):
     @api.depends("active", "meeting_id.attendee_ids.state")
     def _compute_state(self):
         """Obtain request state."""
-        to_check = self.browse(prefetch=self._prefetch)
+        to_check = self.browse()
         for one in self:
             if not one.active:
                 one.state = "canceled"
@@ -205,7 +236,7 @@ class ResourceBooking(models.Model):
         for one in self:
             # You're creating a new record; calendar view sends proper context
             # defaults that at this point are lost; restoring them
-            if one.env.in_onchange and not one.id:
+            if not one.id:
                 one.update(one.default_get(["start", "stop"]))
                 continue
             # Get values from related meeting, if any; just like a related field
@@ -308,20 +339,6 @@ class ResourceBooking(models.Model):
         # In the general use case, stop is start + duration
         self.stop = self.start and self.start + timedelta(hours=self.type_id.duration)
 
-    @api.onchange("type_id")
-    def _onchange_type_fill_tags(self):
-        """Copy default tags from RBT when changing it."""
-        if self.type_id:
-            self.categ_ids = self.type_id.categ_ids
-
-    @api.onchange("start", "stop", "type_id")
-    def _onchange_dates_pick_combination(self):
-        """Select best combination candidate when changing booking dates."""
-        # Useless without the interval
-        if not (self.start and self.stop):
-            return
-        self.combination_id = self._get_best_combination()
-
     def _get_calendar_context(self, year=None, month=None, now=None):
         """Get the required context for the calendar view in the portal.
 
@@ -345,7 +362,7 @@ class ResourceBooking(models.Model):
         slots = self._get_available_slots(start, start + month1)
         return {
             "booking": self,
-            "calendar": calendar.Calendar(lang.week_start - 1),
+            "calendar": calendar.Calendar(int(lang.week_start) - 1),
             "now": now,
             "res_lang": lang,
             "slots": slots,
@@ -383,12 +400,8 @@ class ResourceBooking(models.Model):
                 and availability._items[0][:2] == desired_interval
             ):
                 return combination
-        # TODO In v13 experiment failing always. In v12, datetime widget
-        # triggers onchange on every click, and renders fail=True unusable, but
-        # it would be nice to warn users when they're selecting dates where
-        # nobody is available
+        # Tell portal user there's no combination available
         if self.env.context.get("using_portal"):
-            # Tell user there's no combination available
             hours = (self.stop - self.start).total_seconds() / 3600
             raise ValidationError(
                 _("No resource combinations available on %s")
