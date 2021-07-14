@@ -10,7 +10,7 @@ class ResourceBookingCombination(models.Model):
     _name = "resource.booking.combination"
     _description = "Bookable resource combinations"
 
-    active = fields.Boolean(index=True, default=True)
+    active = fields.Boolean(default=True)
     booking_count = fields.Integer(
         compute="_compute_booking_count", string="Booking count"
     )
