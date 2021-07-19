@@ -15,11 +15,10 @@
     - weekday_names: dict of mappings between weekday numbers and names, where MON=1
      -->
     <template id="scheduling_calendar" name="Resource Booking Calendar">
+        <t t-set="confirm_url" t-value="booking.get_portal_url(suffix='/confirm')" />
+        <t t-set="date_format" t-value="res_lang.date_format" />
+        <t t-set="time_format" t-value="res_lang.time_format.replace(':%S', '')" />
         <div class="o_booking_calendar">
-            <t
-                t-set="confirm_url"
-                t-value="booking.get_portal_url(suffix='/confirm')"
-            />
             <div class="alert alert-danger" t-if="not slots">
                 No free slots found this month.
                 <a
@@ -112,7 +111,7 @@
                                                         type="button"
                                                         data-toggle="modal"
                                                         t-attf-data-target="#modal-confirm-#{int(slot.timestamp())}"
-                                                        t-esc="slot.strftime(res_lang.time_format)"
+                                                        t-esc="slot.strftime(time_format)"
                                                     />
                                                 </t>
                                             </div>
@@ -179,10 +178,10 @@
                                         <li>
                                             Start:
                                             <strong
-                                                t-esc="slot.strftime(res_lang.date_format)"
+                                                t-esc="slot.strftime(date_format)"
                                             />
                                             <strong
-                                                t-esc="slot.strftime(res_lang.time_format)"
+                                                t-esc="slot.strftime(time_format)"
                                             />
                                         </li>
                                         <li>
