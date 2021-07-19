@@ -140,11 +140,11 @@ class PortalCase(HttpCase):
         slot = datetime(2021, 3, 1, 10).timestamp()
         selector_10am = (
             "#dropdown-trigger-2021-03-01 "
-            "+ .slots-dropdown .dropdown-item:contains('10:00:00')"
+            "+ .slots-dropdown .dropdown-item:contains('10:00')"
         )
         selector_1030am = (
             "#dropdown-trigger-2021-03-01 "
-            "+ .slots-dropdown .dropdown-item:contains('10:30:00')"
+            "+ .slots-dropdown .dropdown-item:contains('10:30')"
         )
         self.assertTrue(public_page.cssselect(selector_10am))
         self.assertTrue(public_page.cssselect(selector_1030am))
