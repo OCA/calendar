@@ -8,6 +8,8 @@ setuptools.setup(
     description="Meta package for oca-calendar Odoo addons",
     version=version,
     install_requires=[
+        'odoo12-addon-calendar_event_link_base',
+        'odoo12-addon-calendar_event_link_project_task',
         'odoo12-addon-resource_booking',
     ],
     classifiers=[
