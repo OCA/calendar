@@ -15,7 +15,11 @@ Modules that extend Odoo calendar management tools
 
 [//]: # (addons)
 
-This part will be replaced when running the oca-gen-addons-table script from OCA/maintainer-tools.
+Available addons
+----------------
+addon | version | summary
+--- | --- | ---
+[resource_booking](resource_booking/) | 13.0.1.0.0 | Manage appointments and resource booking
 
 [//]: # (end addons)
 
