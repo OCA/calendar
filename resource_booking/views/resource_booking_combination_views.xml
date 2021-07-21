@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2021 Tecnativa - Jairo Llopis
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <!-- Views -->
+    <record id="resource_booking_combination_form" model="ir.ui.view">
+        <field name="name">Resource booking combination form</field>
+        <field name="model">resource.booking.combination</field>
+        <field name="arch" type="xml">
+            <form>
+                <header />
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <field name="active" invisible="1" />
+                        <widget
+                            name="web_ribbon"
+                            title="Archived"
+                            bg_color="bg-danger"
+                            attrs="{'invisible': [('active', '=', True)]}"
+                        />
+                        <button
+                            name="action_open_bookings"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-calendar"
+                        >
+                            <field name="booking_count" widget="statinfo" />
+                        </button>
+                        <button
+                            name="action_open_resource_booking_types"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-calendar"
+                        >
+                            <field name="type_count" widget="statinfo" />
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
+                    <group name="main">
+                        <field name="resource_ids" />
+                        <field name="forced_calendar_id" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="resource_booking_combination_view_tree" model="ir.ui.view">
+        <field name="name">Resource booking combination tree</field>
+        <field name="model">resource.booking.combination</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+                <field name="resource_ids" widget="many2many_tags" />
+                <field name="forced_calendar_id" />
+            </tree>
+        </field>
+    </record>
+    <record id="resource_booking_combination_view_search" model="ir.ui.view">
+        <field name="name">resource.booking.combination.view.search</field>
+        <field name="model">resource.booking.combination</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="resource_ids" />
+            </search>
+        </field>
+    </record>
+    <!-- Actions -->
+    <record id="resource_booking_combination_action" model="ir.actions.act_window">
+        <field name="name">Resource combinations</field>
+        <field name="res_model">resource.booking.combination</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p
+                class="o_view_nocontent_smiling_face"
+            >Define bookable resource combinations.</p>
+            <p
+            >These records define resource combinations that can be booked together in specified schedules and intervals.</p>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2021 Tecnativa - Jairo Llopis
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<data>
+    <!-- Views -->
+    <record id="resource_booking_view_calendar" model="ir.ui.view">
+        <field name="name">Resource booking calendar</field>
+        <field name="model">resource.booking</field>
+        <field name="arch" type="xml">
+            <calendar
+                string="Bookings"
+                date_start="start"
+                date_stop="stop"
+                quick_add="false"
+                color="combination_id"
+            >
+                <field name="name" invisible="True" />
+                <field name="partner_id" avatar_field="image_128" />
+                <field name="type_id" />
+                <field name="combination_id" />
+            </calendar>
+        </field>
+    </record>
+    <record id="resource_booking_view_tree" model="ir.ui.view">
+        <field name="name">Resource booking tree</field>
+        <field name="model">resource.booking</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="partner_id" />
+                <field name="type_id" />
+                <field name="combination_id" />
+                <field name="state" />
+                <field name="start" />
+                <field name="stop" />
+            </tree>
+        </field>
+    </record>
+    <record id="resource_booking_form" model="ir.ui.view">
+        <field name="name">Resource booking form</field>
+        <field name="model">resource.booking</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="requester_advice" invisible="1" />
+                    <button
+                        name="%(portal.portal_share_action)d"
+                        class="oe_highlight"
+                        string="Share"
+                        type="action"
+                        context="{'default_partner_ids': [(4, partner_id, 0)], 'default_note': requester_advice}"
+                        help="Invite requesting partner to portal."
+                        states="pending"
+                    />
+                    <button
+                        name="%(portal.portal_share_action)d"
+                        string="Share"
+                        type="action"
+                        context="{'default_partner_ids': [(4, partner_id, 0)], 'default_note': requester_advice}"
+                        help="Invite requesting partner to portal."
+                        states="scheduled,confirmed"
+                    />
+                    <button
+                        name="action_schedule"
+                        class="oe_highlight"
+                        string="Schedule"
+                        type="object"
+                        help="Open a calendar to schedule a meeting for this booking request."
+                        attrs="{'invisible': ['|', ('is_modifiable', '=', False), ('state', '!=', 'pending')]}"
+                    />
+                    <button
+                        name="action_confirm"
+                        string="Confirm"
+                        type="object"
+                        help="Confirm that the requesting partner and yourself will attend the scheduled meeting."
+                        attrs="{'invisible': ['|', ('is_modifiable', '=', False), ('state', '!=', 'scheduled')]}"
+                        context="{'confirm_own_attendance': True}"
+                    />
+                    <button
+                        name="action_unschedule"
+                        string="Unschedule"
+                        type="object"
+                        help="Unschedule this booking."
+                        confirm="This will remove the associated meeting to unschedule the booking. Are you sure?"
+                        attrs="{'invisible': ['|', ('is_modifiable', '=', False), ('meeting_id', '=', False)]}"
+                    />
+                    <button
+                        name="action_cancel"
+                        string="Cancel"
+                        type="object"
+                        help="Unschedule this booking and archive it."
+                        attrs="{'invisible': ['|', '|', ('is_modifiable', '=', False), ('state', '=', 'canceled'), ('meeting_id', '!=', False)]}"
+                    />
+                    <button
+                        name="action_cancel"
+                        string="Cancel"
+                        type="object"
+                        help="Unschedule this booking and archive it."
+                        confirm="This will remove the associated meeting to unschedule the booking. Are you sure?"
+                        attrs="{'invisible': ['|', '|', ('is_modifiable', '=', False), ('state', '=', 'canceled'), ('meeting_id', '=', False)]}"
+                    />
+                    <button
+                        name="toggle_active"
+                        string="Set pending"
+                        type="object"
+                        help="Set to pending"
+                        attrs="{'invisible': ['|', ('is_modifiable', '=', False), ('state', '!=', 'canceled')]}"
+                    />
+                    <field name="state" widget="statusbar" />
+                </header>
+                <sheet>
+                    <field name="active" invisible="1" />
+                    <widget
+                        name="web_ribbon"
+                        title="Archived"
+                        bg_color="bg-danger"
+                        attrs="{'invisible': [('active', '=', True)]}"
+                    />
+                    <div class="oe_button_box" name="button_box">
+                        <button
+                            name="action_open_portal"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-globe"
+                        >
+                            <span>Preview</span>
+                        </button>
+                    </div>
+                    <group name="main">
+                        <group name="booking">
+                            <field name="partner_id" />
+                            <field name="type_id" />
+                            <field
+                                name="combination_id"
+                                attrs="{'required': [('start', '!=', False)]}"
+                            />
+                            <field name="categ_ids" widget="many2many_tags" />
+                        </group>
+                        <group name="meeting" string="Meeting">
+                            <field name="meeting_id" groups="base.group_no_one" />
+                            <field name="is_overdue" invisible="1" />
+                            <field name="is_modifiable" invisible="1" />
+                            <div
+                                colspan="2"
+                                role="alert"
+                                class="alert alert-warning"
+                                attrs="{'invisible': [('is_overdue', '=', False)]}"
+                            >
+                                This booking exceeded its modifications deadline.
+                            </div>
+                            <field
+                                name="start"
+                                attrs="{'required': [('stop', '!=', False)]}"
+                            />
+                            <field
+                                name="stop"
+                                attrs="{'required': [('start', '!=', False)]}"
+                            />
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field
+                        name="message_follower_ids"
+                        widget="mail_followers"
+                        groups="base.group_user"
+                    />
+                    <field name="activity_ids" widget="mail_activity" />
+                    <field name="message_ids" widget="mail_thread" />
+                </div>
+            </form>
+        </field>
+    </record>
+    <record id="resource_booking_view_search" model="ir.ui.view">
+        <field name="name">resource.booking.view.search</field>
+        <field name="model">resource.booking</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="partner_id" />
+                <field name="type_id" />
+                <filter
+                    name="is_mine"
+                    string="Involving me"
+                    domain="[('involves_me', '=', True)]"
+                />
+                <filter
+                    name="is_pending"
+                    string="Pending"
+                    domain="[('state', '=', 'pending')]"
+                />
+                <filter
+                    name="is_scheduled"
+                    string="Scheduled or confirmed"
+                    domain="[('state', 'in', ['scheduled', 'confirmed'])]"
+                />
+                <filter name="filter_date" string="Start date" date="start" />
+                <group expand="0" name="groupby" string="Group By">
+                    <filter
+                        string="State"
+                        name="groupby_state"
+                        context="{'group_by': 'state'}"
+                    />
+                    <filter
+                        string="Type"
+                        name="groupby_type_id"
+                        context="{'group_by': 'type_id'}"
+                    />
+                    <filter
+                        string="Combination"
+                        name="groupby_combination_id"
+                        context="{'group_by': 'combination_id'}"
+                    />
+                    <filter
+                        string="Start"
+                        name="groupby_start"
+                        context="{'group_by': 'start'}"
+                    />
+                </group>
+            </search>
+        </field>
+    </record>
+    <!-- Actions -->
+    <record id="resource_booking_action" model="ir.actions.act_window">
+        <field name="name">Bookings</field>
+        <field name="res_model">resource.booking</field>
+        <field name="view_mode">calendar,tree,form</field>
+        <field name="domain">[]</field>
+        <field name="context">{'search_default_is_mine': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Define resource bookings.
+            </p>
+            <p>
+                When scheduled, resources will be blocked. When pending, it means the requester didn't place the booking yet.
+            </p>
+        </field>
+    </record>
+</data>

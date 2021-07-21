@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2021 Tecnativa - Jairo Llopis
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<data>
+    <template id="assets_frontend" inherit_id="web.assets_frontend">
+        <xpath expr="//link[last()]" position="after">
+            <link
+                rel="stylesheet"
+                type="text/scss"
+                href="/resource_booking/static/src/css/portal.scss"
+            />
+        </xpath>
+    </template>
+</data>
