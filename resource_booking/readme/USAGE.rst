@@ -33,5 +33,7 @@ To invite someone to book a resource combination from the portal:
 #. Pick one *Resources combination*, if you want that the requester is assigned
    to that combination. Otherwise, leave it empty, and some free combination
    will be assigned automatically when the requester picks a free slot.
+#. Choose the *duration*, in case it is different from the one specified in the
+   resource booking type.
 #. Click on *Share > Send*.
 #. The requester will receive an email to select a calendar slot from his portal.
