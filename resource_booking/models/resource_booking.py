@@ -2,7 +2,6 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 import calendar
-from contextlib import suppress
 from datetime import datetime, timedelta
 
 from dateutil.relativedelta import relativedelta
@@ -24,14 +23,6 @@ class ResourceBooking(models.Model):
             "combination_required_if_event",
             "CHECK(meeting_id IS NULL OR combination_id IS NOT NULL)",
             "Missing resource booking combination.",
-        ),
-        (
-            "start_stop_together",
-            """CHECK(
-                (start IS NULL AND stop IS NULL) OR
-                (start IS NOT NULL AND stop IS NOT NULL)
-            )""",
-            "Start and stop must be filled or emptied together.",
         ),
         (
             "unique_meeting_id",
@@ -106,7 +97,7 @@ class ResourceBooking(models.Model):
         ),
     )
     start = fields.Datetime(
-        compute="_compute_dates",
+        compute="_compute_start",
         copy=False,
         index=True,
         inverse="_inverse_dates",
@@ -114,11 +105,19 @@ class ResourceBooking(models.Model):
         track_sequence=200,
         tracking=True,
     )
+    duration = fields.Float(
+        compute="_compute_duration",
+        inverse="_inverse_dates",
+        readonly=False,
+        store=True,
+        track_sequence=220,
+        tracking=True,
+        help="Amount of time that the resources will be booked and unavailable for others.",
+    )
     stop = fields.Datetime(
-        compute="_compute_dates",
+        compute="_compute_stop",
         copy=False,
         index=True,
-        inverse="_inverse_dates",
         store=True,
         track_sequence=210,
         tracking=True,
@@ -231,17 +230,38 @@ class ResourceBooking(models.Model):
             one.state = "scheduled" if one.meeting_id else "pending"
         to_check._check_scheduling()
 
-    @api.depends("meeting_id.start", "meeting_id.stop")
-    def _compute_dates(self):
-        for one in self:
-            # You're creating a new record; calendar view sends proper context
-            # defaults that at this point are lost; restoring them
-            if not one.id:
-                one.update(one.default_get(["start", "stop"]))
-                continue
-            # Get values from related meeting, if any; just like a related field
-            one.start = one.meeting_id.start
-            one.stop = one.meeting_id.stop
+    @api.depends("meeting_id.start")
+    def _compute_start(self):
+        """Get start date from related meeting, if available."""
+        for record in self:
+            if record.id:
+                record.start = record.meeting_id.start
+
+    @api.depends("meeting_id.duration", "type_id")
+    def _compute_duration(self):
+        """Compute duration for each booking."""
+        for record in self:
+            # Special case when creating record from UI
+            if not record.id:
+                record.duration = self.default_get(["duration"]).get(
+                    "duration", record.type_id.duration
+                )
+            # Get duration from type only when changing type or when creating from ORM
+            elif not record.duration or record._origin.type_id != record.type_id:
+                record.duration = record.type_id.duration
+            # Get it from meeting only when available
+            elif record.meeting_id:
+                record.duration = record.meeting_id.duration
+
+    @api.depends("start", "duration")
+    def _compute_stop(self):
+        """Get stop date from start date and duration."""
+        for record in self:
+            try:
+                record.stop = record.start + timedelta(hours=record.duration)
+            except TypeError:
+                # Either value is False: no stop date
+                record.stop = False
 
     def _inverse_dates(self):
         """Lazy-create or destroy calendar.event."""
@@ -249,13 +269,14 @@ class ResourceBooking(models.Model):
         _self = self.with_context(from_ui=self.env.context.get("from_ui", True))
         to_create, to_delete = [], _self.env["calendar.event"]
         for one in _self:
-            if one.start and one.stop:
+            if one.start:
                 resource_partners = one.combination_id.resource_ids.filtered(
                     lambda res: res.resource_type == "user"
                 ).mapped("user_id.partner_id")
                 meeting_vals = dict(
                     one.type_id._event_defaults(),
                     categ_ids=[(6, 0, one.categ_ids.ids)],
+                    duration=one.duration,
                     name=one._get_name_formatted(one.partner_id, one.type_id),
                     partner_ids=[
                         (4, partner.id, 0)
@@ -324,20 +345,6 @@ class ResourceBooking(models.Model):
                 )
                 % "\n- ".join(unfitting_bookings.mapped("display_name"))
             )
-
-    @api.onchange("start")
-    def _onchange_start_fill_stop(self):
-        """Apply default stop when changing start."""
-        # When creating a new record by clicking on the calendar view, don't
-        # alter stop the 1st time
-        if not self.id:
-            defaults = self.default_get(["start", "stop"])
-            with suppress(KeyError):
-                if self.start == fields.Datetime.to_datetime(defaults["start"]):
-                    self.stop = defaults["stop"]
-                    return
-        # In the general use case, stop is start + duration
-        self.stop = self.start and self.start + timedelta(hours=self.type_id.duration)
 
     def _get_calendar_context(self, year=None, month=None, now=None):
         """Get the required context for the calendar view in the portal.
@@ -414,7 +421,8 @@ class ResourceBooking(models.Model):
         """Return available slots for scheduling current booking."""
         result = {}
         now = fields.Datetime.context_timestamp(self, fields.Datetime.now())
-        duration = timedelta(hours=self.type_id.duration)
+        slot_duration = timedelta(hours=self.type_id.duration)
+        booking_duration = timedelta(hours=self.duration)
         current = max(
             start_dt, now + timedelta(hours=self.type_id.modifications_deadline)
         )
@@ -424,14 +432,14 @@ class ResourceBooking(models.Model):
             if current != slot_start:
                 current = slot_start
                 continue
-            current_interval = Intervals([(current, current + duration, self)])
+            current_interval = Intervals([(current, current + booking_duration, self)])
             for start, end, _meta in available_intervals & current_interval:
-                if end - start == duration:
+                if end - start == booking_duration:
                     result.setdefault(current.date(), [])
                     result[current.date()].append(current)
                 # I actually only care about the 1st interval, if any
                 break
-            current += duration
+            current += slot_duration
         return result
 
     def _get_intervals(self, start_dt, end_dt, combination=None):
@@ -474,7 +482,7 @@ class ResourceBooking(models.Model):
                 default_res_id=False,
                 # Context used by web_calendar_slot_duration module
                 calendar_slot_duration=FloatTimeParser.value_to_html(
-                    self.type_id.duration, False
+                    self.duration, False
                 ),
                 default_resource_booking_ids=[(6, 0, self.ids)],
                 default_name=self.name,
