@@ -35,6 +35,7 @@ class BackendCase(SavepointCase):
                     "start": "2021-03-02 08:00:00",
                     "type_id": self.rbt.id,
                     "combination_id": rbc_montue.id,
+                    "combination_auto_assign": False,
                 }
             )
         # Booking cannot be placed next Monday before 8:00
@@ -45,6 +46,7 @@ class BackendCase(SavepointCase):
                     "start": "2021-03-02 07:45:00",
                     "type_id": self.rbt.id,
                     "combination_id": rbc_montue.id,
+                    "combination_auto_assign": False,
                 }
             )
         # Booking cannot be placed next Monday after 17:00
@@ -55,6 +57,7 @@ class BackendCase(SavepointCase):
                     "start": "2021-03-02 16:45:00",
                     "type_id": self.rbt.id,
                     "combination_id": rbc_montue.id,
+                    "combination_auto_assign": False,
                 }
             )
         # Booking can be placed next Monday
@@ -64,6 +67,7 @@ class BackendCase(SavepointCase):
                 "start": "2021-03-01 08:00:00",
                 "type_id": self.rbt.id,
                 "combination_id": rbc_montue.id,
+                "combination_auto_assign": False,
             }
         )
         # Another event cannot collide with the same RBC
@@ -74,6 +78,7 @@ class BackendCase(SavepointCase):
                     "start": "2021-03-01 08:29:59",
                     "type_id": self.rbt.id,
                     "combination_id": rbc_montue.id,
+                    "combination_auto_assign": False,
                 }
             )
         # Another event can collide with another RBC
@@ -84,6 +89,7 @@ class BackendCase(SavepointCase):
                 "start": "2021-03-01 08:00:00",
                 "type_id": self.rbt.id,
                 "combination_id": rbc_mon.id,
+                "combination_auto_assign": False,
             }
         )
 
@@ -100,18 +106,21 @@ class BackendCase(SavepointCase):
                     "start": "2021-03-01 08:00:00",
                     "type_id": self.rbt.id,
                     "combination_id": rbc_tue.id,
+                    "combination_auto_assign": False,
                 }
             )
         # However, if the combination is forced to Mondays, you can book it
         rbc_tue.forced_calendar_id = cal_mon
-        self.env["resource.booking"].create(
+        rb = self.env["resource.booking"].create(
             {
                 "partner_id": self.partner.id,
                 "start": "2021-03-01 08:00:00",
                 "type_id": self.rbt.id,
+                "combination_auto_assign": False,
                 "combination_id": rbc_tue.id,
             }
         )
+        self.assertEqual(rb.combination_id, rbc_tue)
 
     def test_booking_from_calendar_view(self):
         # The type is configured by default with bookings of 30 minutes
@@ -265,6 +274,7 @@ class BackendCase(SavepointCase):
             rb_f.partner_id = self.partner
             rb_f.type_id = self.rbt
             rb_f.start = datetime(2021, 3, 1, 10)
+            rb_f.combination_auto_assign = False
             rb_f.combination_id = self.rbcs[0]
             # 1st one works
             if loop == 0:
@@ -413,3 +423,48 @@ class BackendCase(SavepointCase):
                 ],
             },
         )
+
+    def test_location(self):
+        """Location across records works as expected."""
+        rbt2 = self.rbt.copy({"location": "Office 2"})
+        rb_f = Form(self.env["resource.booking"])
+        rb_f.partner_id = self.partner
+        rb_f.type_id = self.rbt
+        rb = rb_f.save()
+        # Pending booking inherits location from type
+        self.assertEqual(rb.state, "pending")
+        self.assertEqual(rb.location, "Main office")
+        # Booking can change location independently now
+        with Form(rb) as rb_f:
+            rb_f.location = "Office 3"
+        self.assertEqual(self.rbt.location, "Main office")
+        self.assertEqual(rb.location, "Office 3")
+        # Changing booking type changes location
+        with Form(rb) as rb_f:
+            rb_f.type_id = rbt2
+        self.assertEqual(rb.location, "Office 2")
+        # Still can change it independently
+        with Form(rb) as rb_f:
+            rb_f.location = "Office 1"
+        self.assertEqual(rb.location, "Office 1")
+        self.assertEqual(rbt2.location, "Office 2")
+        # Schedule the booking, meeting inherits location from it
+        with Form(rb) as rb_f:
+            rb_f.start = "2021-03-01 08:00:00"
+        self.assertEqual(rb.state, "scheduled")
+        self.assertEqual(rb.location, "Office 1")
+        self.assertEqual(rb.meeting_id.location, "Office 1")
+        # Changing meeting location changes location of booking
+        with Form(rb.meeting_id) as meeting_f:
+            meeting_f.location = "Office 2"
+        self.assertEqual(rb.location, "Office 2")
+        self.assertEqual(rb.meeting_id.location, "Office 2")
+        # Changing booking location changes meeting location
+        with Form(rb) as rb_f:
+            rb_f.location = "Office 3"
+        self.assertEqual(rb.meeting_id.location, "Office 3")
+        self.assertEqual(rb.location, "Office 3")
+        # When unscheduled, it keeps location untouched
+        rb.action_unschedule()
+        self.assertFalse(rb.meeting_id)
+        self.assertEqual(rb.location, "Office 3")

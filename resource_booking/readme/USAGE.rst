@@ -19,8 +19,8 @@ To book some resources:
 #. Click on *Booking Count*.
 #. Click on a free slot.
 #. Fill the *Requester*, which may or not be yourself.
-#. Pick one *Resources combination*, in case the one assigned automatically
-   isn't the one you want.
+#. Uncheck *Auto assign* and pick one *Resources combination*, in case the one
+   assigned automatically isn't the one you want.
 
 To invite someone to book a resource combination from the portal:
 
@@ -30,9 +30,10 @@ To invite someone to book a resource combination from the portal:
 #. Click on the list view icon.
 #. Click on *Create*.
 #. Fill the *Requester*.
-#. Pick one *Resources combination*, if you want that the requester is assigned
-   to that combination. Otherwise, leave it empty, and some free combination
-   will be assigned automatically when the requester picks a free slot.
+#. Uncheck *Auto assign* and pick one *Resources combination*, if you want that
+   the requester is assigned to that combination. Otherwise, leave it empty,
+   and some free combination will be assigned automatically when the requester
+   picks a free slot.
 #. Choose the *duration*, in case it is different from the one specified in the
    resource booking type.
 #. Click on *Share > Send*.

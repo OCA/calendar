@@ -44,6 +44,7 @@ class ResourceBookingType(models.Model):
         comodel_name="resource.booking.type.combination.rel",
         inverse_name="type_id",
         string="Available resource combinations",
+        copy=True,
         help="Resource combinations available for this type of bookings.",
     )
     company_id = fields.Many2one(
@@ -117,15 +118,6 @@ class ResourceBookingType(models.Model):
         bookings = self.mapped("booking_ids")
         return bookings._check_scheduling()
 
-    def _event_defaults(self, prefix=""):
-        """Get field names that should fill default values in meetings."""
-        return {
-            prefix + "alarm_ids": [(6, 0, self.alarm_ids.ids)],
-            prefix + "description": self.requester_advice,
-            prefix + "duration": self.duration,
-            prefix + "location": self.location,
-        }
-
     def _get_combinations_priorized(self):
         """Gets all combinations sorted by the chosen assignment method."""
         if not self.combination_assignment:
@@ -175,12 +167,14 @@ class ResourceBookingType(models.Model):
         return {
             "context": dict(
                 self.env.context,
+                default_alarm_ids=[(6, 0, self.alarm_ids.ids)],
+                default_description=self.requester_advice,
+                default_duration=self.duration,
+                default_type_id=self.id,
                 # Context used by web_calendar_slot_duration module
                 calendar_slot_duration=FloatTimeParser.value_to_html(
                     self.duration, False
                 ),
-                default_type_id=self.id,
-                **self._event_defaults(prefix="default_"),
             ),
             "domain": [("type_id", "=", self.id)],
             "name": _("Bookings"),
