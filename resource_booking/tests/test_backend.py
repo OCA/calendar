@@ -1,8 +1,9 @@
 # Copyright 2021 Tecnativa - Jairo Llopis
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
-from datetime import datetime
+from datetime import date, datetime
 
 from freezegun import freeze_time
+from pytz import utc
 
 from odoo import fields
 from odoo.exceptions import ValidationError
@@ -32,7 +33,6 @@ class BackendCase(SavepointCase):
                 {
                     "partner_id": self.partner.id,
                     "start": "2021-03-02 08:00:00",
-                    "stop": "2021-03-02 08:30:00",
                     "type_id": self.rbt.id,
                     "combination_id": rbc_montue.id,
                 }
@@ -43,7 +43,6 @@ class BackendCase(SavepointCase):
                 {
                     "partner_id": self.partner.id,
                     "start": "2021-03-02 07:45:00",
-                    "stop": "2021-03-02 08:15:00",
                     "type_id": self.rbt.id,
                     "combination_id": rbc_montue.id,
                 }
@@ -54,7 +53,6 @@ class BackendCase(SavepointCase):
                 {
                     "partner_id": self.partner.id,
                     "start": "2021-03-02 16:45:00",
-                    "stop": "2021-03-02 17:15:00",
                     "type_id": self.rbt.id,
                     "combination_id": rbc_montue.id,
                 }
@@ -64,7 +62,6 @@ class BackendCase(SavepointCase):
             {
                 "partner_id": self.partner.id,
                 "start": "2021-03-01 08:00:00",
-                "stop": "2021-03-01 08:30:00",
                 "type_id": self.rbt.id,
                 "combination_id": rbc_montue.id,
             }
@@ -75,7 +72,6 @@ class BackendCase(SavepointCase):
                 {
                     "partner_id": self.partner.id,
                     "start": "2021-03-01 08:29:59",
-                    "stop": "2021-03-01 08:59:59",
                     "type_id": self.rbt.id,
                     "combination_id": rbc_montue.id,
                 }
@@ -86,7 +82,6 @@ class BackendCase(SavepointCase):
             {
                 "partner_id": self.partner.id,
                 "start": "2021-03-01 08:00:00",
-                "stop": "2021-03-01 08:30:00",
                 "type_id": self.rbt.id,
                 "combination_id": rbc_mon.id,
             }
@@ -103,7 +98,6 @@ class BackendCase(SavepointCase):
                 {
                     "partner_id": self.partner.id,
                     "start": "2021-03-01 08:00:00",
-                    "stop": "2021-03-01 08:30:00",
                     "type_id": self.rbt.id,
                     "combination_id": rbc_tue.id,
                 }
@@ -114,7 +108,6 @@ class BackendCase(SavepointCase):
             {
                 "partner_id": self.partner.id,
                 "start": "2021-03-01 08:00:00",
-                "stop": "2021-03-01 08:30:00",
                 "type_id": self.rbt.id,
                 "combination_id": rbc_tue.id,
             }
@@ -130,23 +123,24 @@ class BackendCase(SavepointCase):
         self.assertEqual(button_context["calendar_slot_duration"], "00:45")
         self.assertEqual(button_context["default_duration"], 0.75)
         # When you click & drag on calendar to create an event, it adds the
-        # start and end as default; we imitate that here to book a meeting with
-        # 2 slots next monday
+        # start and duration as default; we imitate that here to book a meeting
+        # with 2 slots next monday
+        button_context["default_duration"] = 1.5
         booking_form = Form(
             self.env["resource.booking"].with_context(
-                **button_context,
-                default_start="2021-03-01 08:00:00",
-                default_stop="2021-03-01 09:30:00"
+                **button_context, default_start="2021-03-01 08:00:00",
             )
         )
         # This might seem redundant, but makes sure onchanges don't mess stuff
         self.assertEqual(_2dt(booking_form.start), datetime(2021, 3, 1, 8))
+        self.assertEqual(booking_form.duration, 1.5)
         self.assertEqual(_2dt(booking_form.stop), datetime(2021, 3, 1, 9, 30))
-        # If I change to next week's monday, then the onchange assumes the stop
-        # date will be 1 slot, and not 2
+        # If I change to next week's monday, then the stop date advances 1:30h
         booking_form.start = datetime(2021, 3, 8, 8)
         booking_form.partner_id = self.partner
-        self.assertEqual(_2dt(booking_form.stop), datetime(2021, 3, 8, 8, 45))
+        self.assertEqual(_2dt(booking_form.start), datetime(2021, 3, 8, 8))
+        self.assertEqual(booking_form.duration, 1.5)
+        self.assertEqual(_2dt(booking_form.stop), datetime(2021, 3, 8, 9, 30))
         # I can book it (which means type & combination were autofilled)
         booking = booking_form.save()
         self.assertTrue(booking.meeting_id)
@@ -319,11 +313,11 @@ class BackendCase(SavepointCase):
                 "combination_id": rbc_mon.id,
                 "partner_id": self.partner.id,
                 "start": "2021-02-22 08:00:00",
-                "stop": "2021-02-22 08:30:00",
                 "type_id": self.rbt.id,
             }
         )
         past_booking.action_confirm()
+        self.assertEqual(past_booking.duration, 0.5)
         self.assertEqual(past_booking.state, "confirmed")
         # There's another one for next monday, confirmed too
         future_booking = self.env["resource.booking"].create(
@@ -331,7 +325,6 @@ class BackendCase(SavepointCase):
                 "combination_id": rbc_mon.id,
                 "partner_id": self.partner.id,
                 "start": "2021-03-01 08:00:00",
-                "stop": "2021-03-01 08:30:00",
                 "type_id": self.rbt.id,
             }
         )
@@ -365,7 +358,6 @@ class BackendCase(SavepointCase):
                 "combination_id": self.rbcs[0].id,
                 "partner_id": self.partner.id,
                 "start": "2021-03-01 08:00:00",  # 09:00 in Madrid
-                "stop": "2021-03-01 08:30:00",
                 "type_id": self.rbt.id,
             }
         )
@@ -382,3 +374,42 @@ class BackendCase(SavepointCase):
         )
         # Invitation must display Madrid TZ (CET)
         self.assertIn("09:00:00 CET", invitation_mail.body)
+
+    def test_free_slots_with_different_type_and_booking_durations(self):
+        """Slot and booking duration are different, and all works."""
+        # Type and calendar allow one slot each 30 minutes on Mondays and
+        # Tuesdays from 08:00 to 17:00 UTC. The booking will span for 3 slots.
+        rb = self.env["resource.booking"].create(
+            {
+                "partner_id": self.partner.id,
+                "type_id": self.rbt.id,
+                "duration": self.rbt.duration * 3,
+            }
+        )
+        self.assertEqual(rb.duration, 1.5)
+        slots = rb._get_available_slots(
+            utc.localize(datetime(2021, 3, 2, 14, 15)),
+            utc.localize(datetime(2021, 3, 8, 10)),
+        )
+        self.assertEqual(
+            slots,
+            {
+                # Thursday
+                date(2021, 3, 2): [
+                    # We start searching at 14:15, so first free slot will
+                    # start at 14:30
+                    utc.localize(datetime(2021, 3, 2, 14, 30)),
+                    utc.localize(datetime(2021, 3, 2, 15)),
+                    # Booking duration is 1:30, and calendar ends at 17:00, so
+                    # last slot starts at 15:30
+                    utc.localize(datetime(2021, 3, 2, 15, 30)),
+                ],
+                # Next Monday, because calendar only allows Mondays and Tuesdays
+                date(2021, 3, 8): [
+                    # Calendar starts at 8:00
+                    utc.localize(datetime(2021, 3, 8, 8)),
+                    # We are searching until 10:00, so last free slot is at 8:30
+                    utc.localize(datetime(2021, 3, 8, 8, 30)),
+                ],
+            },
+        )

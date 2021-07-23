@@ -58,7 +58,10 @@ class ResourceBookingType(models.Model):
     duration = fields.Float(
         required=True,
         default=0.5,  # 30 minutes
-        help="Establish each interval's duration.",
+        help=(
+            "Interval offered to start each resource booking. "
+            "Also used as booking default duration."
+        ),
     )
     location = fields.Char()
     modifications_deadline = fields.Float(

@@ -10,7 +10,7 @@
             <calendar
                 string="Bookings"
                 date_start="start"
-                date_stop="stop"
+                date_delay="duration"
                 quick_add="false"
                 color="combination_id"
             >
@@ -136,7 +136,11 @@
                             <field name="categ_ids" widget="many2many_tags" />
                         </group>
                         <group name="meeting" string="Meeting">
-                            <field name="meeting_id" groups="base.group_no_one" />
+                            <field
+                                name="meeting_id"
+                                groups="base.group_no_one"
+                                readonly="1"
+                            />
                             <field name="is_overdue" invisible="1" />
                             <field name="is_modifiable" invisible="1" />
                             <div
@@ -147,14 +151,13 @@
                             >
                                 This booking exceeded its modifications deadline.
                             </div>
+                            <field name="start" />
                             <field
-                                name="start"
-                                attrs="{'required': [('stop', '!=', False)]}"
+                                name="duration"
+                                widget="float_time"
+                                class="oe_inline"
                             />
-                            <field
-                                name="stop"
-                                attrs="{'required': [('start', '!=', False)]}"
-                            />
+                            <field name="stop" />
                         </group>
                     </group>
                 </sheet>
