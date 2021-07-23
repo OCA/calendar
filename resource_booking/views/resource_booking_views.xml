@@ -129,10 +129,16 @@
                         <group name="booking">
                             <field name="partner_id" />
                             <field name="type_id" />
-                            <field
-                                name="combination_id"
-                                attrs="{'required': [('start', '!=', False)]}"
-                            />
+                            <label for="combination_id" />
+                            <div>
+                                <field name="combination_auto_assign" />
+                                <label for="combination_auto_assign" />
+                                <field
+                                    name="combination_id"
+                                    class="oe_inline"
+                                    attrs="{'required': [('start', '!=', False)], 'readonly': [('combination_auto_assign', '=', True)]}"
+                                />
+                            </div>
                             <field name="categ_ids" widget="many2many_tags" />
                         </group>
                         <group name="meeting" string="Meeting">
@@ -158,6 +164,7 @@
                                 class="oe_inline"
                             />
                             <field name="stop" />
+                            <field name="location" />
                         </group>
                     </group>
                 </sheet>

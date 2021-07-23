@@ -61,6 +61,14 @@ class ResourceBooking(models.Model):
         store=True,
         tracking=True,
     )
+    combination_auto_assign = fields.Boolean(
+        string="Auto assigned",
+        default=True,
+        help=(
+            "When checked, resource combinations will be (un)assigned automatically "
+            "based on their availability during the booking dates."
+        ),
+    )
     name = fields.Char(compute="_compute_name")
     partner_id = fields.Many2one(
         "res.partner",
@@ -71,6 +79,7 @@ class ResourceBooking(models.Model):
         tracking=True,
         help="Who requested this booking?",
     )
+    location = fields.Char(compute="_compute_location", readonly=False, store=True,)
     requester_advice = fields.Text(related="type_id.requester_advice", readonly=True)
     involves_me = fields.Boolean(
         compute="_compute_involves_me", search="_search_involves_me"
@@ -100,14 +109,13 @@ class ResourceBooking(models.Model):
         compute="_compute_start",
         copy=False,
         index=True,
-        inverse="_inverse_dates",
+        readonly=False,
         store=True,
         track_sequence=200,
         tracking=True,
     )
     duration = fields.Float(
         compute="_compute_duration",
-        inverse="_inverse_dates",
         readonly=False,
         store=True,
         track_sequence=220,
@@ -144,12 +152,12 @@ class ResourceBooking(models.Model):
             if one.type_id:
                 one.categ_ids = one.type_id.categ_ids
 
-    @api.depends("start", "stop", "type_id")
+    @api.depends("start", "type_id", "combination_auto_assign")
     def _compute_combination_id(self):
         """Select best combination candidate when changing booking dates."""
         for one in self:
             # Useless without the interval
-            if one.start and one.stop:
+            if one.start and one.combination_auto_assign:
                 one.combination_id = one._get_best_combination()
 
     @api.depends("combination_id", "partner_id")
@@ -210,6 +218,18 @@ class ResourceBooking(models.Model):
                 one.partner_id, one.type_id, one.meeting_id
             )
 
+    @api.depends("meeting_id.location", "type_id")
+    def _compute_location(self):
+        """Get location from meeting or type."""
+        for record in self:
+            # Get location from type when changing it or creating from ORM
+            # HACK https://github.com/odoo/odoo/issues/74152
+            if not record.location or record._origin.type_id != record.type_id:
+                record.location = record.type_id.location
+            # Get it from meeting only when available
+            elif record.meeting_id:
+                record.location = record.meeting_id.location
+
     @api.depends("active", "meeting_id.attendee_ids.state")
     def _compute_state(self):
         """Obtain request state."""
@@ -263,10 +283,14 @@ class ResourceBooking(models.Model):
                 # Either value is False: no stop date
                 record.stop = False
 
-    def _inverse_dates(self):
+    def _sync_meeting(self):
         """Lazy-create or destroy calendar.event."""
         # Notify changed dates to attendees
-        _self = self.with_context(from_ui=self.env.context.get("from_ui", True))
+        _self = self.with_context(
+            syncing_booking_ids=self.ids, from_ui=self.env.context.get("from_ui", True)
+        )
+        # Avoid sync recursion
+        _self -= self.browse(self.env.context.get("syncing_booking_ids"))
         to_create, to_delete = [], _self.env["calendar.event"]
         for one in _self:
             if one.start:
@@ -274,9 +298,11 @@ class ResourceBooking(models.Model):
                     lambda res: res.resource_type == "user"
                 ).mapped("user_id.partner_id")
                 meeting_vals = dict(
-                    one.type_id._event_defaults(),
+                    alarm_ids=[(6, 0, one.type_id.alarm_ids.ids)],
                     categ_ids=[(6, 0, one.categ_ids.ids)],
+                    description=one.type_id.requester_advice,
                     duration=one.duration,
+                    location=one.location,
                     name=one._get_name_formatted(one.partner_id, one.type_id),
                     partner_ids=[
                         (4, partner.id, 0)
@@ -389,7 +415,7 @@ class ResourceBooking(models.Model):
     def _get_best_combination(self):
         """Pick best combination based on current booking state."""
         # No dates? Then return whatever is already selected (can be empty)
-        if not (self.start and self.stop):
+        if not self.start:
             return self.combination_id
         # If there's a combination already, put it 1st (highest priority)
         sorted_combinations = self.combination_id + (
@@ -461,6 +487,24 @@ class ResourceBooking(models.Model):
         ).with_context(analyzing_booking=booking_id)
         result &= combinations._get_intervals(start_dt, end_dt)
         return result
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        """Sync booking with meeting if needed."""
+        result = super().create(vals_list)
+        result._sync_meeting()
+        return result
+
+    def write(self, vals):
+        """Sync booking with meeting if needed."""
+        result = super().write(vals)
+        self._sync_meeting()
+        return result
+
+    def unlink(self):
+        """Unlink meeting if needed."""
+        self.meeting_id.unlink()
+        return super().unlink()
 
     def message_get_suggested_recipients(self):
         recipients = super().message_get_suggested_recipients()
