@@ -8,7 +8,6 @@ from dateutil.relativedelta import relativedelta
 
 from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
-from odoo.osv.expression import NEGATIVE_TERM_OPERATORS
 
 from odoo.addons.resource.models.resource import Intervals
 
@@ -35,7 +34,6 @@ class ResourceBooking(models.Model):
     meeting_id = fields.Many2one(
         comodel_name="calendar.event",
         string="Meeting",
-        auto_join=True,
         context={"default_res_id": False, "default_res_model": False},
         copy=False,
         index=True,
@@ -81,9 +79,6 @@ class ResourceBooking(models.Model):
     )
     location = fields.Char(compute="_compute_location", readonly=False, store=True,)
     requester_advice = fields.Text(related="type_id.requester_advice", readonly=True)
-    involves_me = fields.Boolean(
-        compute="_compute_involves_me", search="_search_involves_me"
-    )
     is_modifiable = fields.Boolean(compute="_compute_is_modifiable")
     is_overdue = fields.Boolean(compute="_compute_is_overdue")
     state = fields.Selection(
@@ -159,30 +154,6 @@ class ResourceBooking(models.Model):
             # Useless without the interval
             if one.start and one.combination_auto_assign:
                 one.combination_id = one._get_best_combination()
-
-    @api.depends("combination_id", "partner_id")
-    def _compute_involves_me(self):
-        """Indicate if the booking involves you."""
-        self.involves_me = False
-        domain = self._search_involves_me("=", True)
-        mine = self.filtered_domain(domain)
-        mine.involves_me = True
-
-    def _search_involves_me(self, operator, value):
-        """Fast search of own bookings."""
-        me = self.env.user.partner_id
-        if operator in NEGATIVE_TERM_OPERATORS:
-            value = not value
-        domain = [
-            "|",
-            "|",
-            ("partner_id", "=", me.id),
-            ("meeting_id.attendee_ids.partner_id", "in", me.ids),
-            ("combination_id.resource_ids.user_id.partner_id", "in", me.ids),
-        ]
-        if value:
-            return domain
-        return ["!"] + domain
 
     @api.depends("start")
     def _compute_is_overdue(self):
