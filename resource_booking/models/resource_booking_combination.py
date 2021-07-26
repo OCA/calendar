@@ -72,7 +72,8 @@ class ResourceBookingCombination(models.Model):
         """Get available intervals for this booking combination."""
         base = Intervals([(start_dt, end_dt, self)])
         result = Intervals([])
-        for combination in self:
+        # Detached compatibility with hr_holidays_public
+        for combination in self.with_context(exclude_public_holidays=True):
             combination_intervals = base
             for res in combination.resource_ids:
                 if not combination_intervals:
