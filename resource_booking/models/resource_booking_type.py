@@ -140,9 +140,11 @@ class ResourceBookingType(models.Model):
         duration_delta = timedelta(hours=self.duration)
         end_dt = start_dt + duration_delta
         workday_min = start_dt.replace(hour=0, minute=0, second=0, microsecond=0)
-        attendance_intervals = self.resource_calendar_id._attendance_intervals(
-            workday_min, end_dt
+        # Detached compatibility with hr_holidays_public
+        res_calendar = self.resource_calendar_id.with_context(
+            exclude_public_holidays=True
         )
+        attendance_intervals = res_calendar._attendance_intervals(workday_min, end_dt)
         try:
             workday_start, valid_end, _meta = attendance_intervals._items[-1]
             if valid_end != end_dt:
@@ -152,9 +154,7 @@ class ResourceBookingType(models.Model):
             try:
                 # Returns `False` if no slot is found in the next 2 weeks
                 return (
-                    self.resource_calendar_id.plan_hours(
-                        self.duration, end_dt, compute_leaves=True
-                    )
+                    res_calendar.plan_hours(self.duration, end_dt, compute_leaves=True)
                     - duration_delta
                 )
             except TypeError:
