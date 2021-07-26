@@ -446,7 +446,10 @@ class ResourceBooking(models.Model):
             booking_id = self.id or self._origin.id or -1
         except AttributeError:
             booking_id = -1
-        booking = self.with_context(analyzing_booking=booking_id)
+        # Detached compatibility with hr_holidays_public
+        booking = self.with_context(
+            analyzing_booking=booking_id, exclude_public_holidays=True
+        )
         # RBT calendar uses no resources to restrict bookings
         result = booking.type_id.resource_calendar_id._work_intervals(start_dt, end_dt)
         # Restrict with the chosen combination, or to at least one of the
