@@ -190,7 +190,7 @@
                 <filter
                     name="is_mine"
                     string="Involving me"
-                    domain="[('involves_me', '=', True)]"
+                    domain="['|', '|', ('partner_id.user_ids', '=', uid), ('meeting_id.attendee_ids.partner_id.user_ids', '=', uid), ('combination_id.resource_ids.user_id', '=', uid)]"
                 />
                 <filter
                     name="is_pending"
