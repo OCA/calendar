@@ -44,6 +44,7 @@ class ResourceBookingType(models.Model):
         comodel_name="resource.booking.type.combination.rel",
         inverse_name="type_id",
         string="Available resource combinations",
+        copy=True,
         help="Resource combinations available for this type of bookings.",
     )
     company_id = fields.Many2one(
@@ -58,7 +59,10 @@ class ResourceBookingType(models.Model):
     duration = fields.Float(
         required=True,
         default=0.5,  # 30 minutes
-        help="Establish each interval's duration.",
+        help=(
+            "Interval offered to start each resource booking. "
+            "Also used as booking default duration."
+        ),
     )
     location = fields.Char()
     modifications_deadline = fields.Float(
@@ -114,15 +118,6 @@ class ResourceBookingType(models.Model):
         bookings = self.mapped("booking_ids")
         return bookings._check_scheduling()
 
-    def _event_defaults(self, prefix=""):
-        """Get field names that should fill default values in meetings."""
-        return {
-            prefix + "alarm_ids": [(6, 0, self.alarm_ids.ids)],
-            prefix + "description": self.requester_advice,
-            prefix + "duration": self.duration,
-            prefix + "location": self.location,
-        }
-
     def _get_combinations_priorized(self):
         """Gets all combinations sorted by the chosen assignment method."""
         if not self.combination_assignment:
@@ -145,9 +140,11 @@ class ResourceBookingType(models.Model):
         duration_delta = timedelta(hours=self.duration)
         end_dt = start_dt + duration_delta
         workday_min = start_dt.replace(hour=0, minute=0, second=0, microsecond=0)
-        attendance_intervals = self.resource_calendar_id._attendance_intervals(
-            workday_min, end_dt
+        # Detached compatibility with hr_holidays_public
+        res_calendar = self.resource_calendar_id.with_context(
+            exclude_public_holidays=True
         )
+        attendance_intervals = res_calendar._attendance_intervals(workday_min, end_dt)
         try:
             workday_start, valid_end, _meta = attendance_intervals._items[-1]
             if valid_end != end_dt:
@@ -157,9 +154,7 @@ class ResourceBookingType(models.Model):
             try:
                 # Returns `False` if no slot is found in the next 2 weeks
                 return (
-                    self.resource_calendar_id.plan_hours(
-                        self.duration, end_dt, compute_leaves=True
-                    )
+                    res_calendar.plan_hours(self.duration, end_dt, compute_leaves=True)
                     - duration_delta
                 )
             except TypeError:
@@ -172,12 +167,14 @@ class ResourceBookingType(models.Model):
         return {
             "context": dict(
                 self.env.context,
+                default_alarm_ids=[(6, 0, self.alarm_ids.ids)],
+                default_description=self.requester_advice,
+                default_duration=self.duration,
+                default_type_id=self.id,
                 # Context used by web_calendar_slot_duration module
                 calendar_slot_duration=FloatTimeParser.value_to_html(
                     self.duration, False
                 ),
-                default_type_id=self.id,
-                **self._event_defaults(prefix="default_"),
             ),
             "domain": [("type_id", "=", self.id)],
             "name": _("Bookings"),

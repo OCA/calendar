@@ -1,8 +1,9 @@
 # Copyright 2021 Tecnativa - Jairo Llopis
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
-from datetime import datetime
+from datetime import date, datetime
 
 from freezegun import freeze_time
+from pytz import utc
 
 from odoo import fields
 from odoo.exceptions import ValidationError
@@ -32,9 +33,9 @@ class BackendCase(SavepointCase):
                 {
                     "partner_id": self.partner.id,
                     "start": "2021-03-02 08:00:00",
-                    "stop": "2021-03-02 08:30:00",
                     "type_id": self.rbt.id,
                     "combination_id": rbc_montue.id,
+                    "combination_auto_assign": False,
                 }
             )
         # Booking cannot be placed next Monday before 8:00
@@ -43,9 +44,9 @@ class BackendCase(SavepointCase):
                 {
                     "partner_id": self.partner.id,
                     "start": "2021-03-02 07:45:00",
-                    "stop": "2021-03-02 08:15:00",
                     "type_id": self.rbt.id,
                     "combination_id": rbc_montue.id,
+                    "combination_auto_assign": False,
                 }
             )
         # Booking cannot be placed next Monday after 17:00
@@ -54,9 +55,9 @@ class BackendCase(SavepointCase):
                 {
                     "partner_id": self.partner.id,
                     "start": "2021-03-02 16:45:00",
-                    "stop": "2021-03-02 17:15:00",
                     "type_id": self.rbt.id,
                     "combination_id": rbc_montue.id,
+                    "combination_auto_assign": False,
                 }
             )
         # Booking can be placed next Monday
@@ -64,9 +65,9 @@ class BackendCase(SavepointCase):
             {
                 "partner_id": self.partner.id,
                 "start": "2021-03-01 08:00:00",
-                "stop": "2021-03-01 08:30:00",
                 "type_id": self.rbt.id,
                 "combination_id": rbc_montue.id,
+                "combination_auto_assign": False,
             }
         )
         # Another event cannot collide with the same RBC
@@ -75,9 +76,9 @@ class BackendCase(SavepointCase):
                 {
                     "partner_id": self.partner.id,
                     "start": "2021-03-01 08:29:59",
-                    "stop": "2021-03-01 08:59:59",
                     "type_id": self.rbt.id,
                     "combination_id": rbc_montue.id,
+                    "combination_auto_assign": False,
                 }
             )
         # Another event can collide with another RBC
@@ -86,9 +87,9 @@ class BackendCase(SavepointCase):
             {
                 "partner_id": self.partner.id,
                 "start": "2021-03-01 08:00:00",
-                "stop": "2021-03-01 08:30:00",
                 "type_id": self.rbt.id,
                 "combination_id": rbc_mon.id,
+                "combination_auto_assign": False,
             }
         )
 
@@ -103,22 +104,23 @@ class BackendCase(SavepointCase):
                 {
                     "partner_id": self.partner.id,
                     "start": "2021-03-01 08:00:00",
-                    "stop": "2021-03-01 08:30:00",
                     "type_id": self.rbt.id,
                     "combination_id": rbc_tue.id,
+                    "combination_auto_assign": False,
                 }
             )
         # However, if the combination is forced to Mondays, you can book it
         rbc_tue.forced_calendar_id = cal_mon
-        self.env["resource.booking"].create(
+        rb = self.env["resource.booking"].create(
             {
                 "partner_id": self.partner.id,
                 "start": "2021-03-01 08:00:00",
-                "stop": "2021-03-01 08:30:00",
                 "type_id": self.rbt.id,
+                "combination_auto_assign": False,
                 "combination_id": rbc_tue.id,
             }
         )
+        self.assertEqual(rb.combination_id, rbc_tue)
 
     def test_booking_from_calendar_view(self):
         # The type is configured by default with bookings of 30 minutes
@@ -130,23 +132,24 @@ class BackendCase(SavepointCase):
         self.assertEqual(button_context["calendar_slot_duration"], "00:45")
         self.assertEqual(button_context["default_duration"], 0.75)
         # When you click & drag on calendar to create an event, it adds the
-        # start and end as default; we imitate that here to book a meeting with
-        # 2 slots next monday
+        # start and duration as default; we imitate that here to book a meeting
+        # with 2 slots next monday
+        button_context["default_duration"] = 1.5
         booking_form = Form(
             self.env["resource.booking"].with_context(
-                **button_context,
-                default_start="2021-03-01 08:00:00",
-                default_stop="2021-03-01 09:30:00"
+                **button_context, default_start="2021-03-01 08:00:00",
             )
         )
         # This might seem redundant, but makes sure onchanges don't mess stuff
         self.assertEqual(_2dt(booking_form.start), datetime(2021, 3, 1, 8))
+        self.assertEqual(booking_form.duration, 1.5)
         self.assertEqual(_2dt(booking_form.stop), datetime(2021, 3, 1, 9, 30))
-        # If I change to next week's monday, then the onchange assumes the stop
-        # date will be 1 slot, and not 2
+        # If I change to next week's monday, then the stop date advances 1:30h
         booking_form.start = datetime(2021, 3, 8, 8)
         booking_form.partner_id = self.partner
-        self.assertEqual(_2dt(booking_form.stop), datetime(2021, 3, 8, 8, 45))
+        self.assertEqual(_2dt(booking_form.start), datetime(2021, 3, 8, 8))
+        self.assertEqual(booking_form.duration, 1.5)
+        self.assertEqual(_2dt(booking_form.stop), datetime(2021, 3, 8, 9, 30))
         # I can book it (which means type & combination were autofilled)
         booking = booking_form.save()
         self.assertTrue(booking.meeting_id)
@@ -271,6 +274,7 @@ class BackendCase(SavepointCase):
             rb_f.partner_id = self.partner
             rb_f.type_id = self.rbt
             rb_f.start = datetime(2021, 3, 1, 10)
+            rb_f.combination_auto_assign = False
             rb_f.combination_id = self.rbcs[0]
             # 1st one works
             if loop == 0:
@@ -319,11 +323,11 @@ class BackendCase(SavepointCase):
                 "combination_id": rbc_mon.id,
                 "partner_id": self.partner.id,
                 "start": "2021-02-22 08:00:00",
-                "stop": "2021-02-22 08:30:00",
                 "type_id": self.rbt.id,
             }
         )
         past_booking.action_confirm()
+        self.assertEqual(past_booking.duration, 0.5)
         self.assertEqual(past_booking.state, "confirmed")
         # There's another one for next monday, confirmed too
         future_booking = self.env["resource.booking"].create(
@@ -331,7 +335,6 @@ class BackendCase(SavepointCase):
                 "combination_id": rbc_mon.id,
                 "partner_id": self.partner.id,
                 "start": "2021-03-01 08:00:00",
-                "stop": "2021-03-01 08:30:00",
                 "type_id": self.rbt.id,
             }
         )
@@ -365,7 +368,6 @@ class BackendCase(SavepointCase):
                 "combination_id": self.rbcs[0].id,
                 "partner_id": self.partner.id,
                 "start": "2021-03-01 08:00:00",  # 09:00 in Madrid
-                "stop": "2021-03-01 08:30:00",
                 "type_id": self.rbt.id,
             }
         )
@@ -382,3 +384,119 @@ class BackendCase(SavepointCase):
         )
         # Invitation must display Madrid TZ (CET)
         self.assertIn("09:00:00 CET", invitation_mail.body)
+
+    def test_free_slots_with_different_type_and_booking_durations(self):
+        """Slot and booking duration are different, and all works."""
+        # Type and calendar allow one slot each 30 minutes on Mondays and
+        # Tuesdays from 08:00 to 17:00 UTC. The booking will span for 3 slots.
+        rb = self.env["resource.booking"].create(
+            {
+                "partner_id": self.partner.id,
+                "type_id": self.rbt.id,
+                "duration": self.rbt.duration * 3,
+            }
+        )
+        self.assertEqual(rb.duration, 1.5)
+        slots = rb._get_available_slots(
+            utc.localize(datetime(2021, 3, 2, 14, 15)),
+            utc.localize(datetime(2021, 3, 8, 10)),
+        )
+        self.assertEqual(
+            slots,
+            {
+                # Thursday
+                date(2021, 3, 2): [
+                    # We start searching at 14:15, so first free slot will
+                    # start at 14:30
+                    utc.localize(datetime(2021, 3, 2, 14, 30)),
+                    utc.localize(datetime(2021, 3, 2, 15)),
+                    # Booking duration is 1:30, and calendar ends at 17:00, so
+                    # last slot starts at 15:30
+                    utc.localize(datetime(2021, 3, 2, 15, 30)),
+                ],
+                # Next Monday, because calendar only allows Mondays and Tuesdays
+                date(2021, 3, 8): [
+                    # Calendar starts at 8:00
+                    utc.localize(datetime(2021, 3, 8, 8)),
+                    # We are searching until 10:00, so last free slot is at 8:30
+                    utc.localize(datetime(2021, 3, 8, 8, 30)),
+                ],
+            },
+        )
+
+    def test_location(self):
+        """Location across records works as expected."""
+        rbt2 = self.rbt.copy({"location": "Office 2"})
+        rb_f = Form(self.env["resource.booking"])
+        rb_f.partner_id = self.partner
+        rb_f.type_id = self.rbt
+        rb = rb_f.save()
+        # Pending booking inherits location from type
+        self.assertEqual(rb.state, "pending")
+        self.assertEqual(rb.location, "Main office")
+        # Booking can change location independently now
+        with Form(rb) as rb_f:
+            rb_f.location = "Office 3"
+        self.assertEqual(self.rbt.location, "Main office")
+        self.assertEqual(rb.location, "Office 3")
+        # Changing booking type changes location
+        with Form(rb) as rb_f:
+            rb_f.type_id = rbt2
+        self.assertEqual(rb.location, "Office 2")
+        # Still can change it independently
+        with Form(rb) as rb_f:
+            rb_f.location = "Office 1"
+        self.assertEqual(rb.location, "Office 1")
+        self.assertEqual(rbt2.location, "Office 2")
+        # Schedule the booking, meeting inherits location from it
+        with Form(rb) as rb_f:
+            rb_f.start = "2021-03-01 08:00:00"
+        self.assertEqual(rb.state, "scheduled")
+        self.assertEqual(rb.location, "Office 1")
+        self.assertEqual(rb.meeting_id.location, "Office 1")
+        # Changing meeting location changes location of booking
+        with Form(rb.meeting_id) as meeting_f:
+            meeting_f.location = "Office 2"
+        self.assertEqual(rb.location, "Office 2")
+        self.assertEqual(rb.meeting_id.location, "Office 2")
+        # Changing booking location changes meeting location
+        with Form(rb) as rb_f:
+            rb_f.location = "Office 3"
+        self.assertEqual(rb.meeting_id.location, "Office 3")
+        self.assertEqual(rb.location, "Office 3")
+        # When unscheduled, it keeps location untouched
+        rb.action_unschedule()
+        self.assertFalse(rb.meeting_id)
+        self.assertEqual(rb.location, "Office 3")
+
+    def test_resource_booking_display_name(self):
+        # Pending booking with no name
+        rb = self.env["resource.booking"].create(
+            {"partner_id": self.partner.id, "type_id": self.rbt.id}
+        )
+        self.assertEqual(rb.display_name, "some customer - Test resource booking type")
+        self.assertEqual(
+            rb.with_context(using_portal=True).display_name, "# %d" % rb.id
+        )
+        # Pending booking with name
+        rb.name = "changed"
+        self.assertEqual(rb.display_name, "changed")
+        self.assertEqual(
+            rb.with_context(using_portal=True).display_name, "# %d - changed" % rb.id
+        )
+        # Scheduled booking with name
+        rb.start = "2021-03-01 08:00:00"
+        self.assertEqual(rb.display_name, "changed")
+        self.assertEqual(
+            rb.with_context(using_portal=True).display_name, "# %d - changed" % rb.id
+        )
+        # Scheduled booking with no name
+        rb.name = False
+        self.assertEqual(
+            rb.display_name,
+            "some customer - Test resource booking type "
+            "- 03/01/2021 at (08:00:00 To 08:30:00) (UTC)",
+        )
+        self.assertEqual(
+            rb.with_context(using_portal=True).display_name, "# %d" % rb.id
+        )

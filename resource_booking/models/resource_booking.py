@@ -2,14 +2,12 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 import calendar
-from contextlib import suppress
 from datetime import datetime, timedelta
 
 from dateutil.relativedelta import relativedelta
 
 from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
-from odoo.osv.expression import NEGATIVE_TERM_OPERATORS
 
 from odoo.addons.resource.models.resource import Intervals
 
@@ -26,14 +24,6 @@ class ResourceBooking(models.Model):
             "Missing resource booking combination.",
         ),
         (
-            "start_stop_together",
-            """CHECK(
-                (start IS NULL AND stop IS NULL) OR
-                (start IS NOT NULL AND stop IS NOT NULL)
-            )""",
-            "Start and stop must be filled or emptied together.",
-        ),
-        (
             "unique_meeting_id",
             "UNIQUE(meeting_id)",
             "Only one event per resource booking can exist.",
@@ -44,7 +34,6 @@ class ResourceBooking(models.Model):
     meeting_id = fields.Many2one(
         comodel_name="calendar.event",
         string="Meeting",
-        auto_join=True,
         context={"default_res_id": False, "default_res_model": False},
         copy=False,
         index=True,
@@ -70,7 +59,15 @@ class ResourceBooking(models.Model):
         store=True,
         tracking=True,
     )
-    name = fields.Char(compute="_compute_name")
+    combination_auto_assign = fields.Boolean(
+        string="Auto assigned",
+        default=True,
+        help=(
+            "When checked, resource combinations will be (un)assigned automatically "
+            "based on their availability during the booking dates."
+        ),
+    )
+    name = fields.Char(index=True, help="Leave empty to autogenerate a booking name.")
     partner_id = fields.Many2one(
         "res.partner",
         string="Requester",
@@ -80,10 +77,8 @@ class ResourceBooking(models.Model):
         tracking=True,
         help="Who requested this booking?",
     )
+    location = fields.Char(compute="_compute_location", readonly=False, store=True,)
     requester_advice = fields.Text(related="type_id.requester_advice", readonly=True)
-    involves_me = fields.Boolean(
-        compute="_compute_involves_me", search="_search_involves_me"
-    )
     is_modifiable = fields.Boolean(compute="_compute_is_modifiable")
     is_overdue = fields.Boolean(compute="_compute_is_overdue")
     state = fields.Selection(
@@ -106,19 +101,26 @@ class ResourceBooking(models.Model):
         ),
     )
     start = fields.Datetime(
-        compute="_compute_dates",
+        compute="_compute_start",
         copy=False,
         index=True,
-        inverse="_inverse_dates",
+        readonly=False,
         store=True,
         track_sequence=200,
         tracking=True,
     )
+    duration = fields.Float(
+        compute="_compute_duration",
+        readonly=False,
+        store=True,
+        track_sequence=220,
+        tracking=True,
+        help="Amount of time that the resources will be booked and unavailable for others.",
+    )
     stop = fields.Datetime(
-        compute="_compute_dates",
+        compute="_compute_stop",
         copy=False,
         index=True,
-        inverse="_inverse_dates",
         store=True,
         track_sequence=210,
         tracking=True,
@@ -145,37 +147,13 @@ class ResourceBooking(models.Model):
             if one.type_id:
                 one.categ_ids = one.type_id.categ_ids
 
-    @api.depends("start", "stop", "type_id")
+    @api.depends("start", "type_id", "combination_auto_assign")
     def _compute_combination_id(self):
         """Select best combination candidate when changing booking dates."""
         for one in self:
             # Useless without the interval
-            if one.start and one.stop:
+            if one.start and one.combination_auto_assign:
                 one.combination_id = one._get_best_combination()
-
-    @api.depends("combination_id", "partner_id")
-    def _compute_involves_me(self):
-        """Indicate if the booking involves you."""
-        self.involves_me = False
-        domain = self._search_involves_me("=", True)
-        mine = self.filtered_domain(domain)
-        mine.involves_me = True
-
-    def _search_involves_me(self, operator, value):
-        """Fast search of own bookings."""
-        me = self.env.user.partner_id
-        if operator in NEGATIVE_TERM_OPERATORS:
-            value = not value
-        domain = [
-            "|",
-            "|",
-            ("partner_id", "=", me.id),
-            ("meeting_id.attendee_ids.partner_id", "in", me.ids),
-            ("combination_id.resource_ids.user_id.partner_id", "in", me.ids),
-        ]
-        if value:
-            return domain
-        return ["!"] + domain
 
     @api.depends("start")
     def _compute_is_overdue(self):
@@ -203,13 +181,23 @@ class ResourceBooking(models.Model):
             overdue = self.filtered("is_overdue")
             overdue.is_modifiable = False
 
-    @api.depends("partner_id", "type_id", "meeting_id")
-    def _compute_name(self):
-        """Show a helpful name."""
-        for one in self:
-            one.name = self._get_name_formatted(
-                one.partner_id, one.type_id, one.meeting_id
-            )
+    @api.depends("name", "partner_id", "type_id", "meeting_id")
+    @api.depends_context("uid", "using_portal")
+    def _compute_display_name(self):
+        """Overridden just for dependencies; see `name_get()` for implementation."""
+        return super()._compute_display_name()
+
+    @api.depends("meeting_id.location", "type_id")
+    def _compute_location(self):
+        """Get location from meeting or type."""
+        for record in self:
+            # Get location from type when changing it or creating from ORM
+            # HACK https://github.com/odoo/odoo/issues/74152
+            if not record.location or record._origin.type_id != record.type_id:
+                record.location = record.type_id.location
+            # Get it from meeting only when available
+            elif record.meeting_id:
+                record.location = record.meeting_id.location
 
     @api.depends("active", "meeting_id.attendee_ids.state")
     def _compute_state(self):
@@ -231,32 +219,61 @@ class ResourceBooking(models.Model):
             one.state = "scheduled" if one.meeting_id else "pending"
         to_check._check_scheduling()
 
-    @api.depends("meeting_id.start", "meeting_id.stop")
-    def _compute_dates(self):
-        for one in self:
-            # You're creating a new record; calendar view sends proper context
-            # defaults that at this point are lost; restoring them
-            if not one.id:
-                one.update(one.default_get(["start", "stop"]))
-                continue
-            # Get values from related meeting, if any; just like a related field
-            one.start = one.meeting_id.start
-            one.stop = one.meeting_id.stop
+    @api.depends("meeting_id.start")
+    def _compute_start(self):
+        """Get start date from related meeting, if available."""
+        for record in self:
+            if record.id:
+                record.start = record.meeting_id.start
 
-    def _inverse_dates(self):
+    @api.depends("meeting_id.duration", "type_id")
+    def _compute_duration(self):
+        """Compute duration for each booking."""
+        for record in self:
+            # Special case when creating record from UI
+            if not record.id:
+                record.duration = self.default_get(["duration"]).get(
+                    "duration", record.type_id.duration
+                )
+            # Get duration from type only when changing type or when creating from ORM
+            elif not record.duration or record._origin.type_id != record.type_id:
+                record.duration = record.type_id.duration
+            # Get it from meeting only when available
+            elif record.meeting_id:
+                record.duration = record.meeting_id.duration
+
+    @api.depends("start", "duration")
+    def _compute_stop(self):
+        """Get stop date from start date and duration."""
+        for record in self:
+            try:
+                record.stop = record.start + timedelta(hours=record.duration)
+            except TypeError:
+                # Either value is False: no stop date
+                record.stop = False
+
+    def _sync_meeting(self):
         """Lazy-create or destroy calendar.event."""
         # Notify changed dates to attendees
-        _self = self.with_context(from_ui=self.env.context.get("from_ui", True))
+        _self = self.with_context(
+            syncing_booking_ids=self.ids, from_ui=self.env.context.get("from_ui", True)
+        )
+        # Avoid sync recursion
+        _self -= self.browse(self.env.context.get("syncing_booking_ids"))
         to_create, to_delete = [], _self.env["calendar.event"]
         for one in _self:
-            if one.start and one.stop:
+            if one.start:
                 resource_partners = one.combination_id.resource_ids.filtered(
                     lambda res: res.resource_type == "user"
                 ).mapped("user_id.partner_id")
                 meeting_vals = dict(
-                    one.type_id._event_defaults(),
+                    alarm_ids=[(6, 0, one.type_id.alarm_ids.ids)],
                     categ_ids=[(6, 0, one.categ_ids.ids)],
-                    name=one._get_name_formatted(one.partner_id, one.type_id),
+                    description=one.type_id.requester_advice,
+                    duration=one.duration,
+                    location=one.location,
+                    name=one.name
+                    or one._get_name_formatted(one.partner_id, one.type_id),
                     partner_ids=[
                         (4, partner.id, 0)
                         for partner in one.partner_id | resource_partners
@@ -325,20 +342,6 @@ class ResourceBooking(models.Model):
                 % "\n- ".join(unfitting_bookings.mapped("display_name"))
             )
 
-    @api.onchange("start")
-    def _onchange_start_fill_stop(self):
-        """Apply default stop when changing start."""
-        # When creating a new record by clicking on the calendar view, don't
-        # alter stop the 1st time
-        if not self.id:
-            defaults = self.default_get(["start", "stop"])
-            with suppress(KeyError):
-                if self.start == fields.Datetime.to_datetime(defaults["start"]):
-                    self.stop = defaults["stop"]
-                    return
-        # In the general use case, stop is start + duration
-        self.stop = self.start and self.start + timedelta(hours=self.type_id.duration)
-
     def _get_calendar_context(self, year=None, month=None, now=None):
         """Get the required context for the calendar view in the portal.
 
@@ -382,7 +385,7 @@ class ResourceBooking(models.Model):
     def _get_best_combination(self):
         """Pick best combination based on current booking state."""
         # No dates? Then return whatever is already selected (can be empty)
-        if not (self.start and self.stop):
+        if not self.start:
             return self.combination_id
         # If there's a combination already, put it 1st (highest priority)
         sorted_combinations = self.combination_id + (
@@ -414,7 +417,8 @@ class ResourceBooking(models.Model):
         """Return available slots for scheduling current booking."""
         result = {}
         now = fields.Datetime.context_timestamp(self, fields.Datetime.now())
-        duration = timedelta(hours=self.type_id.duration)
+        slot_duration = timedelta(hours=self.type_id.duration)
+        booking_duration = timedelta(hours=self.duration)
         current = max(
             start_dt, now + timedelta(hours=self.type_id.modifications_deadline)
         )
@@ -424,14 +428,14 @@ class ResourceBooking(models.Model):
             if current != slot_start:
                 current = slot_start
                 continue
-            current_interval = Intervals([(current, current + duration, self)])
+            current_interval = Intervals([(current, current + booking_duration, self)])
             for start, end, _meta in available_intervals & current_interval:
-                if end - start == duration:
+                if end - start == booking_duration:
                     result.setdefault(current.date(), [])
                     result[current.date()].append(current)
                 # I actually only care about the 1st interval, if any
                 break
-            current += duration
+            current += slot_duration
         return result
 
     def _get_intervals(self, start_dt, end_dt, combination=None):
@@ -441,7 +445,10 @@ class ResourceBooking(models.Model):
             booking_id = self.id or self._origin.id or -1
         except AttributeError:
             booking_id = -1
-        booking = self.with_context(analyzing_booking=booking_id)
+        # Detached compatibility with hr_holidays_public
+        booking = self.with_context(
+            analyzing_booking=booking_id, exclude_public_holidays=True
+        )
         # RBT calendar uses no resources to restrict bookings
         result = booking.type_id.resource_calendar_id._work_intervals(start_dt, end_dt)
         # Restrict with the chosen combination, or to at least one of the
@@ -453,6 +460,42 @@ class ResourceBooking(models.Model):
         ).with_context(analyzing_booking=booking_id)
         result &= combinations._get_intervals(start_dt, end_dt)
         return result
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        """Sync booking with meeting if needed."""
+        result = super().create(vals_list)
+        result._sync_meeting()
+        return result
+
+    def write(self, vals):
+        """Sync booking with meeting if needed."""
+        result = super().write(vals)
+        self._sync_meeting()
+        return result
+
+    def unlink(self):
+        """Unlink meeting if needed."""
+        self.meeting_id.unlink()
+        return super().unlink()
+
+    def name_get(self):
+        """Autogenerate booking name if none is provided."""
+        old = super().name_get()
+        new = []
+        for id_, name in old:
+            record = self.browse(id_)
+            if self.env.context.get("using_portal"):
+                # ID optionally suffixed with custom name for portal users
+                template = _("# %(id)d - %(name)s") if record.name else _("# %(id)d")
+                name = template % {"id": id_, "name": name}
+            elif not record.name:
+                # Automatic name for backend users
+                name = self._get_name_formatted(
+                    record.partner_id, record.type_id, record.meeting_id
+                )
+            new.append((id_, name))
+        return new
 
     def message_get_suggested_recipients(self):
         recipients = super().message_get_suggested_recipients()
@@ -474,7 +517,7 @@ class ResourceBooking(models.Model):
                 default_res_id=False,
                 # Context used by web_calendar_slot_duration module
                 calendar_slot_duration=FloatTimeParser.value_to_html(
-                    self.type_id.duration, False
+                    self.duration, False
                 ),
                 default_resource_booking_ids=[(6, 0, self.ids)],
                 default_name=self.name,

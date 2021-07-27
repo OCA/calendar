@@ -10,7 +10,7 @@
             <calendar
                 string="Bookings"
                 date_start="start"
-                date_stop="stop"
+                date_delay="duration"
                 quick_add="false"
                 color="combination_id"
             >
@@ -125,18 +125,33 @@
                             <span>Preview</span>
                         </button>
                     </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Resource Booking Name" />
+                        </h1>
+                    </div>
                     <group name="main">
                         <group name="booking">
                             <field name="partner_id" />
                             <field name="type_id" />
-                            <field
-                                name="combination_id"
-                                attrs="{'required': [('start', '!=', False)]}"
-                            />
+                            <label for="combination_id" />
+                            <div>
+                                <field name="combination_auto_assign" />
+                                <label for="combination_auto_assign" />
+                                <field
+                                    name="combination_id"
+                                    class="oe_inline"
+                                    attrs="{'required': [('start', '!=', False)], 'readonly': [('combination_auto_assign', '=', True)]}"
+                                />
+                            </div>
                             <field name="categ_ids" widget="many2many_tags" />
                         </group>
                         <group name="meeting" string="Meeting">
-                            <field name="meeting_id" groups="base.group_no_one" />
+                            <field
+                                name="meeting_id"
+                                groups="base.group_no_one"
+                                readonly="1"
+                            />
                             <field name="is_overdue" invisible="1" />
                             <field name="is_modifiable" invisible="1" />
                             <div
@@ -147,14 +162,14 @@
                             >
                                 This booking exceeded its modifications deadline.
                             </div>
+                            <field name="start" />
                             <field
-                                name="start"
-                                attrs="{'required': [('stop', '!=', False)]}"
+                                name="duration"
+                                widget="float_time"
+                                class="oe_inline"
                             />
-                            <field
-                                name="stop"
-                                attrs="{'required': [('start', '!=', False)]}"
-                            />
+                            <field name="stop" />
+                            <field name="location" />
                         </group>
                     </group>
                 </sheet>
@@ -180,7 +195,7 @@
                 <filter
                     name="is_mine"
                     string="Involving me"
-                    domain="[('involves_me', '=', True)]"
+                    domain="['|', '|', ('partner_id.user_ids', '=', uid), ('meeting_id.attendee_ids.partner_id.user_ids', '=', uid), ('combination_id.resource_ids.user_id', '=', uid)]"
                 />
                 <filter
                     name="is_pending"

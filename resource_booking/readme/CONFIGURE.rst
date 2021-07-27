@@ -16,7 +16,9 @@ To configure one booking type:
 #. Go to *Resource Bookings > Types*.
 #. Create one.
 #. Give it a *name*.
-#. Set the *Duration*, to know the time assigned to each calendar slot.
+#. Set the *Duration*, to know the time assigned to each calendar slot. It will
+   also be the default duration for each booking, although that can be changed
+   later if necessary.
 #. Set the *Modifications Deadline*, to forbid non-managers to alter dates of
    a booking when it's too late.
 #. Choose one *Availability Calendar*. No bookings will exist outside of it.
