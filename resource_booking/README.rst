@@ -91,7 +91,9 @@ To configure one booking type:
 #. Go to *Resource Bookings > Types*.
 #. Create one.
 #. Give it a *name*.
-#. Set the *Duration*, to know the time assigned to each calendar slot.
+#. Set the *Duration*, to know the time assigned to each calendar slot. It will
+   also be the default duration for each booking, although that can be changed
+   later if necessary.
 #. Set the *Modifications Deadline*, to forbid non-managers to alter dates of
    a booking when it's too late.
 #. Choose one *Availability Calendar*. No bookings will exist outside of it.
@@ -130,8 +132,8 @@ To book some resources:
 #. Click on *Booking Count*.
 #. Click on a free slot.
 #. Fill the *Requester*, which may or not be yourself.
-#. Pick one *Resources combination*, in case the one assigned automatically
-   isn't the one you want.
+#. Uncheck *Auto assign* and pick one *Resources combination*, in case the one
+   assigned automatically isn't the one you want.
 
 To invite someone to book a resource combination from the portal:
 
@@ -141,9 +143,12 @@ To invite someone to book a resource combination from the portal:
 #. Click on the list view icon.
 #. Click on *Create*.
 #. Fill the *Requester*.
-#. Pick one *Resources combination*, if you want that the requester is assigned
-   to that combination. Otherwise, leave it empty, and some free combination
-   will be assigned automatically when the requester picks a free slot.
+#. Uncheck *Auto assign* and pick one *Resources combination*, if you want that
+   the requester is assigned to that combination. Otherwise, leave it empty,
+   and some free combination will be assigned automatically when the requester
+   picks a free slot.
+#. Choose the *duration*, in case it is different from the one specified in the
+   resource booking type.
 #. Click on *Share > Send*.
 #. The requester will receive an email to select a calendar slot from his portal.
 
