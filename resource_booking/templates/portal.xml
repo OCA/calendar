@@ -278,8 +278,7 @@
                     <tr>
                         <td>
                             <a t-att-href="booking.get_portal_url()">
-                                #
-                                <span t-field="booking.id" />
+                                <span t-field="booking.display_name" />
                             </a>
                         </td>
                         <td>
@@ -306,8 +305,8 @@
         <div class="row no-gutters">
             <div class="col-md">
                 <h5 class="mb-1 mb-md-0">
-                    Booking #
-                    <span t-field="booking_sudo.id" />
+                    Booking
+                    <span t-field="booking_sudo.display_name" />
                 </h5>
             </div>
             <div class="col-md text-md-right">

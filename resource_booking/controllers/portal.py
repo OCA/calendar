@@ -49,7 +49,7 @@ class CustomerPortal(portal.CustomerPortal):
     )
     def portal_my_bookings(self, page=1, **kwargs):
         """List bookings that I can access."""
-        Booking = request.env["resource.booking"]
+        Booking = request.env["resource.booking"].with_context(using_portal=True)
         values = self._prepare_portal_layout_values()
         pager = portal.pager(
             url="/my/bookings",
