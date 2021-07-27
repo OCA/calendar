@@ -468,3 +468,35 @@ class BackendCase(SavepointCase):
         rb.action_unschedule()
         self.assertFalse(rb.meeting_id)
         self.assertEqual(rb.location, "Office 3")
+
+    def test_resource_booking_display_name(self):
+        # Pending booking with no name
+        rb = self.env["resource.booking"].create(
+            {"partner_id": self.partner.id, "type_id": self.rbt.id}
+        )
+        self.assertEqual(rb.display_name, "some customer - Test resource booking type")
+        self.assertEqual(
+            rb.with_context(using_portal=True).display_name, "# %d" % rb.id
+        )
+        # Pending booking with name
+        rb.name = "changed"
+        self.assertEqual(rb.display_name, "changed")
+        self.assertEqual(
+            rb.with_context(using_portal=True).display_name, "# %d - changed" % rb.id
+        )
+        # Scheduled booking with name
+        rb.start = "2021-03-01 08:00:00"
+        self.assertEqual(rb.display_name, "changed")
+        self.assertEqual(
+            rb.with_context(using_portal=True).display_name, "# %d - changed" % rb.id
+        )
+        # Scheduled booking with no name
+        rb.name = False
+        self.assertEqual(
+            rb.display_name,
+            "some customer - Test resource booking type "
+            "- 03/01/2021 at (08:00:00 To 08:30:00) (UTC)",
+        )
+        self.assertEqual(
+            rb.with_context(using_portal=True).display_name, "# %d" % rb.id
+        )
