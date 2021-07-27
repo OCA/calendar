@@ -125,6 +125,11 @@
                             <span>Preview</span>
                         </button>
                     </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Resource Booking Name" />
+                        </h1>
+                    </div>
                     <group name="main">
                         <group name="booking">
                             <field name="partner_id" />
