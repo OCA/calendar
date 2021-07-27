@@ -67,7 +67,7 @@ class ResourceBooking(models.Model):
             "based on their availability during the booking dates."
         ),
     )
-    name = fields.Char(compute="_compute_name")
+    name = fields.Char(index=True, help="Leave empty to autogenerate a booking name.")
     partner_id = fields.Many2one(
         "res.partner",
         string="Requester",
@@ -181,13 +181,11 @@ class ResourceBooking(models.Model):
             overdue = self.filtered("is_overdue")
             overdue.is_modifiable = False
 
-    @api.depends("partner_id", "type_id", "meeting_id")
-    def _compute_name(self):
-        """Show a helpful name."""
-        for one in self:
-            one.name = self._get_name_formatted(
-                one.partner_id, one.type_id, one.meeting_id
-            )
+    @api.depends("name", "partner_id", "type_id", "meeting_id")
+    @api.depends_context("uid", "using_portal")
+    def _compute_display_name(self):
+        """Overridden just for dependencies; see `name_get()` for implementation."""
+        return super()._compute_display_name()
 
     @api.depends("meeting_id.location", "type_id")
     def _compute_location(self):
@@ -274,7 +272,8 @@ class ResourceBooking(models.Model):
                     description=one.type_id.requester_advice,
                     duration=one.duration,
                     location=one.location,
-                    name=one._get_name_formatted(one.partner_id, one.type_id),
+                    name=one.name
+                    or one._get_name_formatted(one.partner_id, one.type_id),
                     partner_ids=[
                         (4, partner.id, 0)
                         for partner in one.partner_id | resource_partners
@@ -479,6 +478,24 @@ class ResourceBooking(models.Model):
         """Unlink meeting if needed."""
         self.meeting_id.unlink()
         return super().unlink()
+
+    def name_get(self):
+        """Autogenerate booking name if none is provided."""
+        old = super().name_get()
+        new = []
+        for id_, name in old:
+            record = self.browse(id_)
+            if self.env.context.get("using_portal"):
+                # ID optionally suffixed with custom name for portal users
+                template = _("# %(id)d - %(name)s") if record.name else _("# %(id)d")
+                name = template % {"id": id_, "name": name}
+            elif not record.name:
+                # Automatic name for backend users
+                name = self._get_name_formatted(
+                    record.partner_id, record.type_id, record.meeting_id
+                )
+            new.append((id_, name))
+        return new
 
     def message_get_suggested_recipients(self):
         recipients = super().message_get_suggested_recipients()
