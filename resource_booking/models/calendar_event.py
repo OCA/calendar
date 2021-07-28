@@ -36,10 +36,10 @@ class CalendarEvent(models.Model):
                 % "\n- ".join(frozen.mapped("display_name"))
             )
 
-    def unlink(self):
+    def unlink(self, can_be_deleted=True):
         """Check you're allowed to unschedule it."""
         self._validate_booking_modifications()
-        return super().unlink()
+        return super().unlink(can_be_deleted=can_be_deleted)
 
     def write(self, vals):
         """Check you're allowed to reschedule it."""
