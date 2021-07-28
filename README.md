@@ -19,7 +19,7 @@ Available addons
 ----------------
 addon | version | summary
 --- | --- | ---
-[resource_booking](resource_booking/) | 13.0.2.0.1 | Manage appointments and resource booking
+[resource_booking](resource_booking/) | 13.0.2.0.2 | Manage appointments and resource booking
 
 [//]: # (end addons)
 
