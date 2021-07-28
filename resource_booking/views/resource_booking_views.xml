@@ -195,6 +195,7 @@
                 <filter
                     name="is_mine"
                     string="Involving me"
+                    context="{'virtual_id': False}"
                     domain="['|', '|', ('partner_id.user_ids', '=', uid), ('meeting_id.attendee_ids.partner_id.user_ids', '=', uid), ('combination_id.resource_ids.user_id', '=', uid)]"
                 />
                 <filter
