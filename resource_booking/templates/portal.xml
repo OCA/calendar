@@ -362,11 +362,18 @@
                         <div class="col-md">
                             <div class="mb-1">
                                 <strong>Location:</strong>
-                                <span t-field="booking_sudo.meeting_id.location" />
+                                <span t-field="booking_sudo.location" />
                             </div>
                             <div class="mb-1">
                                 <strong>Dates:</strong>
                                 <span t-field="booking_sudo.meeting_id.display_time" />
+                            </div>
+                            <div class="mb-1">
+                                <strong>Duration:</strong>
+                                <span
+                                    t-field="booking_sudo.duration"
+                                    t-options='{"widget": "float_time"}'
+                                />
                             </div>
                             <div t-if="booking_sudo.requester_advice" class="mb-1">
                                 <strong>Advice:</strong>
