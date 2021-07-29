@@ -267,6 +267,40 @@ class BackendCase(SavepointCase):
             self.assertEqual(rb1_form.combination_id, rbc_tue)
         self.assertEqual(rb1.combination_id, rbc_tue)
 
+    def test_calendar_meeting_and_leave_combined(self):
+        """Resource not bookable on calendar leave."""
+        cal_mon = self.r_calendars[0]
+        res_mon = self.r_users[0]
+        # Add leave next Monday for Mon resource
+        self.env["resource.calendar.leaves"].create(
+            {
+                "date_from": datetime(2021, 3, 1),
+                "date_to": datetime(2021, 3, 3),
+                "calendar_id": cal_mon.id,
+                "resource_id": res_mon.id,
+            }
+        )
+        # Add meeting same day for all resources, so no combination is available
+        self.env["calendar.event"].create(
+            {
+                "start": datetime(2021, 3, 1, 8),
+                "stop": datetime(2021, 3, 1, 10, 30),
+                "name": "some meeting",
+                "partner_ids": [(6, 0, self.users.partner_id.ids)],
+            }
+        )
+        # Check it's not bookable
+        rb_form = Form(self.env["resource.booking"])
+        rb_form.type_id = self.rbt
+        rb_form.partner_id = self.partner
+        # No combination found
+        rb_form.start = datetime(2021, 3, 1, 10)
+        self.assertFalse(rb_form.combination_id)
+        # Combination found
+        rb_form.start = datetime(2021, 3, 8, 10)
+        self.assertTrue(rb_form.combination_id)
+        rb_form.save()
+
     def test_same_slot_twice_not_utc(self):
         """Scheduling the same slot twice fails, when not in UTC."""
         for loop in range(2):
