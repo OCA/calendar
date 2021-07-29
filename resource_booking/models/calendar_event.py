@@ -52,6 +52,42 @@ class CalendarEvent(models.Model):
         rescheduled._validate_booking_modifications()
         return result
 
+    def create_attendees(self):
+        """Autoconfirm resource attendees if preselected."""
+        old_attendees = self.attendee_ids
+        result = super(
+            # This context avoids sending invitations to new attendees
+            CalendarEvent,
+            self.with_context(detaching=True),
+        ).create_attendees()
+        new_attendees = (self.attendee_ids - old_attendees).with_context(
+            self.env.context
+        )
+        for attendee in new_attendees:
+            # No need to change state if it's already done
+            if attendee.state in {"accepted", "declined"}:
+                continue
+            rb = attendee.event_id.resource_booking_ids
+            # Confirm requester attendee always if requested
+            if (
+                self.env.context.get("autoconfirm_booking_requester")
+                and attendee.partner_id == rb.partner_id
+            ):
+                attendee.state = "accepted"
+                continue
+            # Auto-confirm if attendee comes from a handpicked combination
+            if rb.combination_auto_assign:
+                continue
+            if attendee.partner_id in rb.combination_id.resource_ids.user_id.partner_id:
+                attendee.state = "accepted"
+        # Send invitations like upstream would have done
+        to_notify = new_attendees.filtered(lambda a: a.email != self.env.user.email)
+        if to_notify and not self.env.context.get("detaching"):
+            to_notify._send_mail_to_attendees(
+                "calendar.calendar_template_meeting_invitation"
+            )
+        return result
+
     def get_interval(self, interval, tz=None):
         """Autofix tz from related resource booking.
 
