@@ -76,16 +76,30 @@ class PortalCase(HttpCase):
         # One booking for portal user, another for a partner without user
         bookings = self.env["resource.booking"].create(
             [
-                {"partner_id": self.user_portal.partner_id.id, "type_id": self.rbt.id},
-                {"partner_id": self.partner.id, "type_id": self.rbt.id},
+                {
+                    "partner_id": self.user_portal.partner_id.id,
+                    "type_id": self.rbt.id,
+                    "duration": 1,
+                },
+                {
+                    "partner_id": self.partner.id,
+                    "type_id": self.rbt.id,
+                    "location": "Office 2",
+                },
             ]
         )
-        booking_portal, booking_public = bookings
+        booking_public = bookings[1]
         # We assume they were invited by email and clicked on their links
         portal_url, public_url = (one.get_portal_url() for one in bookings)
         # Portal guy goes to scheduling page
         portal_page = self._url_xml(portal_url)
         self.assertTrue(portal_page.cssselect('.badge:contains("Pending")'))
+        self.assertTrue(
+            portal_page.cssselect(':contains("Duration:") + :contains("01:00")')
+        )
+        self.assertTrue(
+            portal_page.cssselect(':contains("Location:") + :contains("Main office")')
+        )
         link = portal_page.cssselect('a:contains("Schedule")')[0]
         portal_url = link.get("href")
         portal_page = self._url_xml(portal_url)
@@ -112,6 +126,12 @@ class PortalCase(HttpCase):
         self.assertTrue(portal_page.cssselect(".o_booking_calendar form"))
         # Public guy does the same
         public_page = self._url_xml(public_url)
+        self.assertTrue(
+            public_page.cssselect(':contains("Duration:") + :contains("00:30")')
+        )
+        self.assertTrue(
+            public_page.cssselect(':contains("Location:") + :contains("Office 2")')
+        )
         self.assertTrue(public_page.cssselect('.badge:contains("Pending")'))
         link = public_page.cssselect('a:contains("Schedule")')[0]
         public_url = link.get("href")
@@ -165,7 +185,7 @@ class PortalCase(HttpCase):
             )
         )
         self.assertTrue(
-            public_page.cssselect('div:contains("Location:"):contains("Main office")')
+            public_page.cssselect('div:contains("Location:"):contains("Office 2")')
         )
         self.assertTrue(
             public_page.cssselect(
@@ -235,7 +255,7 @@ class PortalCase(HttpCase):
         self.assertTrue(
             portal_page.cssselect(
                 'div:contains("Dates:")'
-                ':contains("03/01/2021 at (10:30:00 To 11:00:00) (UTC)")'
+                ':contains("03/01/2021 at (10:30:00 To 11:30:00) (UTC)")'
             )
         )
         # Portal guy cancels
