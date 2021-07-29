@@ -125,7 +125,9 @@ class CustomerPortal(portal.CustomerPortal):
     )
     def portal_booking_confirm(self, booking_id, access_token, when, **kwargs):
         """Confirm a booking in a given datetime."""
-        booking_sudo = self._get_booking_sudo(booking_id, access_token)
+        booking_sudo = self._get_booking_sudo(booking_id, access_token).with_context(
+            autoconfirm_booking_requester=True
+        )
         when_tz_aware = isoparse(when)
         when_naive = datetime.utcfromtimestamp(when_tz_aware.timestamp())
         try:

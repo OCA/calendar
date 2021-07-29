@@ -534,3 +534,41 @@ class BackendCase(SavepointCase):
         self.assertEqual(
             rb.with_context(using_portal=True).display_name, "# %d" % rb.id
         )
+
+    def test_attendee_autoassigned_not_autoconfirmed(self):
+        """Meeting attendees are not autoconfirmed when combination is autoassigned."""
+        # Create an auto-assigned booking
+        rb = self.env["resource.booking"].create(
+            {
+                "partner_id": self.partner.id,
+                "type_id": self.rbt.id,
+                "start": "2021-03-01 08:00:00",
+            }
+        )
+        # Get attendees that belong to the combination human resource
+        resource_partner = rb.combination_id.resource_ids.user_id.partner_id
+        resource_attendees = rb.meeting_id.attendee_ids.filtered(
+            lambda one: one.partner_id == resource_partner
+        )
+        # Combination was auto-assigned, so resource attendees are not confirmed
+        self.assertEqual(resource_attendees.state, "needsAction")
+
+    def test_attendee_not_autoassigned_autoconfirmed(self):
+        """Meeting attendees are auto-confirmed when assigned by hand."""
+        # Create a booking with handpicked combination assignment
+        rb = self.env["resource.booking"].create(
+            {
+                "partner_id": self.partner.id,
+                "type_id": self.rbt.id,
+                "start": "2021-03-01 08:00:00",
+                "combination_auto_assign": False,
+                "combination_id": self.rbcs[0].id,
+            }
+        )
+        # Get attendees that belong to the combination human resources
+        resource_partner = self.users[0].partner_id
+        resource_attendees = rb.meeting_id.attendee_ids.filtered(
+            lambda one: one.partner_id == resource_partner
+        )
+        # Combination was handpicked, so resource attendees are auto-confirmed
+        self.assertEqual(resource_attendees.state, "accepted")
