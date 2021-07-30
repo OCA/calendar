@@ -77,6 +77,21 @@ class ResourceBooking(models.Model):
         tracking=True,
         help="Who requested this booking?",
     )
+    user_id = fields.Many2one(
+        "res.users",
+        default=lambda self: self._default_user_id(),
+        store=True,
+        readonly=False,
+        compute="_compute_user_id",
+        string="Organizer",
+        index=True,
+        tracking=True,
+        help=(
+            "Who organized this booking? Usually whoever created the record. "
+            "It will appear as the calendar event organizer, when scheduled, "
+            "and calendar notifications will be sent in his/her name."
+        ),
+    )
     location = fields.Char(compute="_compute_location", readonly=False, store=True,)
     requester_advice = fields.Text(related="type_id.requester_advice", readonly=True)
     is_modifiable = fields.Boolean(compute="_compute_is_modifiable")
@@ -133,6 +148,10 @@ class ResourceBooking(models.Model):
         required=True,
         tracking=True,
     )
+
+    @api.model
+    def _default_user_id(self):
+        return self.env.user
 
     def _compute_access_url(self):
         result = super()._compute_access_url()
@@ -252,12 +271,17 @@ class ResourceBooking(models.Model):
                 # Either value is False: no stop date
                 record.stop = False
 
+    @api.depends("meeting_id.user_id")
+    def _compute_user_id(self):
+        """Get user from related meeting, if available."""
+        for record in self:
+            if record.meeting_id.user_id:
+                record.user_id = record.meeting_id.user_id
+
     def _sync_meeting(self):
         """Lazy-create or destroy calendar.event."""
         # Notify changed dates to attendees
-        _self = self.with_context(
-            syncing_booking_ids=self.ids, from_ui=self.env.context.get("from_ui", True)
-        )
+        _self = self.with_context(syncing_booking_ids=self.ids)
         # Avoid sync recursion
         _self -= self.browse(self.env.context.get("syncing_booking_ids"))
         to_create, to_delete = [], _self.env["calendar.event"]
@@ -281,12 +305,23 @@ class ResourceBooking(models.Model):
                     resource_booking_ids=[(6, 0, one.ids)],
                     start=one.start,
                     stop=one.stop,
+                    user_id=one.user_id.id,
                     # These 2 avoid creating event as activity
                     res_model_id=False,
                     res_id=False,
                 )
                 if one.meeting_id:
-                    one.meeting_id.write(meeting_vals)
+                    meeting = one.meeting_id
+                    if not all(
+                        (
+                            one.meeting_id.start == one.start,
+                            one.meeting_id.stop == one.stop,
+                            one.meeting_id.duration == one.duration,
+                        )
+                    ):
+                        # Context to notify scheduling change
+                        meeting = meeting.with_context(from_ui=True)
+                    meeting.write(meeting_vals)
                 else:
                     to_create.append(meeting_vals)
             else:
