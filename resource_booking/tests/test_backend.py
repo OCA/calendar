@@ -503,6 +503,22 @@ class BackendCase(SavepointCase):
         self.assertFalse(rb.meeting_id)
         self.assertEqual(rb.location, "Office 3")
 
+    def test_organizer_sync(self):
+        """Resource booking and meeting organizers are properly synced."""
+        rb = self.env["resource.booking"].create(
+            {
+                "partner_id": self.partner.id,
+                "type_id": self.rbt.id,
+                "start": "2021-03-01 08:00:00",
+                "duration": 1.5,
+            }
+        )
+        self.assertEqual(rb.user_id, self.env.user)
+        self.assertEqual(rb.meeting_id.user_id, self.env.user)
+        rb.meeting_id.user_id = self.users[1]
+        self.assertEqual(rb.user_id, self.users[1])
+        self.assertEqual(rb.meeting_id.user_id, self.users[1])
+
     def test_resource_booking_display_name(self):
         # Pending booking with no name
         rb = self.env["resource.booking"].create(
