@@ -161,6 +161,7 @@
                                 groups="base.group_no_one"
                                 readonly="1"
                             />
+                            <field name="user_id" />
                             <field name="is_overdue" invisible="1" />
                             <field name="is_modifiable" invisible="1" />
                             <div
