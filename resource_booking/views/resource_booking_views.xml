@@ -137,7 +137,16 @@
                             <label for="combination_id" />
                             <div>
                                 <field name="combination_auto_assign" />
-                                <label for="combination_auto_assign" />
+                                <label
+                                    for="combination_auto_assign"
+                                    attrs="{'invisible': [('combination_auto_assign', '=', False)]}"
+                                    string="Auto-assigned:"
+                                />
+                                <label
+                                    for="combination_auto_assign"
+                                    attrs="{'invisible': [('combination_auto_assign', '=', True)]}"
+                                    string="Manually assigned:"
+                                />
                                 <field
                                     name="combination_id"
                                     class="oe_inline"
