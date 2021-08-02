@@ -7,7 +7,7 @@ from pytz import utc
 
 from odoo import fields
 from odoo.exceptions import ValidationError
-from odoo.tests.common import Form, SavepointCase
+from odoo.tests.common import Form, SavepointCase, new_test_user
 
 from .common import create_test_data
 
@@ -588,3 +588,40 @@ class BackendCase(SavepointCase):
         )
         # Combination was handpicked, so resource attendees are auto-confirmed
         self.assertEqual(resource_attendees.state, "accepted")
+
+    def test_suggested_recipients(self):
+        # Create a booking as a new user
+        rb_user = new_test_user(
+            self.env, login="rbu", groups="base.group_user,resource_booking.group_user"
+        )
+        rb = (
+            self.env["resource.booking"]
+            .with_user(rb_user)
+            .create(
+                {
+                    "partner_id": self.partner.id,
+                    "type_id": self.rbt.id,
+                    "combination_auto_assign": False,
+                    "combination_id": self.rbcs[0].id,
+                    "user_id": self.users[1].id,
+                }
+            )
+        )
+        # Organizer and creator must already be following
+        self.assertEqual(
+            rb.message_partner_ids, rb_user.partner_id | self.users[1].partner_id
+        )
+        # Requester and combination must be suggested
+        self.assertEqual(
+            rb._message_get_suggested_recipients(),
+            {
+                rb.id: [
+                    (rb.partner_id.id, "some customer", "Requester"),
+                    (
+                        self.users[0].partner_id.id,
+                        "User 0<user_0@example.com>",
+                        "Resources combination",
+                    ),
+                ]
+            },
+        )
