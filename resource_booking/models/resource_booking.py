@@ -532,12 +532,20 @@ class ResourceBooking(models.Model):
             new.append((id_, name))
         return new
 
-    def message_get_suggested_recipients(self):
-        recipients = super().message_get_suggested_recipients()
-        for one in self:
-            if one.partner_id:
-                one._message_add_suggested_recipient(
-                    recipients, partner=one.partner_id, reason=_("Requesting partner")
+    def _message_get_suggested_recipients(self):
+        """Suggest related partners."""
+        recipients = super()._message_get_suggested_recipients()
+        for record in self:
+            record._message_add_suggested_recipient(
+                recipients,
+                partner=record.partner_id,
+                reason=self._fields["partner_id"].string,
+            )
+            for partner in record.combination_id.resource_ids.user_id.partner_id:
+                record._message_add_suggested_recipient(
+                    recipients,
+                    partner=partner,
+                    reason=self._fields["combination_id"].string,
                 )
         return recipients
 
