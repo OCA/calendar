@@ -17,9 +17,9 @@ Modules that extend Odoo calendar management tools
 
 Available addons
 ----------------
-addon | version | summary
---- | --- | ---
-[resource_booking](resource_booking/) | 13.0.2.3.0 | Manage appointments and resource booking
+addon | version | maintainers | summary
+--- | --- | --- | ---
+[resource_booking](resource_booking/) | 13.0.2.3.0 | [![Yajo](https://github.com/Yajo.png?size=30px)](https://github.com/Yajo) | Manage appointments and resource booking
 
 [//]: # (end addons)
 
