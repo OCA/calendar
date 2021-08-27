@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 12.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2021-08-26 21:50+0000\n"
+"PO-Revision-Date: 2021-08-27 11:50+0000\n"
 "Last-Translator: JonathanStein <jstein@image.dk>\n"
 "Language-Team: none\n"
 "Language: da\n"
@@ -107,7 +107,7 @@ msgstr "<span>Forhåndsvisning</span>"
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_portal_form
 msgid "<strong>Advice:</strong>"
-msgstr ""
+msgstr "<strong>Vejledning:</strong>"
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_portal_form
@@ -198,7 +198,7 @@ msgstr "Tilgængelige ressourcekombinationer"
 #. module: resource_booking
 #: model:ir.model,name:resource_booking.model_resource_booking_combination
 msgid "Bookable resource combinations"
-msgstr ""
+msgstr "Bookbare ressourcekombinationer"
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_portal_header
@@ -266,6 +266,10 @@ msgid ""
 "\n"
 "- %s"
 msgstr ""
+"Kan ikke planlægge disse bookinger fordi der ikke er valgt ressourcer for "
+"dem:\n"
+"\n"
+"- %s"
 
 #. module: resource_booking
 #: code:addons/resource_booking/models/resource_booking.py:294
@@ -276,6 +280,10 @@ msgid ""
 "\n"
 "- %s"
 msgstr ""
+"Kan ikke planlægge disse bookinger fordi de ikke passer til deres type eller "
+"ressourcekalender eller fordi ressourcen er optaget:\n"
+"\n"
+"- %s"
 
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking_type__combination_assignment
@@ -283,6 +291,8 @@ msgid ""
 "Choose how to auto-assign resource combinations. It has no effect if assiged "
 "manually."
 msgstr ""
+"Vælg hvordan ressourcer skal auto-tildeles. Det har ingen effekt ved "
+"manuelle tildelinger."
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.alert_availability_lost
@@ -299,7 +309,7 @@ msgstr "Kombination"
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__combination_assignment
 msgid "Combination Assignment"
-msgstr ""
+msgstr "Kombinationstildeling"
 
 #. module: resource_booking
 #: model:ir.ui.menu,name:resource_booking.resource_booking_combination_menu
@@ -338,7 +348,7 @@ msgstr "Bekræft booking"
 msgid ""
 "Confirm that the requesting partner and yourself will attend the scheduled "
 "meeting."
-msgstr ""
+msgstr "Bekræft at anmoderen og du selv vil deltage i det planlagte møde."
 
 #. module: resource_booking
 #: selection:resource.booking,state:0
@@ -364,12 +374,12 @@ msgstr "Oprettet den"
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_portal_header
 msgid "Current state of this booking"
-msgstr ""
+msgstr "Aktuelt status for denne booking"
 
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking__access_url
 msgid "Customer Portal URL"
-msgstr ""
+msgstr "Kundeportal-URL"
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.portal_my_bookings
@@ -379,27 +389,27 @@ msgstr "Dato"
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__alarm_ids
 msgid "Default reminders"
-msgstr ""
+msgstr "Standard påmindelser"
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__categ_ids
 msgid "Default tags"
-msgstr ""
+msgstr "Standard tags"
 
 #. module: resource_booking
 #: model_terms:ir.actions.act_window,help:resource_booking.resource_booking_combination_action
 msgid "Define bookable resource combinations."
-msgstr ""
+msgstr "Definér bookbare ressourcekombinationer."
 
 #. module: resource_booking
 #: model_terms:ir.actions.act_window,help:resource_booking.resource_booking_type_action
 msgid "Define resource booking types."
-msgstr ""
+msgstr "Definér ressource bookingtyper."
 
 #. module: resource_booking
 #: model_terms:ir.actions.act_window,help:resource_booking.resource_booking_action
 msgid "Define resource bookings."
-msgstr ""
+msgstr "Definér ressourcebookinger."
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__display_name
@@ -407,32 +417,32 @@ msgstr ""
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__display_name
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type_combination_rel__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "Vist navn"
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__duration
 msgid "Duration"
-msgstr ""
+msgstr "Varighed"
 
 #. module: resource_booking
 #: sql_constraint:resource.booking.type:0
 msgid "Duration must be positive."
-msgstr ""
+msgstr "Varighed skal være positiv."
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.scheduling_calendar
 msgid "Duration:"
-msgstr ""
+msgstr "Varighed:"
 
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking_type__duration
 msgid "Establish each interval's duration."
-msgstr ""
+msgstr "Sæt hvert intervals varighed."
 
 #. module: resource_booking
 #: model:ir.model,name:resource_booking.model_calendar_event
 msgid "Event"
-msgstr ""
+msgstr "Begivenhed"
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__message_follower_ids
@@ -456,11 +466,13 @@ msgstr "Følgere (partnere)"
 #: model:ir.model.fields,help:resource_booking.field_resource_booking_combination__forced_calendar_id
 msgid "Force a specific calendar, instead of combining the resources'."
 msgstr ""
+"Vælg en specifik kalender i stedet for en kombination af ressourcernes "
+"kalendere."
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_combination__forced_calendar_id
 msgid "Forced calendar"
-msgstr ""
+msgstr "Specifik kalender"
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_portal_form
@@ -502,28 +514,28 @@ msgstr ""
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_portal_form
 msgid "If you cancel this booking:"
-msgstr ""
+msgstr "Hvis du annullerer denne booking:"
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_form
 msgid "Invite requesting partner to portal."
-msgstr ""
+msgstr "Invitér anmoder til portal."
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__involves_me
 msgid "Involves Me"
-msgstr ""
+msgstr "Involverer mig"
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_view_search
 msgid "Involving me"
-msgstr ""
+msgstr "Involverer mig"
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__message_is_follower
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__message_is_follower
 msgid "Is Follower"
-msgstr ""
+msgstr "Er følger"
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__is_modifiable
@@ -538,12 +550,12 @@ msgstr ""
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_portal_form
 msgid "It will be unscheduled."
-msgstr ""
+msgstr "Bliver den ikke-planlagt."
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_portal_form
 msgid "It will disappear from your bookings list."
-msgstr ""
+msgstr "Forsvinder den fra bookinglisten."
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking____last_update
@@ -551,7 +563,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type____last_update
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type_combination_rel____last_update
 msgid "Last Modified on"
-msgstr ""
+msgstr "Senest ændret den"
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__write_uid
@@ -559,7 +571,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__write_uid
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type_combination_rel__write_uid
 msgid "Last Updated by"
-msgstr ""
+msgstr "Senest ændret af"
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__write_date
@@ -567,12 +579,12 @@ msgstr ""
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__write_date
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type_combination_rel__write_date
 msgid "Last Updated on"
-msgstr ""
+msgstr "Senest opdateret den"
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__location
 msgid "Location"
-msgstr ""
+msgstr "Lokation"
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__message_main_attachment_id
@@ -583,33 +595,33 @@ msgstr ""
 #. module: resource_booking
 #: model:res.groups,name:resource_booking.group_manager
 msgid "Manager"
-msgstr ""
+msgstr "Leder"
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__meeting_id
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_form
 msgid "Meeting"
-msgstr ""
+msgstr "Møde"
 
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking__meeting_id
 msgid "Meeting confirmed for this booking."
-msgstr ""
+msgstr "Møde bekræftet for denne booking."
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_type_form
 msgid "Meeting defaults"
-msgstr ""
+msgstr "Standardindstillinger for møder"
 
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking_type__alarm_ids
 msgid "Meetings will be created with these reminders by default."
-msgstr ""
+msgstr "Møder vil som standard blive oprettet med disse påmindelser."
 
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking_type__categ_ids
 msgid "Meetings will be created with these tags by default."
-msgstr ""
+msgstr "Møder vil som standard blive oprettet med disse tags."
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__message_has_error
@@ -626,17 +638,17 @@ msgstr ""
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__message_ids
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__message_ids
 msgid "Messages"
-msgstr ""
+msgstr "Beskeder"
 
 #. module: resource_booking
 #: sql_constraint:resource.booking:0
 msgid "Missing resource booking combination."
-msgstr ""
+msgstr "Manglende ressourcebookingkombination."
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__modifications_deadline
 msgid "Modifications Deadline"
-msgstr ""
+msgstr "Deadline for ændringer"
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__name
@@ -644,41 +656,41 @@ msgstr ""
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__name
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type_combination_rel__type_name
 msgid "Name"
-msgstr ""
+msgstr "Navn"
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__activity_date_deadline
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__activity_date_deadline
 msgid "Next Activity Deadline"
-msgstr ""
+msgstr "Deadline for næste aktivitet"
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__activity_summary
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__activity_summary
 msgid "Next Activity Summary"
-msgstr ""
+msgstr "Opsummering for næste aktivitet"
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__activity_type_id
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__activity_type_id
 msgid "Next Activity Type"
-msgstr ""
+msgstr "Næste aktivitetstype"
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.scheduling_calendar
 msgid "Next month"
-msgstr ""
+msgstr "Næste måned"
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.scheduling_calendar
 msgid "No free slots found this month."
-msgstr ""
+msgstr "Ingen ledige tider denne måned."
 
 #. module: resource_booking
 #: code:addons/resource_booking/models/resource_booking.py:399
 #, python-format
 msgid "No resource combinations available on %s"
-msgstr ""
+msgstr "Ingen ledige ressourcekombinationer den %s"
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__message_needaction_counter
@@ -690,47 +702,47 @@ msgstr ""
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__message_has_error_counter
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__message_has_error_counter
 msgid "Number of error"
-msgstr ""
+msgstr "Antal fejl"
 
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking__message_needaction_counter
 #: model:ir.model.fields,help:resource_booking.field_resource_booking_type__message_needaction_counter
 msgid "Number of messages which requires an action"
-msgstr ""
+msgstr "Antal beskeder, der kræver handling"
 
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking__message_has_error_counter
 #: model:ir.model.fields,help:resource_booking.field_resource_booking_type__message_has_error_counter
 msgid "Number of messages with delivery error"
-msgstr ""
+msgstr "Antal beskeder med leveringsfejl"
 
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking__message_unread_counter
 #: model:ir.model.fields,help:resource_booking.field_resource_booking_type__message_unread_counter
 msgid "Number of unread messages"
-msgstr ""
+msgstr "Antal ulæste beskeder"
 
 #. module: resource_booking
 #: sql_constraint:resource.booking:0
 msgid "Only one event per resource booking can exist."
-msgstr ""
+msgstr "Der kan kun være én begivenhed for hver ressourcebooking."
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_form
 msgid "Open a calendar to schedule a meeting for this booking request."
-msgstr ""
+msgstr "Åbn en kalender for at planlægge et møde for denne bookingforespørgsel."
 
 #. module: resource_booking
 #: selection:resource.booking,activity_state:0
 #: selection:resource.booking.type,activity_state:0
 msgid "Overdue"
-msgstr ""
+msgstr "Overskredet"
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_view_search
 #: selection:resource.booking,state:0
 msgid "Pending"
-msgstr ""
+msgstr "Afventer"
 
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking__state
@@ -740,80 +752,84 @@ msgid ""
 "Confirmed: Meeting scheduled, and requester attendance confirmed.\n"
 "Canceled: Meeting removed, booking archived."
 msgstr ""
+"Afventer: Intet møde planlagt.\n"
+"Planlagt: Anmoderen har endnu ikke bekræftet sin deltagelse.\n"
+"Bekræftet: Mødet er planlagt og anmoderen har bekræftet sin deltagelse.\n"
+"Annulleret: Mødet er slettet og bookingen er arkiveret."
 
 #. module: resource_booking
 #: selection:resource.booking,activity_state:0
 #: selection:resource.booking.type,activity_state:0
 msgid "Planned"
-msgstr ""
+msgstr "Planlagt"
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_portal_form
 msgid "Please confirm this is really what you want."
-msgstr ""
+msgstr "Bekræft venligst, at du ønsker dette."
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__access_url
 msgid "Portal Access URL"
-msgstr ""
+msgstr "Portaladgangs-URL"
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.scheduling_calendar
 msgid "Previous month"
-msgstr ""
+msgstr "Forrige måned"
 
 #. module: resource_booking
 #: selection:resource.booking.type,combination_assignment:0
 msgid "Randomly: order is not important"
-msgstr ""
+msgstr "Tilfældig: Rækkefølgen er ikke vigtig"
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__partner_id
 msgid "Requester"
-msgstr ""
+msgstr "Anmoder"
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__requester_advice
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__requester_advice
 msgid "Requester Advice"
-msgstr ""
+msgstr "Vejledning til anmoder"
 
 #. module: resource_booking
 #: code:addons/resource_booking/models/resource_booking.py:454
 #, python-format
 msgid "Requesting partner"
-msgstr ""
+msgstr "Anmodende partner"
 
 #. module: resource_booking
 #: model:ir.model,name:resource_booking.model_resource_booking
 #: model:ir.module.category,name:resource_booking.category_resource_booking
 msgid "Resource Booking"
-msgstr ""
+msgstr "Ressourcebooking"
 
 #. module: resource_booking
 #: model:ir.model,name:resource_booking.model_resource_booking_type
 msgid "Resource Booking Type"
-msgstr ""
+msgstr "Ressourcebookingstype"
 
 #. module: resource_booking
 #: model:ir.ui.menu,name:resource_booking.resource_booking_main_menu
 msgid "Resource Bookings"
-msgstr ""
+msgstr "Ressoucebookinger"
 
 #. module: resource_booking
 #: model:ir.ui.menu,name:resource_booking.menu_view_resource_calendar_leaves_search
 msgid "Resource Leaves"
-msgstr ""
+msgstr "Ressourcefravær"
 
 #. module: resource_booking
 #: model:ir.model,name:resource_booking.model_resource_calendar
 msgid "Resource Working Time"
-msgstr ""
+msgstr "Ressourcearbejdstider"
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_calendar_event__resource_booking_ids
 msgid "Resource booking"
-msgstr ""
+msgstr "Ressourcebooking"
 
 #. module: resource_booking
 #: model:ir.model,name:resource_booking.model_resource_booking_type_combination_rel
