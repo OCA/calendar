@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 12.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2021-08-29 12:50+0000\n"
+"PO-Revision-Date: 2021-08-30 10:50+0000\n"
 "Last-Translator: JonathanStein <jstein@image.dk>\n"
 "Language-Team: none\n"
 "Language: da\n"
@@ -497,19 +497,19 @@ msgstr "Id"
 #: model:ir.model.fields,help:resource_booking.field_resource_booking__message_unread
 #: model:ir.model.fields,help:resource_booking.field_resource_booking_type__message_unread
 msgid "If checked new messages require your attention."
-msgstr ""
+msgstr "Hvis markeret, er der nye beskeder, der kræver din opmærksomhed."
 
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking__message_needaction
 #: model:ir.model.fields,help:resource_booking.field_resource_booking_type__message_needaction
 msgid "If checked, new messages require your attention."
-msgstr ""
+msgstr "Hvis markeret, er der nye beskeder, der kræver din opmærksomhed."
 
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking__message_has_error
 #: model:ir.model.fields,help:resource_booking.field_resource_booking_type__message_has_error
 msgid "If checked, some messages have a delivery error."
-msgstr ""
+msgstr "Hvis markeret, er der beskeder med leveringsfejl."
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_portal_form
@@ -834,7 +834,7 @@ msgstr "Ressourcebooking"
 #. module: resource_booking
 #: model:ir.model,name:resource_booking.model_resource_booking_type_combination_rel
 msgid "Resource booking type relation with combinations"
-msgstr ""
+msgstr "Ressourcebookingtypers relation med kombinationer"
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_combination__type_rel_ids
@@ -1017,6 +1017,8 @@ msgid ""
 "such as available resource combinations, availability schedules and interval "
 "duration."
 msgstr ""
+"Disse poster kategoriserer ressourcebookinger og angiver restriktioner, som "
+"tilgængelige kombinationer, ledige tider og intervaller."
 
 #. module: resource_booking
 #: model_terms:ir.actions.act_window,help:resource_booking.resource_booking_combination_action
@@ -1024,6 +1026,8 @@ msgid ""
 "These records define resource combinations that can be booked together in "
 "specified schedules and intervals."
 msgstr ""
+"Disse poster angiver ressourcekombinationer, der kan bookes sammen på "
+"specifikke tider og intervaller."
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_form
@@ -1037,6 +1041,8 @@ msgid ""
 "This will remove the associated meeting to unschedule the booking. Are you "
 "sure?"
 msgstr ""
+"Dette vil fjerne det tilknyttede møde og sætte bookingen til ikke-planlagt. "
+"Er du sikker?"
 
 #. module: resource_booking
 #: selection:resource.booking,activity_state:0
@@ -1082,17 +1088,17 @@ msgstr "Antal ulæste beskeder"
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_form
 msgid "Unschedule"
-msgstr ""
+msgstr "Ikke-planlagt"
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_form
 msgid "Unschedule this booking and archive it."
-msgstr ""
+msgstr "Sæt booking til ikke-planlagt og arkivér den."
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_form
 msgid "Unschedule this booking."
-msgstr ""
+msgstr "Sæt booking til ikke-planlagt."
 
 #. module: resource_booking
 #: model:res.groups,name:resource_booking.group_user
@@ -1102,12 +1108,12 @@ msgstr "Bruger"
 #. module: resource_booking
 #: model:res.groups,comment:resource_booking.group_user
 msgid "Users allowed to book resources"
-msgstr ""
+msgstr "Brugere der kan booke ressourcer"
 
 #. module: resource_booking
 #: model:res.groups,comment:resource_booking.group_manager
 msgid "Users allowed to manage resource booking configurations."
-msgstr ""
+msgstr "Brugere der kan administrere ressourcebookingindstillinger."
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__website_message_ids
@@ -1127,6 +1133,8 @@ msgid ""
 "When scheduled, resources will be blocked. When pending, it means the "
 "requester didn't place the booking yet."
 msgstr ""
+"Planlagt blokkerer ressourcerne. Afventede betyder, at anmoderen ikke har "
+"bekræftet bookingen endnu."
 
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking_type__modifications_deadline
@@ -1135,6 +1143,9 @@ msgid ""
 "will be canceled automatically. Also, only booking managers will be able to "
 "unschedule or reschedule them. The value is expressed in hours."
 msgstr ""
+"Hvis en booking ikke er bekræftet inden denne deadline, vil den automatisk "
+"blive annulleret. Desuden vil kun booking ledere kunne ændre eller annullere "
+"dem. Værdien angives i timer."
 
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking__partner_id
