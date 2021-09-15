@@ -15,7 +15,7 @@ from odoo.addons.microsoft_calendar.utils.microsoft_calendar import MicrosoftEve
 
 class TestSyncMicrosoft2Odoo(SavepointCase):
     @property
-    @freeze_time('2020-06-03')
+    @freeze_time("2020-06-03")
     def now(self):
         return pytz.utc.localize(datetime.now()).isoformat()
 
@@ -131,12 +131,12 @@ class TestSyncMicrosoft2Odoo(SavepointCase):
             datetime.now() + relativedelta(days=1)
         ).isoformat()
 
-    @freeze_time('2020-06-03')
+    @freeze_time("2020-06-03")
     def sync(self, events):
 
         self.env["calendar.event"]._sync_microsoft2odoo(events)
 
-    @freeze_time('2020-06-03')
+    @freeze_time("2020-06-03")
     def test_new_microsoft_recurrence(self):
 
         recurrence = self.env["calendar.recurrence"].search(
@@ -158,7 +158,7 @@ class TestSyncMicrosoft2Odoo(SavepointCase):
         self.assertEqual(events[2].start, datetime(2020, 5, 5, 14, 30))
         self.assertEqual(events[2].stop, datetime(2020, 5, 5, 16, 00))
 
-    @freeze_time('2020-06-03')
+    @freeze_time("2020-06-03")
     def test_microsoft_recurrence_delete_one_event(self):
         values = [
             {
@@ -269,7 +269,7 @@ class TestSyncMicrosoft2Odoo(SavepointCase):
             events.mapped("name"), ["My recurrent event", "My recurrent event"]
         )
 
-    @freeze_time('2020-06-03')
+    @freeze_time("2020-06-03")
     def test_microsoft_recurrence_change_name_one_event(self):
         values = [
             {
@@ -438,7 +438,7 @@ class TestSyncMicrosoft2Odoo(SavepointCase):
             ["My recurrent event", "My recurrent event 2", "My recurrent event"],
         )
 
-    @freeze_time('2020-06-03')
+    @freeze_time("2020-06-03")
     def test_microsoft_recurrence_change_name_all_event(self):
         values = [
             {
@@ -559,7 +559,7 @@ class TestSyncMicrosoft2Odoo(SavepointCase):
             ["My recurrent event 2", "My recurrent event 2", "My recurrent event 2"],
         )
 
-    @freeze_time('2020-06-03')
+    @freeze_time("2020-06-03")
     def test_microsoft_recurrence_change_date_one_event(self):
         values = [
             {
@@ -746,7 +746,7 @@ class TestSyncMicrosoft2Odoo(SavepointCase):
         self.assertEqual(special_event.start, datetime(2020, 5, 4, 14, 30))
         self.assertEqual(special_event.stop, datetime(2020, 5, 4, 17, 00))
 
-    @freeze_time('2020-06-03')
+    @freeze_time("2020-06-03")
     def test_microsoft_recurrence_delete_first_event(self):
         values = [
             {
@@ -1074,7 +1074,7 @@ class TestSyncMicrosoft2Odoo(SavepointCase):
         self.assertEqual(events[2].start, datetime(2020, 5, 5, 14, 30))
         self.assertEqual(events[2].stop, datetime(2020, 5, 5, 16, 30))
 
-    @freeze_time('2020-06-03')
+    @freeze_time("2020-06-03")
     def test_microsoft_recurrence_split_recurrence(self):
         values = [
             {
@@ -1349,7 +1349,7 @@ class TestSyncMicrosoft2Odoo(SavepointCase):
         self.assertEqual(events_2[2].start, datetime(2020, 5, 6, 14, 30))
         self.assertEqual(events_2[2].stop, datetime(2020, 5, 6, 17, 00))
 
-    @freeze_time('2020-06-03')
+    @freeze_time("2020-06-03")
     def test_microsoft_recurrence_delete(self):
         recurrence_id = self.env["calendar.recurrence"].search(
             [("microsoft_id", "=", self.recurrence_id)]

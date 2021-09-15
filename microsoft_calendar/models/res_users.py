@@ -17,6 +17,7 @@ from odoo.addons.microsoft_account.models.microsoft_service import (
 from odoo.addons.microsoft_calendar.models.microsoft_sync import (
     microsoft_calendar_token,
 )
+
 from odoo.addons.microsoft_calendar.utils.microsoft_calendar import (
     InvalidSyncToken,
     MicrosoftCalendarService,
@@ -143,7 +144,7 @@ class User(models.Model):
 
     @api.model
     def _sync_all_microsoft_calendar(self):
-        """ Cron job """
+        """Cron job"""
         users = self.env["res.users"].search(
             [("microsoft_calendar_rtoken", "!=", False)]
         )

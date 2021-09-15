@@ -11,4 +11,5 @@ The module adds Microsoft user in res user.
 """,
     "depends": ["base_setup"],
     "data": ["data/microsoft_account_data.xml"],
+    "website": "https://github.com/OCA/calendar",
 }

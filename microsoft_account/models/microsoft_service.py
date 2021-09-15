@@ -30,10 +30,10 @@ class MicrosoftService(models.AbstractModel):
 
     @api.model
     def generate_refresh_token(self, service, authorization_code):
-        """ Call Microsoft API to refresh the token, with the given authorization code
-            :param service : the name of the microsoft service to actualize
-            :param authorization_code : the code to exchange against the new refresh token
-            :returns the new refresh token
+        """Call Microsoft API to refresh the token, with the given authorization code
+        :param service : the name of the microsoft service to actualize
+        :param authorization_code : the code to exchange against the new refresh token
+        :returns the new refresh token
         """
         Parameters = self.env["ir.config_parameter"].sudo()
         client_id = Parameters.get_param("microsoft_%s_client_id" % service)
@@ -67,8 +67,8 @@ class MicrosoftService(models.AbstractModel):
 
     @api.model
     def _get_authorize_uri(self, from_url, service, scope):
-        """ This method return the url needed to allow this instance of Odoo to access to the scope
-            of gmail specified as parameters
+        """This method return the url needed to allow this instance of Odoo to access to the scope
+        of gmail specified as parameters
         """
         state = {"d": self.env.cr.dbname, "s": service, "f": from_url}
 
@@ -91,8 +91,8 @@ class MicrosoftService(models.AbstractModel):
 
     @api.model
     def _get_microsoft_tokens(self, authorize_code, service):
-        """ Call Microsoft API to exchange authorization code against token, with POST request, to
-            not be redirected.
+        """Call Microsoft API to exchange authorization code against token, with POST request, to
+        not be redirected.
         """
         get_param = self.env["ir.config_parameter"].sudo().get_param
         base_url = get_param("web.base.url", default="http://www.odoo.com?NoBaseUrl")
@@ -139,12 +139,12 @@ class MicrosoftService(models.AbstractModel):
         preuri="https://graph.microsoft.com",
         timeout=TIMEOUT,
     ):
-        """ Execute the request to Microsoft API. Return a tuple ('HTTP_CODE', 'HTTP_RESPONSE')
-            :param uri : the url to contact
-            :param params : dict or already encoded parameters for the request to make
-            :param headers : headers of request
-            :param method : the method to use to make the request
-            :param preuri : pre url to prepend to param uri.
+        """Execute the request to Microsoft API. Return a tuple ('HTTP_CODE', 'HTTP_RESPONSE')
+        :param uri : the url to contact
+        :param params : dict or already encoded parameters for the request to make
+        :param headers : headers of request
+        :param method : the method to use to make the request
+        :param preuri : pre url to prepend to param uri.
         """
         if params is None:
             params = {}

@@ -7,4 +7,5 @@
     # TODO: how can we exclude the code yanked from v14?
     "license": "AGPL-3",
     "author": "Odoo Community Association (OCA),Hunki Enterprises BV",
+    "website": "https://github.com/OCA/calendar",
 }
