@@ -739,7 +739,9 @@ msgid "Randomly: order is not important"
 msgstr ""
 
 #. module: resource_booking
+#: code:addons/resource_booking/models/resource_booking.py:477
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__partner_id
+#, python-format
 msgid "Requester"
 msgstr ""
 
@@ -747,12 +749,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__requester_advice
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__requester_advice
 msgid "Requester Advice"
-msgstr ""
-
-#. module: resource_booking
-#: code:addons/resource_booking/models/resource_booking.py:454
-#, python-format
-msgid "Requesting partner"
 msgstr ""
 
 #. module: resource_booking
@@ -848,7 +844,7 @@ msgid "Schedule"
 msgstr ""
 
 #. module: resource_booking
-#: code:addons/resource_booking/models/resource_booking.py:474
+#: code:addons/resource_booking/models/resource_booking.py:497
 #, python-format
 msgid "Schedule booking"
 msgstr ""
