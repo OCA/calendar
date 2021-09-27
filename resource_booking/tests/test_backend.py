@@ -589,7 +589,7 @@ class BackendCase(SavepointCase):
         # Combination was handpicked, so resource attendees are auto-confirmed
         self.assertEqual(resource_attendees.state, "accepted")
 
-    def test_suggested_recipients(self):
+    def test_suggested_and_subscribed_recipients(self):
         # Create a booking as a new user
         rb_user = new_test_user(
             self.env, login="rbu", groups="base.group_user,resource_booking.group_user"
@@ -607,21 +607,12 @@ class BackendCase(SavepointCase):
                 }
             )
         )
-        # Organizer and creator must already be following
+        # Organizer, combination and creator must already be following
         self.assertEqual(
-            rb.message_partner_ids, rb_user.partner_id | self.users[1].partner_id
+            rb.message_partner_ids, rb_user.partner_id | self.users[:2].partner_id
         )
         # Requester and combination must be suggested
         self.assertEqual(
             rb._message_get_suggested_recipients(),
-            {
-                rb.id: [
-                    (rb.partner_id.id, "some customer", "Requester"),
-                    (
-                        self.users[0].partner_id.id,
-                        "User 0<user_0@example.com>",
-                        "Resources combination",
-                    ),
-                ]
-            },
+            {rb.id: [(rb.partner_id.id, "some customer", "Requester")]},
         )
