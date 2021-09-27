@@ -1,7 +1,7 @@
 # Copyright 2021 Tecnativa - Jairo Llopis
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 from freezegun import freeze_time
-from odoo.tests.common import SavepointCase, Form
+from odoo.tests.common import SavepointCase, Form, new_test_user
 from odoo.exceptions import ValidationError
 from odoo import fields
 from datetime import datetime
@@ -378,3 +378,33 @@ class BackendCase(SavepointCase):
         )
         # Invitation must display Madrid TZ (CET)
         self.assertIn("09:00:00 CET", invitation_mail.body)
+
+    def test_suggested_and_subscribed_recipients(self):
+        # Create a booking as a new user
+        rb_user = new_test_user(
+            self.env, login="rbu", groups="base.group_user,resource_booking.group_user"
+        )
+        rb = (
+            self.env["resource.booking"]
+            .sudo(rb_user)
+            .create(
+                {
+                    "partner_id": self.partner.id,
+                    "type_id": self.rbt.id,
+                    "combination_id": self.rbcs[0].id,
+                }
+            )
+        )
+        # Creator and resource must already be following
+        self.assertEqual(
+            rb.message_partner_ids, rb_user.partner_id | self.users[0].partner_id
+        )
+        # Requester must be suggested
+        self.assertEqual(
+            rb.message_get_suggested_recipients(),
+            {
+                rb.id: [
+                    (rb.partner_id.id, "some customer", "Requester"),
+                ]
+            },
+        )
