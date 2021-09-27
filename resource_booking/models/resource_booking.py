@@ -446,12 +446,35 @@ class ResourceBooking(models.Model):
         result &= combinations._get_intervals(start_dt, end_dt)
         return result
 
+    def _message_auto_subscribe_followers(self, updated_values, default_subtype_ids):
+        """Auto-subscribe and notify resource partners."""
+        result = super()._message_auto_subscribe_followers(
+            updated_values, default_subtype_ids
+        )
+        combination = self.env["resource.booking.combination"].sudo().browse(
+            updated_values.get("combination_id")
+        )
+        resource_partners = combination.mapped(
+            "resource_ids.user_id.partner_id"
+        ).filtered("active")
+        for partner in resource_partners:
+            result.append(
+                (
+                    partner.id,
+                    default_subtype_ids,
+                    "mail.message_user_assigned"
+                    if partner != self.env.user.partner_id
+                    else False,
+                )
+            )
+        return result
+
     def message_get_suggested_recipients(self):
         recipients = super().message_get_suggested_recipients()
         for one in self:
             if one.partner_id:
                 one._message_add_suggested_recipient(
-                    recipients, partner=one.partner_id, reason=_("Requesting partner")
+                    recipients, partner=one.partner_id, reason=_("Requester")
                 )
         return recipients
 
