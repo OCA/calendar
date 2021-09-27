@@ -730,7 +730,8 @@ msgstr "Der kan kun være én begivenhed for hver ressourcebooking."
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_form
 msgid "Open a calendar to schedule a meeting for this booking request."
-msgstr "Åbn en kalender for at planlægge et møde for denne bookingforespørgsel."
+msgstr ""
+"Åbn en kalender for at planlægge et møde for denne bookingforespørgsel."
 
 #. module: resource_booking
 #: selection:resource.booking,activity_state:0
@@ -784,7 +785,9 @@ msgid "Randomly: order is not important"
 msgstr "Tilfældig: Rækkefølgen er ikke vigtig"
 
 #. module: resource_booking
+#: code:addons/resource_booking/models/resource_booking.py:477
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__partner_id
+#, python-format
 msgid "Requester"
 msgstr "Anmoder"
 
@@ -793,12 +796,6 @@ msgstr "Anmoder"
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__requester_advice
 msgid "Requester Advice"
 msgstr "Vejledning til anmoder"
-
-#. module: resource_booking
-#: code:addons/resource_booking/models/resource_booking.py:454
-#, python-format
-msgid "Requesting partner"
-msgstr "Anmodende partner"
 
 #. module: resource_booking
 #: model:ir.model,name:resource_booking.model_resource_booking
@@ -893,7 +890,7 @@ msgid "Schedule"
 msgstr "Skema"
 
 #. module: resource_booking
-#: code:addons/resource_booking/models/resource_booking.py:474
+#: code:addons/resource_booking/models/resource_booking.py:497
 #, python-format
 msgid "Schedule booking"
 msgstr "Planlagt booking"
@@ -1175,3 +1172,6 @@ msgstr ""
 "for ændringer:\n"
 "\n"
 "- %s"
+
+#~ msgid "Requesting partner"
+#~ msgstr "Anmodende partner"
