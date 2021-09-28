@@ -4,7 +4,7 @@
 {
     "name": "Resource booking",
     "summary": "Manage appointments and resource booking",
-    "version": "13.0.2.3.1",
+    "version": "13.0.2.4.0",
     "development_status": "Beta",
     "category": "Appointments",
     "website": "https://github.com/OCA/calendar",
@@ -29,6 +29,7 @@
         "web_calendar_slot_duration",
     ],
     "data": [
+        "data/mail.xml",
         "security/resource_booking_security.xml",
         "security/ir.model.access.csv",
         "templates/assets.xml",
