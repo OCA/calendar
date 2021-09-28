@@ -83,7 +83,7 @@ class ResourceCalendar(models.Model):
                     (
                         fields.Datetime.context_timestamp(event, event.start),
                         fields.Datetime.context_timestamp(event, event.stop),
-                        event,
+                        self.env["resource.calendar.leaves"],
                     )
                 )
         return Intervals(intervals)
