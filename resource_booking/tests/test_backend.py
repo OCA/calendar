@@ -1,6 +1,7 @@
 # Copyright 2021 Tecnativa - Jairo Llopis
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 from datetime import date, datetime
+from unittest.mock import patch
 
 from freezegun import freeze_time
 from pytz import utc
@@ -594,19 +595,21 @@ class BackendCase(SavepointCase):
         rb_user = new_test_user(
             self.env, login="rbu", groups="base.group_user,resource_booking.group_user"
         )
-        rb = (
-            self.env["resource.booking"]
-            .with_user(rb_user)
-            .create(
-                {
-                    "partner_id": self.partner.id,
-                    "type_id": self.rbt.id,
-                    "combination_auto_assign": False,
-                    "combination_id": self.rbcs[0].id,
-                    "user_id": self.users[1].id,
-                }
+        # Enable auto-subscription messaging
+        with patch.object(self.env.registry, "ready", True):
+            rb = (
+                self.env["resource.booking"]
+                .with_user(rb_user)
+                .create(
+                    {
+                        "partner_id": self.partner.id,
+                        "type_id": self.rbt.id,
+                        "combination_auto_assign": False,
+                        "combination_id": self.rbcs[0].id,
+                        "user_id": self.users[1].id,
+                    }
+                )
             )
-        )
         # Organizer, combination and creator must already be following
         self.assertEqual(
             rb.message_partner_ids, rb_user.partner_id | self.users[:2].partner_id

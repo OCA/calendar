@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2021 Tecnativa - Jairo Llopis
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<data>
+
+    <!-- Inspired in message_user_assigned -->
+    <template id="message_combination_assigned">
+        <p style="margin: 0px;">
+            Dear user,
+            <br />
+            You have been assigned to the
+            <t t-esc="model_description or 'document'" />
+            <t t-esc="object.name_get()[0][1]" />
+            because you belong to the chosen resource combination:
+            <t t-esc="object.combination_id.name_get()[0][1]" />.
+        </p>
+        <p style="margin-top: 24px; margin-bottom: 16px;">
+            <a
+                t-att-href="'/mail/view?model=%s&amp;res_id=%s' % (object._name, object.id)"
+                style="background-color:#875A7B; padding: 10px; text-decoration: none; color: #fff; border-radius: 5px;"
+            >
+                View
+                <t t-esc="model_description or 'document'" />
+            </a>
+        </p>
+    </template>
+
+</data>

@@ -550,7 +550,7 @@ class ResourceBooking(models.Model):
                 (
                     partner.id,
                     default_subtype_ids,
-                    "mail.message_user_assigned"
+                    "resource_booking.message_combination_assigned"
                     if partner != self.env.user.partner_id
                     else False,
                 )
