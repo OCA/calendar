@@ -390,6 +390,14 @@ msgid "Date"
 msgstr "Fecha"
 
 #. module: resource_booking
+#: model_terms:ir.ui.view,arch_db:resource_booking.message_combination_assigned
+msgid ""
+"Dear user,\n"
+"            <br/>\n"
+"            You have been assigned to the"
+msgstr ""
+
+#. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__alarm_ids
 msgid "Default reminders"
 msgstr "Recordatorios por defecto"
@@ -1120,6 +1128,11 @@ msgstr ""
 "Usuarios que pueden gestionar la configuración de las reservas de recursos."
 
 #. module: resource_booking
+#: model_terms:ir.ui.view,arch_db:resource_booking.message_combination_assigned
+msgid "View"
+msgstr ""
+
+#. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__website_message_ids
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__website_message_ids
 msgid "Website Messages"
@@ -1181,6 +1194,11 @@ msgstr ""
 "de modificaciones:\n"
 "\n"
 "- %s"
+
+#. module: resource_booking
+#: model_terms:ir.ui.view,arch_db:resource_booking.message_combination_assigned
+msgid "because you belong to the chosen resource combination:"
+msgstr ""
 
 #~ msgid "Requesting partner"
 #~ msgstr "Solicitante"
