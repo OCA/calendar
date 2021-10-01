@@ -29,6 +29,7 @@
         "web_calendar_slot_duration",
     ],
     "data": [
+        "data/mail.xml",
         "security/resource_booking_security.xml",
         "security/ir.model.access.csv",
         "templates/assets.xml",
