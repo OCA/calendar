@@ -48,7 +48,7 @@ msgid ""
 msgstr ""
 
 #. module: calendar_resource
-#: code:addons/calendar_resource/models/resource_calendar_attendance.py:23
+#: code:addons/calendar_resource/models/resource_calendar_attendance.py:22
 #, python-format
 msgid "End Date cannot be earlier than Starting Date."
 msgstr ""
@@ -126,7 +126,7 @@ msgid "Select Resources"
 msgstr "Selecione os recursos"
 
 #. module: calendar_resource
-#: code:addons/calendar_resource/models/calendar_event.py:107
+#: code:addons/calendar_resource/models/calendar_event.py:100
 #, python-format
 msgid ""
 "The resource, %s, cannot be double-booked with any overlapping meetings or "
@@ -134,7 +134,7 @@ msgid ""
 msgstr ""
 
 #. module: calendar_resource
-#: code:addons/calendar_resource/models/calendar_event.py:257
+#: code:addons/calendar_resource/models/calendar_event.py:235
 #, python-format
 msgid ""
 "The resource, %s, is not available during the following dates and times "
@@ -142,7 +142,7 @@ msgid ""
 msgstr ""
 
 #. module: calendar_resource
-#: code:addons/calendar_resource/models/calendar_event.py:132
+#: code:addons/calendar_resource/models/calendar_event.py:122
 #, python-format
 msgid ""
 "The resource, '%s', is not allowed in the following event types: \n"
@@ -150,7 +150,7 @@ msgid ""
 msgstr ""
 
 #. module: calendar_resource
-#: code:addons/calendar_resource/models/calendar_event.py:171
+#: code:addons/calendar_resource/models/calendar_event.py:154
 #, python-format
 msgid ""
 "The resource, '%s', is on leave during the following times which are "
@@ -164,7 +164,7 @@ msgid "Work Detail"
 msgstr ""
 
 #. module: calendar_resource
-#: code:addons/calendar_resource/models/resource_calendar_attendance.py:33
+#: code:addons/calendar_resource/models/resource_calendar_attendance.py:32
 #, python-format
 msgid ""
 "Work to cannot be earlier or the same as Work from. If it is a night shift, "
