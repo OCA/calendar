@@ -40,13 +40,7 @@ class ResourceBooking(models.Model):
         ondelete="set null",
         help="Meeting confirmed for this booking.",
     )
-    categ_ids = fields.Many2many(
-        string="Tags",
-        comodel_name="calendar.event.type",
-        compute="_compute_categ_ids",
-        store=True,
-        readonly=False,
-    )
+    categ_ids = fields.Many2many(string="Tags", comodel_name="calendar.event.type")
     combination_id = fields.Many2one(
         comodel_name="resource.booking.combination",
         string="Resources combination",
@@ -159,8 +153,8 @@ class ResourceBooking(models.Model):
             one.access_url = "/my/bookings/%d" % one.id
         return result
 
-    @api.depends("type_id")
-    def _compute_categ_ids(self):
+    @api.onchange("type_id")
+    def _onchange_type_set_categ_ids(self):
         """Copy default tags from RBT when changing it."""
         for one in self:
             if one.type_id:
