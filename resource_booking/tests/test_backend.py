@@ -619,3 +619,13 @@ class BackendCase(SavepointCase):
             rb._message_get_suggested_recipients(),
             {rb.id: [(rb.partner_id.id, "some customer", "Requester")]},
         )
+
+    def test_creating_rbt_has_tags(self):
+        """Creating booking works if type has tags."""
+        categ = self.env["calendar.event.type"].create({"name": "test tag"})
+        self.rbt.categ_ids = categ
+        rb_f = Form(self.env["resource.booking"])
+        rb_f.partner_id = self.partner
+        rb_f.type_id = self.rbt
+        rb = rb_f.save()
+        self.assertEqual(rb.categ_ids, categ)
