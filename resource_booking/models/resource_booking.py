@@ -238,6 +238,12 @@ class ResourceBooking(models.Model):
                     resource_booking_ids=[(6, 0, one.ids)],
                     start=one.start,
                     stop=one.stop,
+                    # If you're not booked, you're free
+                    show_as=(
+                        "busy"
+                        if self.env.user.partner_id in resource_partners
+                        else "free"
+                    ),
                     # These 2 avoid creating event as activity
                     res_model_id=False,
                     res_id=False,
