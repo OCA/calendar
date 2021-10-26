@@ -15,7 +15,7 @@ from .common import create_test_data
 _2dt = fields.Datetime.to_datetime
 
 
-@freeze_time("2021-02-26 09:00:00", tick=True)
+@freeze_time("2021-02-26 09:00:00", tick=True)  # Last Friday of February
 class BackendCase(SavepointCase):
     @classmethod
     def setUpClass(cls):
@@ -629,3 +629,48 @@ class BackendCase(SavepointCase):
         rb_f.type_id = self.rbt
         rb = rb_f.save()
         self.assertEqual(rb.categ_ids, categ)
+
+    def test_event_show_as_free(self):
+        """Don't mind about event owner.
+
+        Here I'll create 2 overlapping events. Since I create both, I'll be the
+        owner of both automatically. However, there are 2 RBC available (one is
+        me), so I still should be able to create 2 events.
+        """
+        env = self.env(user=self.users[0])
+        env.user.groups_id = self.env.ref("base.group_user") | self.env.ref(
+            "resource_booking.group_user"
+        )
+        # I'm the last option
+        self.rbt.combination_assignment = "sorted"
+        self.rbt.combination_rel_ids[0].sequence = 10
+        # Create one long event on Monday, where there are 2 RBC available (one is me)
+        rb_f = Form(env["resource.booking"])
+        rb_f.type_id = self.rbt
+        rb_f.start = "2021-03-01 09:00:00"
+        rb_f.duration = 1
+        rb_f.partner_id = self.partner
+        rb1 = rb_f.save()
+        # I'm not booked, so I'm free
+        self.assertEqual(rb1.combination_id, self.rbcs[2])
+        self.assertEqual(rb1.meeting_id.show_as, "free")
+        # Create another event within the previous one
+        rb_f = Form(env["resource.booking"])
+        rb_f.type_id = self.rbt
+        rb_f.start = "2021-03-01 09:00:00"
+        rb_f.duration = 1.5
+        rb_f.partner_id = self.partner.copy()
+        # Saving works because I'm free
+        rb2 = rb_f.save()
+        # I'm booked this time, so I'm busy
+        self.assertEqual(rb2.combination_id, self.rbcs[0])
+        self.assertEqual(rb2.meeting_id.show_as, "busy")
+        # But if I'm not free for 1st RB, it will fail without available resources
+        rb1.meeting_id.show_as = "busy"
+        rb_f = Form(env["resource.booking"])
+        rb_f.type_id = self.rbt
+        rb_f.start = "2021-03-01 09:30:00"
+        rb_f.duration = 0.5
+        rb_f.partner_id = self.partner.copy()
+        with self.assertRaises(AssertionError):
+            rb_f.save()
