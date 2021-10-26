@@ -18,12 +18,14 @@ msgstr ""
 
 #. module: resource_booking
 #: code:addons/resource_booking/models/resource_booking.py:368
+#: code:addons/resource_booking/models/resource_booking.py:374
 #, python-format
 msgid "%(partner)s - %(type)s"
 msgstr "%(partner)s - %(type)s"
 
 #. module: resource_booking
 #: code:addons/resource_booking/models/resource_booking.py:367
+#: code:addons/resource_booking/models/resource_booking.py:373
 #, python-format
 msgid "%(partner)s - %(type)s - %(time)s"
 msgstr "%(partner)s - %(type)s - %(time)s"
@@ -260,6 +262,7 @@ msgstr "Annulleret"
 
 #. module: resource_booking
 #: code:addons/resource_booking/models/resource_booking.py:266
+#: code:addons/resource_booking/models/resource_booking.py:272
 #, python-format
 msgid ""
 "Cannot schedule these bookings because no resources are selected for them:\n"
@@ -273,6 +276,7 @@ msgstr ""
 
 #. module: resource_booking
 #: code:addons/resource_booking/models/resource_booking.py:294
+#: code:addons/resource_booking/models/resource_booking.py:300
 #, python-format
 msgid ""
 "Cannot schedule these bookings because they do not fit in their type or "
@@ -696,6 +700,7 @@ msgstr "Ingen ledige tider denne måned."
 
 #. module: resource_booking
 #: code:addons/resource_booking/models/resource_booking.py:399
+#: code:addons/resource_booking/models/resource_booking.py:405
 #, python-format
 msgid "No resource combinations available on %s"
 msgstr "Ingen ledige ressourcekombinationer den %s"
@@ -794,6 +799,7 @@ msgstr "Tilfældig: Rækkefølgen er ikke vigtig"
 
 #. module: resource_booking
 #: code:addons/resource_booking/models/resource_booking.py:477
+#: code:addons/resource_booking/models/resource_booking.py:483
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__partner_id
 #, python-format
 msgid "Requester"
@@ -899,6 +905,7 @@ msgstr "Skema"
 
 #. module: resource_booking
 #: code:addons/resource_booking/models/resource_booking.py:497
+#: code:addons/resource_booking/models/resource_booking.py:503
 #, python-format
 msgid "Schedule booking"
 msgstr "Planlagt booking"
