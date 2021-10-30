@@ -18,11 +18,13 @@
         <t t-set="confirm_url" t-value="booking.get_portal_url(suffix='/confirm')" />
         <t t-set="date_format" t-value="res_lang.date_format" />
         <t t-set="time_format" t-value="res_lang.time_format.replace(':%S', '')" />
+        <t t-set="start_next" t-value="start + relativedelta(months=1)" />
+        <t t-set="start_previous" t-value="start - relativedelta(months=1)" />
         <div class="o_booking_calendar">
             <div class="alert alert-danger" t-if="not slots">
                 No free slots found this month.
                 <a
-                    t-att-href="booking.get_portal_url(suffix='/schedule/%d/%d' % (start.year, start.month + 1))"
+                    t-att-href="booking.get_portal_url(suffix='/schedule/%d/%d' % (start_next.year, start_next.month))"
                     class="alert-link"
                 >
                     Try next month
@@ -43,7 +45,7 @@
                         <th class="text-left">
                             <a
                                 t-if="start > now"
-                                t-att-href="booking.get_portal_url(suffix='/schedule/%d/%d' % (start.year, start.month - 1))"
+                                t-att-href="booking.get_portal_url(suffix='/schedule/%d/%d' % (start_previous.year, start_previous.month))"
                                 class="btn btn-secondary"
                                 title="Previous month"
                             >
@@ -57,7 +59,7 @@
                         />
                         <th class="text-right">
                             <a
-                                t-att-href="booking.get_portal_url(suffix='/schedule/%d/%d' % (start.year, start.month + 1))"
+                                t-att-href="booking.get_portal_url(suffix='/schedule/%d/%d' % (start_next.year, start_next.month))"
                                 class="btn btn-secondary"
                                 title="Next month"
                             >
