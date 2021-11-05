@@ -4,7 +4,11 @@
 
 def create_test_data(obj):
     """Create test data for a case."""
-    obj.env = obj.env(context={"tz": "UTC"})
+    obj.env = obj.env(
+        context=dict(
+            obj.env.context, tracking_disable=True, no_reset_password=True, tz="UTC"
+        )
+    )
     # Create one resource.calendar available on Mondays, another one on
     # Tuesdays, and another one on Mondays and Tuesdays; in that order
     attendances = [
