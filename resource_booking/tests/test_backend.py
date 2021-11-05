@@ -591,6 +591,7 @@ class BackendCase(SavepointCase):
         self.assertEqual(resource_attendees.state, "accepted")
 
     def test_suggested_and_subscribed_recipients(self):
+        self.env = self.env(context=dict(self.env.context, tracking_disable=False))
         # Create a booking as a new user
         rb_user = new_test_user(
             self.env, login="rbu", groups="base.group_user,resource_booking.group_user"
@@ -637,7 +638,9 @@ class BackendCase(SavepointCase):
         owner of both automatically. However, there are 2 RBC available (one is
         me), so I still should be able to create 2 events.
         """
-        env = self.env(user=self.users[0])
+        env = self.env(
+            user=self.users[0], context=dict(self.env.context, tracking_disable=False)
+        )
         env.user.groups_id = self.env.ref("base.group_user") | self.env.ref(
             "resource_booking.group_user"
         )
