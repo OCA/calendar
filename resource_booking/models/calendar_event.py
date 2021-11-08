@@ -80,6 +80,9 @@ class CalendarEvent(models.Model):
                 continue
             if attendee.partner_id in rb.combination_id.resource_ids.user_id.partner_id:
                 attendee.state = "accepted"
+        # Don't send notifications if you're a public user
+        if self.env.user._is_public():
+            return result
         # Send invitations like upstream would have done
         to_notify = new_attendees.filtered(lambda a: a.email != self.env.user.email)
         if to_notify and not self.env.context.get("detaching"):
