@@ -242,3 +242,51 @@ class PortalCase(HttpCase):
         portal_url = link.get("href")
         portal_page = self._url_xml(portal_url)
         self.assertTrue(portal_page.cssselect(".oe_login_form"))
+
+
+@freeze_time("2021-12-26 09:00:00", tick=True)
+class PortalCaseCalendar(HttpCase):
+    def setUp(self):
+        super().setUp()
+        create_test_data(self)
+        self.user_portal = self.env["res.users"].create({
+            "name": "portal",
+            "login": "ptl",
+            "password": "ptl",
+            "groups_id": [(4, self.env.ref("base.group_portal").id, 0)],
+        })
+
+    def _url_xml(self, url, data=None, timeout=10):
+        """Open an URL and return the lxml etree object resulting from its content."""
+        response = self.url_open(url, data, timeout)
+        return fromstring(response.content)
+
+    def test_portal_scheduling_calendar(self):
+        # test scheduling calendar when switching year
+        booking = self.env["resource.booking"].create(
+            {"partner_id": self.user_portal.partner_id.id, "type_id": self.rbt.id}
+        )
+        self.authenticate("ptl", "ptl")
+        portal_url = booking.get_portal_url()
+        # Portal guy goes to scheduling page
+        portal_page = self._url_xml(portal_url)
+        link = portal_page.cssselect('a:contains("Schedule")')[0]
+        portal_url = link.get("href")
+        portal_page = self._url_xml(portal_url)
+        self.assertTrue(
+            portal_page.cssselect(".o_booking_calendar:contains('December 2021')")
+        )
+        # He goes to January 2022
+        link = portal_page.cssselect('a[title="Next month"]')[0]
+        portal_url = link.get("href")
+        portal_page = self._url_xml(portal_url)
+        self.assertTrue(
+            portal_page.cssselect(".o_booking_calendar:contains('January 2022')")
+        )
+        # He goes back to December 2021
+        link = portal_page.cssselect('a[title="Previous month"]')[0]
+        portal_url = link.get("href")
+        portal_page = self._url_xml(portal_url)
+        self.assertTrue(
+            portal_page.cssselect(".o_booking_calendar:contains('December 2021')")
+        )
