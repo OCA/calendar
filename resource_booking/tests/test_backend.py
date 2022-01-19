@@ -604,7 +604,7 @@ class BackendCase(SavepointCase):
                 .with_user(rb_user)
                 .create(
                     {
-                        "partner_id": self.partner.id,
+                        "partner_id": rb_user.partner_id.id,
                         "type_id": self.rbt.id,
                         "combination_auto_assign": False,
                         "combination_id": self.rbcs[0].id,

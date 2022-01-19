@@ -5,7 +5,6 @@ from pytz import UTC
 
 from odoo import api, fields, models
 
-from odoo.addons.calendar.models.calendar import calendar_id2real_id
 from odoo.addons.resource.models.resource import Intervals
 
 
@@ -55,9 +54,10 @@ class ResourceCalendar(models.Model):
             .search([("start", "<=", end_dt), ("stop", ">=", start_dt)])
         )
         for event in all_events:
-            real_event = self.env["calendar.event"].browse(
-                calendar_id2real_id(event.id)
-            )
+            # real_event = self.env["calendar.event"].browse(
+            #     calendar_id2real_id(event.id)
+            # )
+            real_event = event
             # Is the event the same one we're currently checking?
             if real_event.resource_booking_ids.id == analyzed_booking_id:
                 continue
