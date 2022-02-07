@@ -15,10 +15,12 @@ _logger = logging.getLogger(__name__)
 
 TIMEOUT = 20
 
-MICROSOFT_AUTH_ENDPOINT = (
+DEFAULT_MICROSOFT_AUTH_ENDPOINT = (
     "https://login.microsoftonline.com/common/oauth2/v2.0/authorize"
 )
-MICROSOFT_TOKEN_ENDPOINT = "https://login.microsoftonline.com/common/oauth2/v2.0/token"
+DEFAULT_MICROSOFT_TOKEN_ENDPOINT = (
+    "https://login.microsoftonline.com/common/oauth2/v2.0/token"
+)
 
 
 class MicrosoftService(models.AbstractModel):
@@ -27,6 +29,26 @@ class MicrosoftService(models.AbstractModel):
 
     def _get_calendar_scope(self):
         return "offline_access openid Calendars.ReadWrite"
+
+    @api.model
+    def _get_auth_endpoint(self):
+        return (
+            self.env["ir.config_parameter"]
+            .sudo()
+            .get_param(
+                "microsoft_account.auth_endpoint", DEFAULT_MICROSOFT_AUTH_ENDPOINT
+            )
+        )
+
+    @api.model
+    def _get_token_endpoint(self):
+        return (
+            self.env["ir.config_parameter"]
+            .sudo()
+            .get_param(
+                "microsoft_account.token_endpoint", DEFAULT_MICROSOFT_TOKEN_ENDPOINT
+            )
+        )
 
     @api.model
     def generate_refresh_token(self, service, authorization_code):
@@ -53,7 +75,7 @@ class MicrosoftService(models.AbstractModel):
         }
         try:
             req = requests.post(
-                MICROSOFT_TOKEN_ENDPOINT, data=data, headers=headers, timeout=TIMEOUT
+                self._get_token_endpoint(), data=data, headers=headers, timeout=TIMEOUT
             )
             req.raise_for_status()
             content = req.json()
@@ -87,7 +109,7 @@ class MicrosoftService(models.AbstractModel):
                 "access_type": "offline",
             }
         )
-        return "{}?{}".format(MICROSOFT_AUTH_ENDPOINT, encoded_params)
+        return "{}?{}".format(self._get_auth_endpoint(), encoded_params)
 
     @api.model
     def _get_microsoft_tokens(self, authorize_code, service):
@@ -113,7 +135,7 @@ class MicrosoftService(models.AbstractModel):
         }
         try:
             dummy, response, dummy = self._do_request(
-                MICROSOFT_TOKEN_ENDPOINT,
+                self._get_token_endpoint(),
                 params=data,
                 headers=headers,
                 method="POST",
@@ -187,7 +209,8 @@ class MicrosoftService(models.AbstractModel):
             if int(status) in (204, 404):  # Page not found, no response
                 response = False
             else:
-                response = res.json()
+                # Some answers return empty content
+                response = res.content and res.json() or {}
 
             try:
                 ask_time = datetime.strptime(

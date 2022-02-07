@@ -11,13 +11,9 @@ from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 from odoo.loglevels import exception_to_unicode
 
-from odoo.addons.microsoft_account.models.microsoft_service import (
-    MICROSOFT_TOKEN_ENDPOINT,
-)
 from odoo.addons.microsoft_calendar.models.microsoft_sync import (
     microsoft_calendar_token,
 )
-
 from odoo.addons.microsoft_calendar.utils.microsoft_calendar import (
     InvalidSyncToken,
     MicrosoftCalendarService,
@@ -68,7 +64,7 @@ class User(models.Model):
 
         try:
             dummy, response, dummy = self.env["microsoft.service"]._do_request(
-                MICROSOFT_TOKEN_ENDPOINT,
+                self.env["microsoft.service"]._get_token_endpoint(),
                 params=data,
                 headers=headers,
                 method="POST",
