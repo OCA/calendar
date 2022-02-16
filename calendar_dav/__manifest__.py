@@ -11,6 +11,7 @@
     "license": "AGPL-3",
     "application": False,
     "installable": True,
+    "auto_install": True,
     "depends": [
         "base_dav",
         "calendar",
