@@ -505,7 +505,10 @@ class ResourceBooking(models.Model):
 
     def write(self, vals):
         """Sync booking with meeting if needed."""
-        result = super().write(vals)
+        # On a database with lots of recurrent calendar events we could get serious
+        # performance downgrades. As we'll be computing them with _sync_meeting later
+        # we'll be avoiding triggering on the super call (i.e. compute methods)
+        result = super(ResourceBooking, self.with_context(virtual_id=False)).write(vals)
         self._sync_meeting()
         return result
 

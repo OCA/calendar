@@ -10,6 +10,7 @@
             <calendar
                 string="Bookings"
                 date_start="start"
+                date_stop="stop"
                 date_delay="duration"
                 quick_add="false"
                 color="combination_id"
