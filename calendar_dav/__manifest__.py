@@ -12,6 +12,7 @@
     "application": False,
     "installable": True,
     "auto_install": True,
+    "post_init_hook": "post_init_hook",
     "depends": [
         "base_dav",
         "calendar",
