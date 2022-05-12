@@ -265,6 +265,19 @@ class ResourceBooking(models.Model):
                 # Either value is False: no stop date
                 record.stop = False
 
+    def _with_calendar_tz_context(self):
+        """We'll prefer the calendar tz context as the dates to display to the user.
+        Otherwise, it'll be confusing when the user is in another timezone or has no
+        timezon at all in which case the default will be UTC. We make the fallback
+        timezone the same way calendar._get_display_time() does it."""
+        timezone = (
+            self.type_id.resource_calendar_id.tz
+            or self._context.get("tz")
+            or self.env.user.partner_id.tz
+            or "UTC"
+        )
+        return self.with_context(tz=timezone)
+
     @api.depends("meeting_id.user_id")
     def _compute_user_id(self):
         """Get user from related meeting, if available."""
@@ -357,7 +370,9 @@ class ResourceBooking(models.Model):
                 unfitting_bookings -= booking
                 continue
             meeting_dates = tuple(
-                fields.Datetime.context_timestamp(self, booking[field])
+                fields.Datetime.context_timestamp(
+                    self._with_calendar_tz_context(), booking[field]
+                )
                 for field in ("start", "stop")
             )
             available_intervals = booking._get_intervals(*meeting_dates)
@@ -392,7 +407,8 @@ class ResourceBooking(models.Model):
         month = month or now.month
         start = datetime(year, month, 1)
         start, now = (
-            fields.Datetime.context_timestamp(self, dt) for dt in (start, now)
+            fields.Datetime.context_timestamp(self._with_calendar_tz_context(), dt)
+            for dt in (start, now)
         )
         start = start.replace(hour=0, minute=0, second=0, microsecond=0)
         lang = self.env["res.lang"]._lang_get(self.env.lang or self.env.user.lang)
@@ -427,7 +443,7 @@ class ResourceBooking(models.Model):
             self.type_id._get_combinations_priorized() - self.combination_id
         )
         desired_interval = tuple(
-            fields.Datetime.context_timestamp(self, dt)
+            fields.Datetime.context_timestamp(self._with_calendar_tz_context(), dt)
             for dt in (self.start, self.stop)
         )
         # Get 1st combination available in the desired interval
@@ -451,7 +467,9 @@ class ResourceBooking(models.Model):
     def _get_available_slots(self, start_dt, end_dt):
         """Return available slots for scheduling current booking."""
         result = {}
-        now = fields.Datetime.context_timestamp(self, fields.Datetime.now())
+        now = fields.Datetime.context_timestamp(
+            self._with_calendar_tz_context(), fields.Datetime.now()
+        )
         slot_duration = timedelta(hours=self.type_id.duration)
         booking_duration = timedelta(hours=self.duration)
         current = max(
