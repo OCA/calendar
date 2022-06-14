@@ -46,9 +46,16 @@ class ResourceCalendar(models.Model):
             and resource.user_id.active
             and resource.user_id
         )
+        # We want to avoid unnecessary queries, which can be quite unperformant when
+        # there are lots of recurrent events.
+        if not resource and not resource_user:
+            return Intervals(intervals)
         # Simple domain to get all possibly conflicting events in a single
         # query; this reduces DB calls and helps the underlying recurring
         # system (in calendar.event) to work smoothly
+        # TODO: There's room for performance improvement when no recurrent events
+        # are to be considered. In that case we could simply use the context key
+        # virtual_id=False. How how can we know it in advance?
         all_events = (
             self.env["calendar.event"]
             .with_context(active_test=True)
