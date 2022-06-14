@@ -53,13 +53,14 @@ class ResourceCalendar(models.Model):
         # Simple domain to get all possibly conflicting events in a single
         # query; this reduces DB calls and helps the underlying recurring
         # system (in calendar.event) to work smoothly
-        # TODO: There's room for performance improvement when no recurrent events
-        # are to be considered. In that case we could simply use the context key
-        # virtual_id=False. How how can we know it in advance?
+        domain = [("start", "<=", end_dt), ("stop", ">=", start_dt)]
+        # Anyway up to this version, is more performant to restrict as much as possible
+        # the events to avoid recurrent events.
+        # TODO: in v14 we should test which approach remains the most performant
+        if resource_user:
+            domain += [("partner_ids", "=", resource_user.partner_id.id)]
         all_events = (
-            self.env["calendar.event"]
-            .with_context(active_test=True)
-            .search([("start", "<=", end_dt), ("stop", ">=", start_dt)])
+            self.env["calendar.event"].with_context(active_test=True).search(domain)
         )
         for event in all_events:
             real_event = self.env["calendar.event"].browse(
