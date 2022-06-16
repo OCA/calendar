@@ -9,7 +9,7 @@
     "website": "https://github.com/OCA/calendar",
     "author": "Akretion, Odoo Community Association (OCA)",
     "license": "AGPL-3",
-    "depends": ["calendar"],
+    "depends": ["calendar", "web_calendar_color_field"],
     "data": [
         "views/calendar_event.xml",
         "views/partner.xml",
