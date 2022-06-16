@@ -4,12 +4,12 @@
 {
     "name": "Calendar Partner Color",
     "summary": "Adapt calendar color based on partner's color",
-    "version": "14.0.0.0.0",
+    "version": "14.0.0.1.0",
     "category": "Calendar",
     "website": "https://github.com/OCA/calendar",
     "author": "Akretion, Odoo Community Association (OCA)",
     "license": "AGPL-3",
-    "depends": ["calendar"],
+    "depends": ["calendar", "web_calendar_color_field"],
     "data": [
         "views/calendar_event.xml",
         "views/partner.xml",
