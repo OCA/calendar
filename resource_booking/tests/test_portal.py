@@ -200,7 +200,8 @@ class PortalCase(HttpCase):
         for attendee in booking_public.meeting_id.attendee_ids:
             self.assertTrue(attendee.partner_id)
             self.assertIn(
-                attendee.partner_id, self.partner | self.users[0].partner_id,
+                attendee.partner_id,
+                self.partner | self.users[0].partner_id,
             )
             self.assertEqual(
                 attendee.state,

@@ -86,7 +86,11 @@ class ResourceBooking(models.Model):
             "and calendar notifications will be sent in his/her name."
         ),
     )
-    location = fields.Char(compute="_compute_location", readonly=False, store=True,)
+    location = fields.Char(
+        compute="_compute_location",
+        readonly=False,
+        store=True,
+    )
     requester_advice = fields.Text(related="type_id.requester_advice", readonly=True)
     is_modifiable = fields.Boolean(compute="_compute_is_modifiable")
     is_overdue = fields.Boolean(compute="_compute_is_overdue")
