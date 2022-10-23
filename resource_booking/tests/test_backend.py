@@ -138,7 +138,8 @@ class BackendCase(SavepointCase):
         button_context["default_duration"] = 1.5
         booking_form = Form(
             self.env["resource.booking"].with_context(
-                **button_context, default_start="2021-03-01 08:00:00",
+                **button_context,
+                default_start="2021-03-01 08:00:00",
             )
         )
         # This might seem redundant, but makes sure onchanges don't mess stuff
