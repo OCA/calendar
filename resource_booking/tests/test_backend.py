@@ -1,4 +1,5 @@
 # Copyright 2021 Tecnativa - Jairo Llopis
+# Copyright 2022 Tecnativa - Pedro M. Baeza
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 from datetime import date, datetime
 from unittest.mock import patch
@@ -327,7 +328,7 @@ class BackendCase(SavepointCase):
         ce_f.name = "recurring event past monday"
         for user in self.users:
             ce_f.partner_ids.add(user.partner_id)
-        ce_f.start_datetime = datetime(2021, 2, 22, 8)
+        ce_f.start = datetime(2021, 2, 22, 8)
         ce_f.duration = 1
         ce_f.recurrency = True
         ce_f.interval = 1
@@ -602,6 +603,7 @@ class BackendCase(SavepointCase):
             rb = (
                 self.env["resource.booking"]
                 .with_user(rb_user)
+                .sudo()
                 .create(
                     {
                         "partner_id": self.partner.id,
@@ -639,17 +641,13 @@ class BackendCase(SavepointCase):
         owner of both automatically. However, there are 2 RBC available (one is
         me), so I still should be able to create 2 events.
         """
-        env = self.env(
-            user=self.users[0], context=dict(self.env.context, tracking_disable=False)
-        )
-        env.user.groups_id = self.env.ref("base.group_user") | self.env.ref(
-            "resource_booking.group_user"
-        )
+        user = self.users[0]
+        rb_obj = self.env["resource.booking"].with_context(tracking_disable=True)
         # I'm the last option
         self.rbt.combination_assignment = "sorted"
         self.rbt.combination_rel_ids[0].sequence = 10
         # Create one long event on Monday, where there are 2 RBC available (one is me)
-        rb_f = Form(env["resource.booking"])
+        rb_f = Form(rb_obj)
         rb_f.type_id = self.rbt
         rb_f.start = "2021-03-01 09:00:00"
         rb_f.duration = 1
@@ -657,9 +655,9 @@ class BackendCase(SavepointCase):
         rb1 = rb_f.save()
         # I'm not booked, so I'm free
         self.assertEqual(rb1.combination_id, self.rbcs[2])
-        self.assertEqual(rb1.meeting_id.show_as, "free")
+        self.assertNotIn(user.partner_id, rb1.meeting_id.partner_ids)
         # Create another event within the previous one
-        rb_f = Form(env["resource.booking"])
+        rb_f = Form(rb_obj)
         rb_f.type_id = self.rbt
         rb_f.start = "2021-03-01 09:00:00"
         rb_f.duration = 1.5
@@ -668,10 +666,9 @@ class BackendCase(SavepointCase):
         rb2 = rb_f.save()
         # I'm booked this time, so I'm busy
         self.assertEqual(rb2.combination_id, self.rbcs[0])
-        self.assertEqual(rb2.meeting_id.show_as, "busy")
-        # But if I'm not free for 1st RB, it will fail without available resources
-        rb1.meeting_id.show_as = "busy"
-        rb_f = Form(env["resource.booking"])
+        self.assertIn(user.partner_id, rb2.meeting_id.partner_ids)
+        # Thus, it will fail without available resources on a next one
+        rb_f = Form(rb_obj)
         rb_f.type_id = self.rbt
         rb_f.start = "2021-03-01 09:30:00"
         rb_f.duration = 0.5

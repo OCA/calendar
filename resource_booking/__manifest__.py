@@ -1,15 +1,16 @@
 # Copyright 2021 Tecnativa - Jairo Llopis
+# Copyright 2022 Tecnativa - Pedro M. Baeza
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 {
     "name": "Resource booking",
     "summary": "Manage appointments and resource booking",
-    "version": "13.0.2.6.5",
-    "development_status": "Beta",
+    "version": "14.0.1.0.0",
+    "development_status": "Production/Stable",
     "category": "Appointments",
     "website": "https://github.com/OCA/calendar",
     "author": "Tecnativa, Odoo Community Association (OCA)",
-    "maintainers": ["Yajo"],
+    "maintainers": ["pedrobaeza"],
     "license": "AGPL-3",
     "application": True,
     "installable": True,
@@ -17,8 +18,6 @@
         "python": [
             # Used implicitly
             "cssselect",
-            # Only for tests
-            "freezegun",
         ],
     },
     "depends": [
