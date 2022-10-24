@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 13.0\n"
+"Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -175,6 +175,12 @@ msgstr ""
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__activity_state
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__activity_state
 msgid "Activity State"
+msgstr ""
+
+#. module: resource_booking
+#: model:ir.model.fields,field_description:resource_booking.field_resource_booking__activity_type_icon
+#: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__activity_type_icon
+msgid "Activity Type Icon"
 msgstr ""
 
 #. module: resource_booking
@@ -445,10 +451,13 @@ msgid "Define resource bookings."
 msgstr ""
 
 #. module: resource_booking
+#: model:ir.model.fields,field_description:resource_booking.field_calendar_event__display_name
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__display_name
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_combination__display_name
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__display_name
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type_combination_rel__display_name
+#: model:ir.model.fields,field_description:resource_booking.field_resource_calendar__display_name
+#: model:ir.model.fields,field_description:resource_booking.field_resource_resource__display_name
 msgid "Display Name"
 msgstr ""
 
@@ -487,6 +496,12 @@ msgid "Followers (Partners)"
 msgstr ""
 
 #. module: resource_booking
+#: model:ir.model.fields,help:resource_booking.field_resource_booking__activity_type_icon
+#: model:ir.model.fields,help:resource_booking.field_resource_booking_type__activity_type_icon
+msgid "Font awesome icon e.g. fa-tasks"
+msgstr ""
+
+#. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking_combination__forced_calendar_id
 msgid "Force a specific calendar, instead of combining the resources'."
 msgstr ""
@@ -508,10 +523,13 @@ msgid "Group By"
 msgstr ""
 
 #. module: resource_booking
+#: model:ir.model.fields,field_description:resource_booking.field_calendar_event__id
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__id
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_combination__id
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__id
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type_combination_rel__id
+#: model:ir.model.fields,field_description:resource_booking.field_resource_calendar__id
+#: model:ir.model.fields,field_description:resource_booking.field_resource_resource__id
 msgid "ID"
 msgstr ""
 
@@ -592,10 +610,13 @@ msgid "It will disappear from your bookings list."
 msgstr ""
 
 #. module: resource_booking
+#: model:ir.model.fields,field_description:resource_booking.field_calendar_event____last_update
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking____last_update
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_combination____last_update
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type____last_update
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type_combination_rel____last_update
+#: model:ir.model.fields,field_description:resource_booking.field_resource_calendar____last_update
+#: model:ir.model.fields,field_description:resource_booking.field_resource_resource____last_update
 msgid "Last Modified on"
 msgstr ""
 
@@ -693,6 +714,12 @@ msgstr ""
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__modifications_deadline
 msgid "Modifications Deadline"
+msgstr ""
+
+#. module: resource_booking
+#: model:ir.model.fields,field_description:resource_booking.field_resource_booking__my_activity_date_deadline
+#: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__my_activity_date_deadline
+msgid "My Activity Deadline"
 msgstr ""
 
 #. module: resource_booking
