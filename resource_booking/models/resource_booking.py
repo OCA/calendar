@@ -1,4 +1,5 @@
 # Copyright 2021 Tecnativa - Jairo Llopis
+# Copyright 2022 Tecnativa - Pedro M. Baeza
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 import calendar
@@ -119,14 +120,12 @@ class ResourceBooking(models.Model):
         index=True,
         readonly=False,
         store=True,
-        track_sequence=200,
         tracking=True,
     )
     duration = fields.Float(
         compute="_compute_duration",
         readonly=False,
         store=True,
-        track_sequence=220,
         tracking=True,
         help="Amount of time that the resources will be booked and unavailable for others.",
     )
@@ -135,7 +134,6 @@ class ResourceBooking(models.Model):
         copy=False,
         index=True,
         store=True,
-        track_sequence=210,
         tracking=True,
     )
     type_id = fields.Many2one(
@@ -304,12 +302,7 @@ class ResourceBooking(models.Model):
                     start=one.start,
                     stop=one.stop,
                     user_id=one.user_id.id,
-                    # If you're not booked, you're free
-                    show_as=(
-                        "busy"
-                        if self.env.user.partner_id in resource_partners
-                        else "free"
-                    ),
+                    show_as="busy",
                     # These 2 avoid creating event as activity
                     res_model_id=False,
                     res_id=False,
