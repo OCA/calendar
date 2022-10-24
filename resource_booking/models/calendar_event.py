@@ -1,4 +1,5 @@
 # Copyright 2021 Tecnativa - Jairo Llopis
+# Copyright 2022 Tecnativa - Pedro M. Baeza
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 from odoo import _, api, fields, models
@@ -6,7 +7,6 @@ from odoo.exceptions import ValidationError
 
 
 class CalendarEvent(models.Model):
-    _name = "calendar.event"
     _inherit = "calendar.event"
 
     # One2one field, actually
@@ -36,10 +36,10 @@ class CalendarEvent(models.Model):
                 % "\n- ".join(frozen.mapped("display_name"))
             )
 
-    def unlink(self, can_be_deleted=True):
+    def unlink(self):
         """Check you're allowed to unschedule it."""
         self._validate_booking_modifications()
-        return super().unlink(can_be_deleted=can_be_deleted)
+        return super().unlink()
 
     def write(self, vals):
         """Check you're allowed to reschedule it."""
@@ -52,44 +52,26 @@ class CalendarEvent(models.Model):
         rescheduled._validate_booking_modifications()
         return result
 
-    def create_attendees(self):
-        """Autoconfirm resource attendees if preselected."""
-        old_attendees = self.attendee_ids
-        result = super(
-            # This context avoids sending invitations to new attendees
-            CalendarEvent,
-            self.with_context(detaching=True),
-        ).create_attendees()
-        new_attendees = (self.attendee_ids - old_attendees).with_context(
-            self.env.context
-        )
-        for attendee in new_attendees:
-            # No need to change state if it's already done
-            if attendee.state in {"accepted", "declined"}:
-                continue
-            rb = attendee.event_id.resource_booking_ids
-            # Confirm requester attendee always if requested
-            if (
-                self.env.context.get("autoconfirm_booking_requester")
-                and attendee.partner_id == rb.partner_id
-            ):
-                attendee.state = "accepted"
-                continue
-            # Auto-confirm if attendee comes from a handpicked combination
-            if rb.combination_auto_assign:
-                continue
-            if attendee.partner_id in rb.combination_id.resource_ids.user_id.partner_id:
-                attendee.state = "accepted"
-        # Don't send notifications if you're a public user
-        if self.env.user._is_public():
-            return result
-        # Send invitations like upstream would have done
-        to_notify = new_attendees.filtered(lambda a: a.email != self.env.user.email)
-        if to_notify and not self.env.context.get("detaching"):
-            to_notify._send_mail_to_attendees(
-                "calendar.calendar_template_meeting_invitation"
-            )
-        return result
+    @api.model_create_multi
+    def create(self, vals_list):
+        """Transfer resource booking to _attendees_values by context.
+
+        We need to serialize the creation in that case.
+        """
+        vals_list2 = []
+        records = self.env["calendar.event"]
+        for vals in vals_list:
+            if "resource_booking_ids" in vals:
+                records += super(
+                    CalendarEvent,
+                    self.with_context(
+                        resource_booking_ids=vals["resource_booking_ids"]
+                    ),
+                ).create(vals)
+            else:
+                vals_list2.append(vals)
+        records += super().create(vals_list2)
+        return records
 
     def get_interval(self, interval, tz=None):
         """Autofix tz from related resource booking.
@@ -100,3 +82,31 @@ class CalendarEvent(models.Model):
         """
         tz = self.resource_booking_ids.type_id.resource_calendar_id.tz or tz
         return super().get_interval(interval=interval, tz=tz)
+
+    def _attendees_values(self, partner_commands):
+        """Autoconfirm resource attendees if preselected and hand-picked on RB.
+
+        NOTE: There's no support for changing `resource_booking_ids` once the meeting
+        is created nor having more than one Rb attached to the same meeting, but that's
+        not a real case for now.
+        """
+        attendee_commands = super()._attendees_values(partner_commands)
+        ctx_partner_id = False
+        for cmd in self.env.context.get("resource_booking_ids", []):
+            if cmd[0] == 0 and not cmd[2].get("combination_auto_assign", True):
+                ctx_partner_id = cmd[2]["partner_id"]
+            elif cmd[0] == 6:
+                rb = self.env["resource.booking"].browse(cmd[2])
+                if rb.combination_auto_assign:
+                    continue  # only auto-confirm if handpicked combination
+                ctx_partner_id = rb.combination_id.resource_ids.user_id.partner_id.id
+        for command in attendee_commands:
+            if command[0] != 0:
+                continue
+            att_partner_id = ctx_partner_id
+            if not att_partner_id:
+                rb = self.resource_booking_ids
+                att_partner_id = rb.combination_id.resource_ids.user_id.partner_id.id
+            if command[2]["partner_id"] == att_partner_id:
+                command[2]["state"] = "accepted"
+        return attendee_commands

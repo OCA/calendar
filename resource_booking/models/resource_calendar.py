@@ -1,11 +1,11 @@
 # Copyright 2021 Tecnativa - Jairo Llopis
+# Copyright 2022 Tecnativa - Pedro M. Baeza
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 from pytz import UTC
 
 from odoo import api, fields, models
 
-from odoo.addons.calendar.models.calendar import calendar_id2real_id
 from odoo.addons.resource.models.resource import Intervals
 
 
@@ -63,15 +63,12 @@ class ResourceCalendar(models.Model):
             self.env["calendar.event"].with_context(active_test=True).search(domain)
         )
         for event in all_events:
-            real_event = self.env["calendar.event"].browse(
-                calendar_id2real_id(event.id)
-            )
             # Is the event the same one we're currently checking?
-            if real_event.resource_booking_ids.id == analyzed_booking_id:
+            if event.resource_booking_ids.id == analyzed_booking_id:
                 continue
             try:
                 # Is the event not booking our resource?
-                if resource & real_event.mapped(
+                if resource & event.mapped(
                     "resource_booking_ids.combination_id.resource_ids"
                 ):
                     raise Busy
