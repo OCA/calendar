@@ -22,4 +22,5 @@
     "post_init_hook": "init_initiating_microsoft_uuid",
     "external_dependencies": {"python": ["freezegun"]},
     "website": "https://github.com/OCA/calendar",
+    "license": "LGPL-3",
 }

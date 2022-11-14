@@ -4,8 +4,7 @@
     "depends": ["calendar"],
     "category": "Hidden",
     "data": ["security/ir.model.access.csv"],
-    # TODO: how can we exclude the code yanked from v14?
-    "license": "AGPL-3",
+    "license": "LGPL-3",
     "author": "Odoo Community Association (OCA),Hunki Enterprises BV",
     "website": "https://github.com/OCA/calendar",
 }
