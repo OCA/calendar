@@ -9,6 +9,7 @@ setuptools.setup(
     version=version,
     install_requires=[
         'odoo14-addon-calendar_partner_color',
+        'odoo14-addon-resource_booking',
     ],
     classifiers=[
         'Programming Language :: Python',
