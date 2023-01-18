@@ -8,6 +8,7 @@ setuptools.setup(
     description="Meta package for oca-calendar Odoo addons",
     version=version,
     install_requires=[
+        'odoo11-addon-calendar_dav',
         'odoo11-addon-calendar_resource',
     ],
     classifiers=[
