@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2021 Tecnativa - Jairo Llopis
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <!-- Views -->
+    <record id="resource_booking_type_form" model="ir.ui.view">
+        <field name="name">Resource booking type form</field>
+        <field name="model">resource.booking.type</field>
+        <field name="arch" type="xml">
+            <form>
+                <header />
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <field name="active" invisible="1" />
+                        <widget
+                            name="web_ribbon"
+                            title="Archived"
+                            bg_color="bg-danger"
+                            attrs="{'invisible': [('active', '=', True)]}"
+                        />
+                        <button
+                            name="action_open_bookings"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-calendar"
+                        >
+                            <field name="booking_count" widget="statinfo" />
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
+                    <group name="main">
+                        <group name="settings" string="Settings">
+                            <field
+                                name="company_id"
+                                options="{'no_create': True}"
+                                groups="base.group_multi_company"
+                            />
+                            <field name="duration" widget="float_time" />
+                            <field name="modifications_deadline" widget="float_time" />
+                            <field name="resource_calendar_id" />
+                        </group>
+                        <group name="event_defaults" string="Meeting defaults">
+                            <field name="location" />
+                            <field name="alarm_ids" widget="many2many_tags" />
+                            <field
+                                name="categ_ids"
+                                widget="many2many_tags"
+                                options="{'no_create_edit': True}"
+                            />
+                            <field name="requester_advice" />
+                        </group>
+                        <group
+                            string="Resource combinations"
+                            name="combinations"
+                            colspan="2"
+                        >
+                            <field name="combination_assignment" />
+                            <field name="combination_rel_ids">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle" />
+                                    <field name="combination_id" />
+                                </tree>
+                            </field>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field
+                        name="message_follower_ids"
+                        widget="mail_followers"
+                        groups="base.group_user"
+                    />
+                    <field name="activity_ids" widget="mail_activity" />
+                    <field name="message_ids" widget="mail_thread" />
+                </div>
+            </form>
+        </field>
+    </record>
+    <record id="resource_booking_type_view_tree" model="ir.ui.view">
+        <field name="name">Resource booking type tree</field>
+        <field name="model">resource.booking.type</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+                <field name="resource_calendar_id" />
+                <field name="duration" widget="float_time" />
+            </tree>
+        </field>
+    </record>
+    <record id="resource_booking_type_view_search" model="ir.ui.view">
+        <field name="name">resource.booking.type.view.search</field>
+        <field name="model">resource.booking.type</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" />
+                <field name="company_id" groups="base.group_multi_company" />
+                <group expand="0" name="groupby" string="Group By">
+                    <filter
+                        string="Company"
+                        name="groupby_company_id"
+                        context="{'group_by':'company_id'}"
+                        groups="base.group_multi_company"
+                    />
+                </group>
+            </search>
+        </field>
+    </record>
+    <!-- Actions -->
+    <record id="resource_booking_type_action" model="ir.actions.act_window">
+        <field name="name">Types</field>
+        <field name="res_model">resource.booking.type</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Define resource booking types.</p>
+            <p
+            >These records categorize resource bookings and apply restrictions to them, such as available resource combinations, availability schedules and interval duration.</p>
+        </field>
+    </record>
+</odoo>
