@@ -21,7 +21,7 @@ Available addons
 ----------------
 addon | version | maintainers | summary
 --- | --- | --- | ---
-[calendar_partner_color](calendar_partner_color/) | 14.0.0.0.0 | [![hparfr](https://github.com/hparfr.png?size=30px)](https://github.com/hparfr) | Adapt calendar color based on partner's color
+[calendar_partner_color](calendar_partner_color/) | 14.0.0.1.0 | [![hparfr](https://github.com/hparfr.png?size=30px)](https://github.com/hparfr) | Adapt calendar color based on partner's color
 
 [//]: # (end addons)
 
