@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    SPDX-FileCopyrightText: 2023 Coop IT Easy SC
+
+    SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+<odoo>
+
+    <record id="resource_category_view_tree" model="ir.ui.view">
+        <field name="name">Resource category tree</field>
+        <field name="model">resource.category</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+                <field name="resource_ids" widget="many2many_tags" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="resource_category_view_form" model="ir.ui.view">
+        <field name="name">Resource category form</field>
+        <field name="model">resource.category</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name" />
+                        <field name="resource_ids" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="resource_category_action" model="ir.actions.act_window">
+        <field name="name">Resource Categories</field>
+        <field name="res_model">resource.category</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Define resource categories.</p>
+            <p>These records allow to group resources.</p>
+        </field>
+    </record>
+
+</odoo>

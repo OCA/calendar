@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    SPDX-FileCopyrightText: 2023 Coop IT Easy SC
+
+    SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+<odoo>
+
+    <record id="resource_resource_view_form" model="ir.ui.view">
+        <field name="name">Resource form</field>
+        <field name="model">resource.resource</field>
+        <field name="inherit_id" ref="resource.resource_resource_form" />
+        <field name="arch" type="xml">
+            <field name="resource_type" position="after">
+                <field name="resource_category_ids" widget="many2many_tags" />
+            </field>
+        </field>
+    </record>
+
+    <record id="resource_resource_view_tree" model="ir.ui.view">
+        <field name="name">Resource form</field>
+        <field name="model">resource.resource</field>
+        <field name="inherit_id" ref="resource.resource_resource_tree" />
+        <field name="arch" type="xml">
+            <field name="resource_type" position="after">
+                <field name="resource_category_ids" widget="many2many_tags" />
+            </field>
+        </field>
+    </record>
+
+</odoo>
