@@ -11,6 +11,11 @@ from odoo import fields
 from odoo.exceptions import ValidationError
 from odoo.tests.common import Form, TransactionCase, new_test_user, users
 
+from odoo.addons.resource.models.resource import Intervals
+from odoo.addons.resource_booking.models.resource_booking import (
+    _availability_is_fitting,
+)
+
 from .common import create_test_data
 
 _2dt = fields.Datetime.to_datetime
@@ -107,6 +112,116 @@ class BackendCase(TransactionCase):
                 "combination_id": rbc_mon.id,
                 "combination_auto_assign": False,
             }
+        )
+
+    def test_scheduling_constraints_span_two_days(self):
+        # Booking can span across two calendar days.
+        cal_frisun = self.r_calendars[3]
+        rbc_frisun = self.rbcs[3]
+        self.rbt.resource_calendar_id = cal_frisun
+        self.env["resource.booking"].create(
+            {
+                "partner_id": self.partner.id,
+                "start": "2021-03-06 23:00:00",
+                "duration": 2,
+                "type_id": self.rbt.id,
+                "combination_id": rbc_frisun.id,
+                "combination_auto_assign": False,
+            }
+        )
+        # Booking cannot overlap.
+        with self.assertRaises(ValidationError), self.env.cr.savepoint():
+            self.env["resource.booking"].create(
+                {
+                    "partner_id": self.partner.id,
+                    "start": "2021-03-06 22:00:00",
+                    "duration": 4,
+                    "type_id": self.rbt.id,
+                    "combination_id": rbc_frisun.id,
+                    "combination_auto_assign": False,
+                }
+            )
+        # Test a case where there is an overlap, but the conflict happens at
+        # 00:00 exactly.
+        self.env["resource.booking"].create(
+            {
+                "partner_id": self.partner.id,
+                "start": "2021-03-14 00:00:00",
+                "duration": 1,
+                "type_id": self.rbt.id,
+                "combination_id": rbc_frisun.id,
+                "combination_auto_assign": False,
+            }
+        )
+        with self.assertRaises(ValidationError), self.env.cr.savepoint():
+            self.env["resource.booking"].create(
+                {
+                    "partner_id": self.partner.id,
+                    "start": "2021-03-13 23:00:00",
+                    "duration": 4,
+                    "type_id": self.rbt.id,
+                    "combination_id": rbc_frisun.id,
+                    "combination_auto_assign": False,
+                }
+            )
+        # If there are too many minutes between the end and start of the two
+        # dates, the booking cannot be contiguous.
+        cal_frisun.attendance_ids.write({"hour_to": 23.96})  # 23:58
+        with self.assertRaises(ValidationError), self.env.cr.savepoint():
+            self.env["resource.booking"].create(
+                {
+                    "partner_id": self.partner.id,
+                    "start": "2021-03-20 23:00:00",
+                    "duration": 2,
+                    "type_id": self.rbt.id,
+                    "combination_id": rbc_frisun.id,
+                    "combination_auto_assign": False,
+                }
+            )
+
+    def test_scheduling_constraints_span_three_days(self):
+        # Booking can span across two calendar days.
+        cal_frisun = self.r_calendars[3]
+        rbc_frisun = self.rbcs[3]
+        self.rbt.resource_calendar_id = cal_frisun
+        self.env["resource.booking"].create(
+            {
+                "partner_id": self.partner.id,
+                "start": "2021-03-05 23:00:00",
+                "duration": 24 * 2,
+                "type_id": self.rbt.id,
+                "combination_id": rbc_frisun.id,
+                "combination_auto_assign": False,
+            }
+        )
+
+    def test_availability_is_fitting_malformed_date_skip(self):
+        """Test a case for malformed data where a date is skipped in the
+        available_intervals list of tuples.
+        """
+        recset = self.env["resource.booking"]
+        tuples = [
+            (datetime(2021, 3, 1, 18, 0), datetime(2021, 3, 1, 23, 59), recset),
+            (datetime(2021, 3, 2, 0, 0), datetime(2021, 3, 2, 23, 59), recset),
+            (datetime(2021, 3, 3, 0, 0), datetime(2021, 3, 3, 18, 0), recset),
+        ]
+        available_intervals = Intervals(tuples)
+        self.assertTrue(
+            _availability_is_fitting(
+                available_intervals,
+                datetime(2021, 3, 1, 18, 0),
+                datetime(2021, 3, 3, 18, 0),
+            )
+        )
+        # Skip a day by removing it.
+        tuples.pop(1)
+        available_intervals = Intervals(tuples)
+        self.assertFalse(
+            _availability_is_fitting(
+                available_intervals,
+                datetime(2021, 3, 1, 18, 0),
+                datetime(2021, 3, 3, 18, 0),
+            )
         )
 
     def test_rbc_forced_calendar(self):
@@ -259,7 +374,7 @@ class BackendCase(TransactionCase):
 
     def test_sorted_assignment(self):
         """Set sorted assignment on RBT and test it works correctly."""
-        rbc_mon, rbc_tue, rbc_montue = self.rbcs
+        rbc_mon, rbc_tue, rbc_montue, rbc_frisun = self.rbcs
         with Form(self.rbt) as rbt_form:
             rbt_form.combination_assignment = "sorted"
         # Book next monday at 10:00
@@ -713,5 +828,35 @@ class BackendCase(TransactionCase):
             resource.is_available(
                 utc.localize(datetime(2021, 3, 3, 10, 0)),
                 utc.localize(datetime(2021, 3, 3, 11, 0)),
+            )
+        )
+
+    def test_resource_is_available_span_days(self):
+        # Correctly handle bookings that span across midnight.
+        cal_satsun = self.r_calendars[3]
+        rbc_satsun = self.rbcs[3]
+        resource = rbc_satsun.resource_ids[1]
+        self.rbt.resource_calendar_id = cal_satsun
+        self.env["resource.booking"].create(
+            {
+                "partner_id": self.partner.id,
+                "start": "2021-03-06 23:00:00",
+                "duration": 2,
+                "type_id": self.rbt.id,
+                "combination_id": rbc_satsun.id,
+                "combination_auto_assign": False,
+            }
+        )
+        self.assertFalse(
+            resource.is_available(
+                utc.localize(datetime(2021, 3, 6, 22, 0)),
+                utc.localize(datetime(2021, 3, 7, 2, 0)),
+            )
+        )
+        # Resource is available on the next weekend.
+        self.assertTrue(
+            resource.is_available(
+                utc.localize(datetime(2021, 3, 13, 22, 0)),
+                utc.localize(datetime(2021, 3, 14, 2, 0)),
             )
         )

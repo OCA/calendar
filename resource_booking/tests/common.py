@@ -10,7 +10,8 @@ def create_test_data(obj):
         )
     )
     # Create one resource.calendar available on Mondays, another one on
-    # Tuesdays, and another one on Mondays and Tuesdays; in that order
+    # Tuesdays, and another one on Mondays and Tuesdays; in that order.
+    # Also create an all-day calendar for Saturday and Sunday.
     attendances = [
         (
             0,
@@ -34,12 +35,46 @@ def create_test_data(obj):
                 "day_period": "morning",
             },
         ),
+        (
+            0,
+            0,
+            {
+                "name": "Fridays",
+                "dayofweek": "4",
+                "hour_from": 0,
+                "hour_to": 23.99,
+                "day_period": "morning",
+            },
+        ),
+        (
+            0,
+            0,
+            {
+                "name": "Saturdays",
+                "dayofweek": "5",
+                "hour_from": 0,
+                "hour_to": 23.99,
+                "day_period": "morning",
+            },
+        ),
+        (
+            0,
+            0,
+            {
+                "name": "Sunday",
+                "dayofweek": "6",
+                "hour_from": 0,
+                "hour_to": 23.99,
+                "day_period": "morning",
+            },
+        ),
     ]
     obj.r_calendars = obj.env["resource.calendar"].create(
         [
-            {"name": "Mon", "attendance_ids": attendances[:1], "tz": "UTC"},
-            {"name": "Tue", "attendance_ids": attendances[1:], "tz": "UTC"},
-            {"name": "MonTue", "attendance_ids": attendances, "tz": "UTC"},
+            {"name": "Mon", "attendance_ids": [attendances[0]], "tz": "UTC"},
+            {"name": "Tue", "attendance_ids": [attendances[1]], "tz": "UTC"},
+            {"name": "MonTue", "attendance_ids": attendances[0:2], "tz": "UTC"},
+            {"name": "FriSun", "attendance_ids": attendances[2:], "tz": "UTC"},
         ]
     )
     # Create one material resource for each of those calendars; same order
@@ -62,7 +97,7 @@ def create_test_data(obj):
                 "login": "user_%d" % num,
                 "name": "User %d" % num,
             }
-            for num in range(3)
+            for num, _ in enumerate(obj.r_calendars)
         ]
     )
     obj.r_users = obj.env["resource.resource"].create(
@@ -85,7 +120,7 @@ def create_test_data(obj):
             for (user, material) in zip(obj.r_users, obj.r_materials)
         ]
     )
-    # Create one RBT that includes all 3 RBCs as available combinations
+    # Create one RBT that includes all RBCs as available combinations
     obj.rbt = obj.env["resource.booking.type"].create(
         {
             "name": "Test resource booking type",
