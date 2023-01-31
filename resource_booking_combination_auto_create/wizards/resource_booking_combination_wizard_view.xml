@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    SPDX-FileCopyrightText: 2023 Coop IT Easy SC
+
+    SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+<odoo>
+
+    <record id="resource_booking_combination_wizard_view" model="ir.ui.view">
+        <field name="name">Resource booking combination wizard</field>
+        <field name="model">resource.booking.combination.wizard</field>
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="multi_step_wizard.multi_step_wizard_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//footer" position="before">
+                <group name="start" attrs="{'invisible': [('state', '!=', 'start')]}">
+                    <field name="resource_booking_category_selection_ids">
+                        <tree editable="bottom">
+                            <field
+                                name="resource_category_id"
+                                options="{'no_create': True}"
+                            />
+                            <field name="quantity" />
+                        </tree>
+                    </field>
+                </group>
+                <group
+                    name="configure"
+                    attrs="{'invisible': [('state', '!=', 'configure')]}"
+                >
+                    <p><field
+                            name="configure_step_message"
+                            class="oe_inline"
+                            readonly="True"
+                        /></p>
+                    <field
+                        name="current_resource_booking_category_selection_id_id"
+                        readonly="True"
+                        invisible="True"
+                    />
+                    <field
+                        name="available_resource_ids"
+                        widget="many2many_checkboxes"
+                        domain="[('resource_booking_category_selection_id', '=', current_resource_booking_category_selection_id_id)]"
+                    />
+                </group>
+                <group name="final" attrs="{'invisible': [('state', '!=', 'final')]}">
+                    <field name="selected_resource_ids" readonly="True" />
+                </group>
+            </xpath>
+            <xpath expr="//div[@name='states_buttons']/button" position="before">
+                <button
+                    name="create_combination"
+                    string="OK"
+                    type="object"
+                    class="btn-primary"
+                    attrs="{'invisible': [('state', '!=', 'final')]}"
+                />
+            </xpath>
+        </field>
+    </record>
+
+    <record
+        id="resource_booking_combination_wizard_action"
+        model="ir.actions.act_window"
+    >
+        <field name="name">Select resource categories</field>
+        <field name="res_model">resource.booking.combination.wizard</field>
+        <field name="view_id" ref="resource_booking_combination_wizard_view" />
+        <field name="target">new</field>
+    </record>
+
+</odoo>
