@@ -14,7 +14,8 @@ include_wkhtmltopdf: false
 odoo_version: 14.0
 org_name: Odoo Community Association (OCA)
 org_slug: OCA
-rebel_module_groups: []
+rebel_module_groups:
+- resource_booking_simultaneous_human
 repo_description: Modules that extend Odoo calendar management tools
 repo_name: Calendar modules for Odoo
 repo_slug: calendar
