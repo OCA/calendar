@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 from odoo import _, api, fields, models
+from odoo.exceptions import ValidationError
 
 
 class ResourceBookingCombinationWizard(models.TransientModel):
@@ -124,7 +125,14 @@ class ResourceBookingCombinationWizard(models.TransientModel):
 
     @api.model
     def create(self, vals):
-        vals["resource_booking_id"] = self.env.context["active_id"]
+        resource_booking_id = self.env.context["active_id"]
+        resource_booking = self.env["resource.booking"].browse(resource_booking_id)
+        if not resource_booking.start or not resource_booking.duration:
+            raise ValidationError(
+                "To select resources, the booking must have a start date and "
+                "a duration."
+            )
+        vals["resource_booking_id"] = resource_booking_id
         return super().create(vals)
 
     def state_exit_start(self):

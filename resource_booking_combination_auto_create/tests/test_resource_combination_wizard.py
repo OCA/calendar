@@ -4,6 +4,7 @@
 
 from freezegun import freeze_time
 
+from odoo.exceptions import ValidationError
 from odoo.tests.common import TransactionCase
 
 
@@ -300,6 +301,69 @@ class ResourceCombinationWizardCase(TransactionCase):
         selecting it for one category should make it unavailable for the
         others.
         """
+
+    def test_no_dates(self):
+        """
+        Opening the wizard if the start date or the duration is not set should
+        raise a validation error.
+        """
+        booking = self.env["resource.booking"].create(
+            {
+                "partner_id": self.partner_1.id,
+                "type_id": self.booking_type_1.id,
+                # no start and no duration
+                # "start": "2023-02-06 10:00:00",
+                # "duration": 2,
+            }
+        )
+        with self.assertRaises(ValidationError) as cm:
+            self._create_wizard_with_selected_categories(
+                booking, [self.room_category, self.worker_category]
+            )
+        self.assertEqual(
+            str(cm.exception),
+            "To select resources, the booking must have a start date and a "
+            "duration.",
+        )
+        booking = self.env["resource.booking"].create(
+            {
+                "partner_id": self.partner_1.id,
+                "type_id": self.booking_type_1.id,
+                # no start
+                "duration": 2,
+            }
+        )
+        with self.assertRaises(ValidationError) as cm:
+            self._create_wizard_with_selected_categories(
+                booking, [self.room_category, self.worker_category]
+            )
+        booking = self.env["resource.booking"].create(
+            {
+                "partner_id": self.partner_1.id,
+                "type_id": self.booking_type_1.id,
+                "start": "2023-02-06 10:00:00",
+                # no duration
+            }
+        )
+        # this does not fail because a default duration is taken from the
+        # booking type.
+        self._create_wizard_with_selected_categories(
+            booking, [self.room_category, self.worker_category]
+        )
+        # if this default duration is set to 0.
+        self.booking_type_1.duration = 0
+        booking = self.env["resource.booking"].create(
+            {
+                "partner_id": self.partner_1.id,
+                "type_id": self.booking_type_1.id,
+                "start": "2023-02-06 10:00:00",
+                # no duration
+            }
+        )
+        with self.assertRaises(ValidationError) as cm:
+            self._create_wizard_with_selected_categories(
+                booking, [self.room_category, self.worker_category]
+            )
 
     def test_no_categories_selected(self):
         """
