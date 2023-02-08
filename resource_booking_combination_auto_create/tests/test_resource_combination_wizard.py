@@ -195,6 +195,7 @@ class ResourceCombinationWizardCase(TransactionCase):
         and assign it to the booking.
         """
         booking = self._create_resource_booking()
+        self.assertEqual(booking.state, "pending")
         wizard = self._create_wizard_with_selected_categories(
             booking, [self.room_category, self.worker_category]
         )
@@ -204,6 +205,7 @@ class ResourceCombinationWizardCase(TransactionCase):
         self._select_resources_by_index_on_current_step(wizard, [0])
         wizard.open_next()
         wizard.create_combination()
+        self.assertEqual(booking.state, "scheduled")
         combination = booking.combination_id
         resources = combination.resource_ids
         self.assertEqual(len(resources), 2)
@@ -304,3 +306,44 @@ class ResourceCombinationWizardCase(TransactionCase):
         When no categories are selected, it should go to a special step that
         displays an error message, and allows only to go back or cancel.
         """
+
+    def test_no_resources_selected(self):
+        """
+        When no resources are selected, no resource combination should be
+        assigned.
+        """
+        booking = self._create_resource_booking()
+        wizard = self._create_wizard_with_selected_categories(
+            booking, [self.room_category, self.worker_category]
+        )
+        wizard.open_next()
+        wizard.open_next()
+        wizard.open_next()
+        wizard.create_combination()
+        self.assertFalse(booking.combination_id)
+        self.assertEqual(booking.state, "pending")
+
+    def test_unassign_resources(self):
+        """
+        On a booking with a resource combination, re-opening the wizard and
+        selecting no resources should unassign the resource combination.
+        """
+        booking = self._create_resource_booking()
+        wizard = self._create_wizard_with_selected_categories(
+            booking, [self.room_category, self.worker_category]
+        )
+        wizard.open_next()
+        self._select_resources_by_index_on_current_step(wizard, [0])
+        wizard.open_next()
+        self._select_resources_by_index_on_current_step(wizard, [0])
+        wizard.open_next()
+        wizard.create_combination()
+        self.assertEqual(booking.state, "scheduled")
+        wizard = self._create_wizard_with_selected_categories(
+            booking, [self.room_category]
+        )
+        wizard.open_next()
+        wizard.open_next()
+        wizard.create_combination()
+        self.assertFalse(booking.combination_id)
+        self.assertEqual(booking.state, "pending")

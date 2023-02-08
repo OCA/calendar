@@ -187,11 +187,16 @@ class ResourceBookingCombinationWizard(models.TransientModel):
 
     def create_combination(self):
         # search for an existing combination that matched the selected resources.
+        resource_combination_model = self.env["resource.booking.combination"]
         resources = self.selected_resource_ids
+        if not resources:
+            self.resource_booking_id.combination_id = (
+                resource_combination_model.browse()
+            )
+            return
         domain = []
         for resource in resources:
             domain.append(("resource_ids", "=", resource.id))
-        resource_combination_model = self.env["resource.booking.combination"]
         existing_combinations = resource_combination_model.search(domain)
         resource_combination = resource_combination_model.browse()
         for combination in existing_combinations:
