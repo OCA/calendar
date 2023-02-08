@@ -7,46 +7,46 @@ from freezegun import freeze_time
 from odoo.tests.common import TransactionCase
 
 
+@freeze_time("2023-01-31 12:00:00")
 class ResourceCombinationWizardCase(TransactionCase):
     def setUp(self, *args, **kwargs):
         super().setUp(*args, **kwargs)
-        # calendar have default attendance_ids, force it to have none.
-        self.full_calendar = self.env["resource.calendar"].create(
-            {"name": "full-time", "attendance_ids": False}
-        )
+        attendances = []
         for day in range(7):
-            self.env["resource.calendar.attendance"].create(
+            attendances.append(
                 {
                     "name": "attendance",
                     "dayofweek": str(day),
                     "hour_from": 0,
                     "hour_to": 12,
-                    "calendar_id": self.full_calendar.id,
                 }
             )
-            self.env["resource.calendar.attendance"].create(
+            attendances.append(
                 {
                     "name": "attendance",
                     "dayofweek": str(day),
                     "hour_from": 12,
                     "hour_to": 24,
-                    "calendar_id": self.full_calendar.id,
                 }
             )
-        self.workweek_calendar = self.env["resource.calendar"].create(
-            {"name": "workweek", "attendance_ids": False}
+        self.full_calendar = self.env["resource.calendar"].create(
+            {
+                "name": "full-time",
+                "attendance_ids": [(0, 0, vals) for vals in attendances],
+                "tz": "UTC",
+            }
         )
+        attendances = []
         for day in range(5):
-            self.env["resource.calendar.attendance"].create(
+            attendances.append(
                 {
                     "name": "attendance",
                     "dayofweek": str(day),
                     "hour_from": 8,
                     "hour_to": 12,
-                    "calendar_id": self.full_calendar.id,
                 }
             )
-            self.env["resource.calendar.attendance"].create(
+            attendances.append(
                 {
                     "name": "attendance",
                     "dayofweek": str(day),
@@ -55,6 +55,13 @@ class ResourceCombinationWizardCase(TransactionCase):
                     "calendar_id": self.full_calendar.id,
                 }
             )
+        self.workweek_calendar = self.env["resource.calendar"].create(
+            {
+                "name": "workweek",
+                "attendance_ids": [(0, 0, vals) for vals in attendances],
+                "tz": "UTC",
+            }
+        )
         self.user_1 = self.env["res.users"].create(
             {
                 "name": "User 1",
@@ -107,6 +114,7 @@ class ResourceCombinationWizardCase(TransactionCase):
         self.booking_type_1 = self.env["resource.booking.type"].create(
             {
                 "name": "booking type 1",
+                "resource_calendar_id": self.full_calendar.id,
             }
         )
         self.room_category = self.env["resource.category"].create(
@@ -126,6 +134,72 @@ class ResourceCombinationWizardCase(TransactionCase):
             }
         )
 
+    def _create_resource_combination(self, resources):
+        return self.env["resource.booking.combination"].create(
+            {
+                "resource_ids": [
+                    (6, 0, [r.id for r in resources]),
+                ],
+            }
+        )
+
+    def _add_combination_to_booking_type(self, booking_type, resource_combination):
+        self.env["resource.booking.type.combination.rel"].create(
+            {
+                "type_id": booking_type.id,
+                "combination_id": resource_combination.id,
+            }
+        )
+
+    def _create_wizard_with_selected_categories(
+        self, resource_booking, resource_categories
+    ):
+        return (
+            self.env["resource.booking.combination.wizard"]
+            .with_context({"active_id": resource_booking.id})
+            .create(
+                {
+                    "resource_booking_category_selection_ids": [
+                        (
+                            0,
+                            0,
+                            {
+                                "resource_category_id": r.id,
+                            },
+                        )
+                        for r in resource_categories
+                    ]
+                }
+            )
+        )
+
+    def _get_available_resources_on_current_step(self, wizard):
+        return self.env["resource.booking.category.selection.resource"].search(
+            [
+                (
+                    "resource_booking_category_selection_id",
+                    "=",
+                    wizard.current_resource_booking_category_selection_id.id,
+                )
+            ]
+        )
+
+    def _select_resources_by_index_on_current_step(self, wizard, indexes):
+        available_resources = self._get_available_resources_on_current_step(wizard)
+        wizard.available_resource_ids = [
+            (6, 0, [available_resources[i].id for i in indexes])
+        ]
+
+    def _create_resource_booking(self):
+        return self.env["resource.booking"].create(
+            {
+                "partner_id": self.partner_1.id,
+                "type_id": self.booking_type_1.id,
+                "start": "2023-02-06 10:00:00",
+                "duration": 2,
+            }
+        )
+
     def test_create_resource_combination(self):
         """
         Selecting available resources should create a new resource combination
@@ -137,6 +211,43 @@ class ResourceCombinationWizardCase(TransactionCase):
         Selecting available resources should use a corresponding existing
         resource combination if one exists and assign it to the booking.
         """
+        existing_combination = self._create_resource_combination(
+            [self.room_1, self.worker_1]
+        )
+        self._add_combination_to_booking_type(self.booking_type_1, existing_combination)
+        booking = self._create_resource_booking()
+        wizard = self._create_wizard_with_selected_categories(
+            booking, [self.room_category, self.worker_category]
+        )
+        wizard.open_next()
+        self._select_resources_by_index_on_current_step(wizard, [0])
+        wizard.open_next()
+        self._select_resources_by_index_on_current_step(wizard, [0])
+        wizard.open_next()
+        wizard.create_combination()
+        combination = booking.combination_id
+        self.assertEqual(combination, existing_combination)
+
+    def test_create_resource_combination_if_none_exactly_matching(self):
+        """
+        It should not use an existing combination if it contains resources
+        that have not been selected (in addition to the selected ones).
+        """
+        combination_2_rooms = self._create_resource_combination(
+            [self.room_1, self.room_2]
+        )
+        self._add_combination_to_booking_type(self.booking_type_1, combination_2_rooms)
+        booking = self._create_resource_booking()
+        wizard = self._create_wizard_with_selected_categories(
+            booking, [self.room_category]
+        )
+        wizard.open_next()
+        self._select_resources_by_index_on_current_step(wizard, [0])
+        wizard.open_next()
+        wizard.create_combination()
+        combination = booking.combination_id
+        self.assertNotEqual(combination, combination_2_rooms)
+        self.assertEqual(len(combination), 1)
 
     def test_no_available_resources_found(self):
         """
@@ -169,20 +280,3 @@ class ResourceCombinationWizardCase(TransactionCase):
         When no categories are selected, it should go to a special step that
         displays an error message, and allows only to go back or cancel.
         """
-
-    @freeze_time("2023-01-31 12:00:00")
-    def test_resource_available(self):
-        booking = self.env["resource.booking"].create(
-            {
-                "partner_id": self.partner_1.id,
-                "type_id": self.booking_type_1.id,
-                "start": "2023-02-06 10:00:00",
-                "duration": 2,
-            }
-        )
-        wizard = (
-            self.env["resource.booking.combination.wizard"]
-            .with_context({"active_id": booking.id})
-            .create({})
-        )
-        # todo: continue writing test

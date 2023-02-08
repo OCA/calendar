@@ -182,9 +182,10 @@ class ResourceBookingCombinationWizard(models.TransientModel):
         resource_combination_model = self.env["resource.booking.combination"]
         existing_combinations = resource_combination_model.search(domain)
         resource_combination = resource_combination_model.browse()
-        for resource_combination in existing_combinations:
+        for combination in existing_combinations:
             # use first matching combination
-            if len(resource_combination.resource_ids) == len(resources):
+            if len(combination.resource_ids) == len(resources):
+                resource_combination = combination
                 break
         add_to_type = True
         if resource_combination:
