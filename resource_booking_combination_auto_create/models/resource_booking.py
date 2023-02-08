@@ -12,7 +12,8 @@ class ResourceBooking(models.Model):
     _sql_constraints = [
         (
             "combination_required_if_event",
-            "check(meeting_id is null or state = 'pending' or combination_id is not null)",
+            "check(meeting_id is null or state = 'pending' or "
+            "combination_id is not null)",
             "Missing resource booking combination.",
         ),
     ]

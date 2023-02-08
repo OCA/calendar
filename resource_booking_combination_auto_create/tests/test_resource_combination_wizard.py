@@ -259,6 +259,22 @@ class ResourceCombinationWizardCase(TransactionCase):
         booking = self._create_resource_booking()
         self.assertFalse(booking.combination_id)
 
+    def test_allow_save_booking_with_meeting_without_combination(self):
+        """
+        It should be possible to save a resource booking with a date but no
+        resource combination.
+
+        This is needed for the wizard, because opening the wizard saves the
+        resource booking.
+        """
+        # note: this condition is checked in an sql constraint and sql
+        # constraints are only checked when the transaction is committed, so
+        # this test actually does not fail even with the default constraint.
+        booking = self._create_resource_booking()
+        self.assertTrue(booking.meeting_id)
+        self.assertFalse(booking.combination_id)
+        self.assertEqual(booking.state, "pending")
+
     def test_no_available_resources_found(self):
         """
         If no matching available resources are found, no resource combination
