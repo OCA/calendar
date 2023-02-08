@@ -22,7 +22,6 @@ class ResourceBookingCategorySelection(models.TransientModel):
         required=True,
         ondelete="cascade",
     )
-    quantity = fields.Integer("Quantity", required=True, default=1)
     resource_ids = fields.Many2many(
         "resource.booking.category.selection.resource",
         string="Resources",

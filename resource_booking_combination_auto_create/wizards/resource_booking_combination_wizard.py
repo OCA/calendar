@@ -16,10 +16,16 @@ class ResourceBookingCombinationWizard(models.TransientModel):
         required=True,
         ondelete="cascade",
     )
+    resource_category_ids = fields.Many2many(
+        "resource.category",
+        relation="rb_category_selection",
+        string="Resource Categories",
+    )
     resource_booking_category_selection_ids = fields.One2many(
         "resource.booking.category.selection",
         "resource_booking_combination_wizard_id",
-        "Resource Categories",
+        "Resource Category Selections",
+        compute="_compute_resource_booking_category_selection_ids",
     )
     current_resource_booking_category_selection_id = fields.Many2one(
         "resource.booking.category.selection",
@@ -56,9 +62,15 @@ class ResourceBookingCombinationWizard(models.TransientModel):
         compute="_compute_selected_resource_ids",
     )
 
-    @api.depends("resource_booking_category_selection_ids")
+    @api.depends("resource_category_ids")
+    def _compute_resource_booking_category_selection_ids(self):
+        self.resource_booking_category_selection_ids = self.env[
+            "resource.booking.category.selection"
+        ].search([("resource_booking_combination_wizard_id", "=", self.id)])
+
+    @api.depends("resource_category_ids")
     def _compute_configure_step_count(self):
-        self.configure_step_count = len(self.resource_booking_category_selection_ids)
+        self.configure_step_count = len(self.resource_category_ids)
 
     @api.depends("current_resource_booking_category_selection_id")
     def _compute_configure_step_message(self):

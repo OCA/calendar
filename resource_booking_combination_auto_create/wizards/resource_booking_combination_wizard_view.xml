@@ -14,15 +14,7 @@
         <field name="arch" type="xml">
             <xpath expr="//footer" position="before">
                 <group name="start" attrs="{'invisible': [('state', '!=', 'start')]}">
-                    <field name="resource_booking_category_selection_ids">
-                        <tree editable="bottom">
-                            <field
-                                name="resource_category_id"
-                                options="{'no_create': True}"
-                            />
-                            <field name="quantity" />
-                        </tree>
-                    </field>
+                    <field name="resource_category_ids" widget="many2many_checkboxes" />
                 </group>
                 <group
                     name="configure"

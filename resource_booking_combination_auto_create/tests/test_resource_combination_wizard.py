@@ -158,18 +158,7 @@ class ResourceCombinationWizardCase(TransactionCase):
             self.env["resource.booking.combination.wizard"]
             .with_context({"active_id": resource_booking.id})
             .create(
-                {
-                    "resource_booking_category_selection_ids": [
-                        (
-                            0,
-                            0,
-                            {
-                                "resource_category_id": r.id,
-                            },
-                        )
-                        for r in resource_categories
-                    ]
-                }
+                {"resource_category_ids": [(6, 0, [r.id for r in resource_categories])]}
             )
         )
 
@@ -205,6 +194,21 @@ class ResourceCombinationWizardCase(TransactionCase):
         Selecting available resources should create a new resource combination
         and assign it to the booking.
         """
+        booking = self._create_resource_booking()
+        wizard = self._create_wizard_with_selected_categories(
+            booking, [self.room_category, self.worker_category]
+        )
+        wizard.open_next()
+        self._select_resources_by_index_on_current_step(wizard, [0])
+        wizard.open_next()
+        self._select_resources_by_index_on_current_step(wizard, [0])
+        wizard.open_next()
+        wizard.create_combination()
+        combination = booking.combination_id
+        resources = combination.resource_ids
+        self.assertEqual(len(resources), 2)
+        self.assertIn(self.room_1, resources)
+        self.assertIn(self.worker_1, resources)
 
     def test_find_existing_resource_combination(self):
         """
@@ -293,12 +297,6 @@ class ResourceCombinationWizardCase(TransactionCase):
         should appear several times in the list of available resources, but
         selecting it for one category should make it unavailable for the
         others.
-        """
-
-    def test_unique_resource_category(self):
-        """
-        It should be impossible to select a resource category that has been
-        already selected.
         """
 
     def test_no_categories_selected(self):
