@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-from odoo import models
+from odoo import fields, models
 
 
 class ResourceBooking(models.Model):
@@ -16,6 +16,9 @@ class ResourceBooking(models.Model):
             "Missing resource booking combination.",
         ),
     ]
+
+    # change default value
+    combination_auto_assign = fields.Boolean(default=False)
 
     def _check_scheduling(self):
         has_meeting = self.filtered("meeting_id")

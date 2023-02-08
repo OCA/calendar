@@ -249,6 +249,16 @@ class ResourceCombinationWizardCase(TransactionCase):
         self.assertNotEqual(combination, combination_2_rooms)
         self.assertEqual(len(combination), 1)
 
+    def test_no_auto_assign_combination(self):
+        """
+        When creating a booking with a booking type that contains only one
+        resource combination, that combination must not be auto-assigned.
+        """
+        combination = self._create_resource_combination([self.room_1])
+        self._add_combination_to_booking_type(self.booking_type_1, combination)
+        booking = self._create_resource_booking()
+        self.assertFalse(booking.combination_id)
+
     def test_no_available_resources_found(self):
         """
         If no matching available resources are found, no resource combination
