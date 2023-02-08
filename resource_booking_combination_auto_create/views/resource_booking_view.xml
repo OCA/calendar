@@ -11,13 +11,20 @@
         <field name="model">resource.booking</field>
         <field name="inherit_id" ref="resource_booking.resource_booking_form" />
         <field name="arch" type="xml">
+            <xpath expr="//label[@for='combination_id']" position="replace">
+                <label for="resource_ids" />
+            </xpath>
             <xpath expr="//div[field[@name='combination_id']]" position="replace">
                 <div>
-                    <field
-                        name="combination_id"
-                        class="oe_inline"
-                        options="{'no_create': True}"
-                    />
+                    <field name="resource_ids">
+                        <tree>
+                            <field name="name" />
+                            <field
+                                name="resource_category_ids"
+                                widget="many2many_tags"
+                            />
+                        </tree>
+                    </field>
                     <button
                         name="%(resource_booking_combination_wizard_action)d"
                         type="action"

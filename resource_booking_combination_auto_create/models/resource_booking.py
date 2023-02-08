@@ -20,6 +20,8 @@ class ResourceBooking(models.Model):
 
     # change default value
     combination_auto_assign = fields.Boolean(default=False)
+    # allow to access resources through the resource combination
+    resource_ids = fields.Many2many(related="combination_id.resource_ids")
 
     def _check_scheduling(self):
         has_meeting = self.filtered("meeting_id")
