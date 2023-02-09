@@ -13,6 +13,15 @@ from odoo.exceptions import ValidationError
 from odoo.addons.resource.models.resource import Intervals
 
 
+def _availability_is_fitting(available_intervals, start_dt, end_dt):
+    # Booking is uninterrupted on the same calendar day.
+    return (
+        len(available_intervals) == 1
+        and available_intervals._items[0][0] <= start_dt
+        and available_intervals._items[0][1] >= end_dt
+    )
+
+
 class ResourceBooking(models.Model):
     _name = "resource.booking"
     _inherit = ["mail.thread", "mail.activity.mixin", "portal.mixin"]
@@ -354,15 +363,10 @@ class ResourceBooking(models.Model):
             if already_happened:
                 unfitting_bookings -= booking
                 continue
-            meeting_dates = tuple(
-                fields.Datetime.context_timestamp(self, booking[field])
-                for field in ("start", "stop")
-            )
-            available_intervals = booking._get_intervals(*meeting_dates)
-            if (
-                len(available_intervals) == 1
-                and available_intervals._items[0][:2] == meeting_dates
-            ):
+            start_dt = fields.Datetime.context_timestamp(self, booking["start"])
+            end_dt = fields.Datetime.context_timestamp(self, booking["stop"])
+            available_intervals = booking._get_intervals(start_dt, end_dt)
+            if _availability_is_fitting(available_intervals, start_dt, end_dt):
                 unfitting_bookings -= booking
         # Explain which bookings failed validation
         if unfitting_bookings:
@@ -424,17 +428,12 @@ class ResourceBooking(models.Model):
         sorted_combinations = self.combination_id + (
             self.type_id._get_combinations_priorized() - self.combination_id
         )
-        desired_interval = tuple(
-            fields.Datetime.context_timestamp(self, dt)
-            for dt in (self.start, self.stop)
-        )
+        start_dt = fields.Datetime.context_timestamp(self, self.start)
+        end_dt = fields.Datetime.context_timestamp(self, self.stop)
         # Get 1st combination available in the desired interval
         for combination in sorted_combinations:
-            availability = self._get_intervals(*desired_interval, combination)
-            if (
-                len(availability) == 1
-                and availability._items[0][:2] == desired_interval
-            ):
+            available_intervals = self._get_intervals(start_dt, end_dt, combination)
+            if _availability_is_fitting(available_intervals, start_dt, end_dt):
                 return combination
         # Tell portal user there's no combination available
         if self.env.context.get("using_portal"):
