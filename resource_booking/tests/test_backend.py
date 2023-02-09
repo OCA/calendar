@@ -675,3 +675,57 @@ class BackendCase(SavepointCase):
         rb_f.partner_id = self.partner.copy()
         with self.assertRaises(AssertionError):
             rb_f.save()
+
+    def test_resource_is_available(self):
+        """If a resource is involved in a booking or is not active at any point
+        between two datetimes, then it is unavailable.
+        """
+        rbc_montue = self.rbcs[2]
+        resource = rbc_montue.resource_ids[1]
+        self.env["resource.booking"].create(
+            {
+                "partner_id": self.partner.id,
+                "start": "2021-03-01 08:00:00",
+                "type_id": self.rbt.id,
+                "combination_id": rbc_montue.id,
+                "combination_auto_assign": False,
+            }
+        )
+        # Resource is available on Monday at an unoccupied time.
+        self.assertTrue(
+            resource.is_available(
+                utc.localize(datetime(2021, 3, 1, 10, 0)),
+                utc.localize(datetime(2021, 3, 1, 11, 0)),
+            )
+        )
+        # Resource is not available on Monday at an occupied time (longer than
+        # booking).
+        self.assertFalse(
+            resource.is_available(
+                utc.localize(datetime(2021, 3, 1, 7, 45)),
+                utc.localize(datetime(2021, 3, 1, 8, 45)),
+            )
+        )
+        # Resource is not available on Monday at an occupied time (within
+        # booking time).
+        self.assertFalse(
+            resource.is_available(
+                utc.localize(datetime(2021, 3, 1, 8, 10)),
+                utc.localize(datetime(2021, 3, 1, 8, 20)),
+            )
+        )
+        # Resource is not available on Monday at an occupied time (partially
+        # overlaps booking).
+        self.assertFalse(
+            resource.is_available(
+                utc.localize(datetime(2021, 3, 1, 8, 15)),
+                utc.localize(datetime(2021, 3, 1, 8, 45)),
+            )
+        )
+        # Resource is not available on Wednesdays.
+        self.assertFalse(
+            resource.is_available(
+                utc.localize(datetime(2021, 3, 3, 10, 0)),
+                utc.localize(datetime(2021, 3, 3, 11, 0)),
+            )
+        )
