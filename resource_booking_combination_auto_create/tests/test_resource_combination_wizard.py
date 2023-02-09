@@ -411,3 +411,21 @@ class ResourceCombinationWizardCase(TransactionCase):
         wizard.create_combination()
         self.assertFalse(booking.combination_id)
         self.assertEqual(booking.state, "pending")
+
+    def test_change_selected_resource_categories(self):
+        """
+        Going back to the first step and unselecting a previously selected
+        category should update the next steps accordingly.
+        """
+        # fixme: this test currently fails
+        booking = self._create_resource_booking()
+        wizard = self._create_wizard_with_selected_categories(
+            booking, [self.room_category, self.worker_category]
+        )
+        wizard.open_next()
+        self.assertEqual(wizard.configure_step_count, 2)
+        wizard.open_previous()
+        # unselect the first category.
+        wizard.resource_category_ids = [(3, self.room_category.id, 0)]
+        wizard.open_next()
+        self.assertEqual(wizard.configure_step_count, 1)

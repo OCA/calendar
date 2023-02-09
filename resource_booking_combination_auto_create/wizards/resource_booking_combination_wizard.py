@@ -19,14 +19,14 @@ class ResourceBookingCombinationWizard(models.TransientModel):
     )
     resource_category_ids = fields.Many2many(
         "resource.category",
-        relation="rb_category_selection",
         string="Resource Categories",
+        compute="_compute_resource_category_ids",
+        inverse="_set_resource_category_ids",
     )
     resource_booking_category_selection_ids = fields.One2many(
         "resource.booking.category.selection",
         "resource_booking_combination_wizard_id",
         "Resource Category Selections",
-        compute="_compute_resource_booking_category_selection_ids",
     )
     current_resource_booking_category_selection_id = fields.Many2one(
         "resource.booking.category.selection",
@@ -63,15 +63,33 @@ class ResourceBookingCombinationWizard(models.TransientModel):
         compute="_compute_selected_resource_ids",
     )
 
-    @api.depends("resource_category_ids")
-    def _compute_resource_booking_category_selection_ids(self):
-        self.resource_booking_category_selection_ids = self.env[
-            "resource.booking.category.selection"
-        ].search([("resource_booking_combination_wizard_id", "=", self.id)])
+    @api.depends("resource_booking_category_selection_ids.resource_category_id")
+    def _compute_resource_category_ids(self):
+        self.resource_category_ids = (
+            self.resource_booking_category_selection_ids.mapped("resource_category_id")
+        )
 
-    @api.depends("resource_category_ids")
+    def _set_resource_category_ids(self):
+        resource_category_ids = set(self.resource_category_ids.ids)
+        existing_rbcss = self.resource_booking_category_selection_ids
+        command = []
+        for rbcs in existing_rbcss:
+            if rbcs.resource_category_id.id not in resource_category_ids:
+                command.append((2, rbcs.id, 0))
+        if command:
+            self.resource_booking_category_selection_ids = command
+        remaining_category_ids = set(
+            self.resource_booking_category_selection_ids.mapped("resource_category_id")
+        )
+        to_create = resource_category_ids - remaining_category_ids
+        if to_create:
+            self.resource_booking_category_selection_ids = [
+                (0, 0, {"resource_category_id": id}) for id in to_create
+            ]
+
+    @api.depends("resource_booking_category_selection_ids")
     def _compute_configure_step_count(self):
-        self.configure_step_count = len(self.resource_category_ids)
+        self.configure_step_count = len(self.resource_booking_category_selection_ids)
 
     @api.depends("current_resource_booking_category_selection_id")
     def _compute_configure_step_message(self):
