@@ -9,8 +9,9 @@ class ResourceBookingCategorySelectionResource(models.TransientModel):
     _name = "resource.booking.category.selection.resource"
     _description = "Resource Booking Category Selection Resource"
     _table = "rb_category_selection_resource"
+    _order = "name"
 
-    name = fields.Char(related="resource_id.name")
+    name = fields.Char(related="resource_id.name", store=True)
     resource_booking_category_selection_id = fields.Many2one(
         "resource.booking.category.selection",
         "Resource Booking Category Selection",

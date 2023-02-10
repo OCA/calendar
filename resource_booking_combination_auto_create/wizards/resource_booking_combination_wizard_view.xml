@@ -31,7 +31,7 @@
                         invisible="True"
                     />
                     <field
-                        name="available_resource_ids"
+                        name="current_selected_resource_ids"
                         widget="many2many_checkboxes"
                         domain="[('resource_booking_category_selection_id', '=', current_resource_booking_category_selection_id_id)]"
                     />

@@ -31,19 +31,14 @@ class ResourceBookingCombinationWizard(models.TransientModel):
     current_resource_booking_category_selection_id = fields.Many2one(
         "resource.booking.category.selection",
         "Current Resource Category Selection",
-        ondelete="cascade",
+        ondelete="set null",
     )
     current_resource_booking_category_selection_id_id = fields.Integer(
         "Current Resource Category Selection ID",
         related="current_resource_booking_category_selection_id.id",
     )
-    current_resource_category_name = fields.Char(
-        related="current_resource_booking_category_selection_id"
-        ".resource_category_id.name",
-    )
-    available_resource_ids = fields.Many2many(
+    current_selected_resource_ids = fields.Many2many(
         "resource.booking.category.selection.resource",
-        string="Resources",
         related="current_resource_booking_category_selection_id.resource_ids",
         readonly=False,
     )
@@ -71,21 +66,19 @@ class ResourceBookingCombinationWizard(models.TransientModel):
 
     def _set_resource_category_ids(self):
         resource_category_ids = set(self.resource_category_ids.ids)
-        existing_rbcss = self.resource_booking_category_selection_ids
-        command = []
-        for rbcs in existing_rbcss:
-            if rbcs.resource_category_id.id not in resource_category_ids:
-                command.append((2, rbcs.id, 0))
-        if command:
-            self.resource_booking_category_selection_ids = command
-        remaining_category_ids = set(
-            self.resource_booking_category_selection_ids.mapped("resource_category_id")
-        )
-        to_create = resource_category_ids - remaining_category_ids
-        if to_create:
-            self.resource_booking_category_selection_ids = [
-                (0, 0, {"resource_category_id": id}) for id in to_create
-            ]
+        commands = []
+        for rbcs in self.resource_booking_category_selection_ids:
+            resource_category_id = rbcs.resource_category_id.id
+            if resource_category_id not in resource_category_ids:
+                commands.append((2, rbcs.id, 0))
+            else:
+                resource_category_ids.remove(resource_category_id)
+        for resource_category in self.resource_category_ids:
+            if resource_category.id not in resource_category_ids:
+                continue
+            commands.append((0, 0, {"resource_category_id": resource_category.id}))
+        if commands:
+            self.resource_booking_category_selection_ids = commands
 
     @api.depends("resource_booking_category_selection_ids")
     def _compute_configure_step_count(self):
@@ -93,11 +86,21 @@ class ResourceBookingCombinationWizard(models.TransientModel):
 
     @api.depends("current_resource_booking_category_selection_id")
     def _compute_configure_step_message(self):
-        self.configure_step_message = _(
-            "Select resources for category {category}:".format(
-                category=self.current_resource_category_name
-            )
+        resource_category_name = (
+            self.current_resource_booking_category_selection_id.resource_category_id.name
         )
+        if self.current_resource_booking_category_selection_id.available_resource_ids:
+            self.configure_step_message = _(
+                "Select resources for category {category}:".format(
+                    category=resource_category_name
+                )
+            )
+        else:
+            self.configure_step_message = _(
+                "No available resources found for category {category}.".format(
+                    category=resource_category_name
+                )
+            )
 
     @api.depends("resource_booking_category_selection_ids.resource_ids.resource_id")
     def _compute_selected_resource_ids(self):
@@ -136,10 +139,46 @@ class ResourceBookingCombinationWizard(models.TransientModel):
         act_window["name"] = self._compute_step_name()
         return act_window
 
+    def _resource_is_available(self, resource):
+        # todo: implement this
+        for rbcs in self.resource_booking_category_selection_ids:
+            if rbcs == self.current_resource_booking_category_selection_id:
+                continue
+            if resource in rbcs.mapped("resource_ids.resource_id"):
+                return False
+        return True
+
+    def _find_available_resources_for_current_step(self):
+        commands = []
+        current_rbcs = self.current_resource_booking_category_selection_id
+        rbcsr_by_resource = {}
+        for rbcsr in current_rbcs.available_resource_ids:
+            rbcsr_by_resource[rbcsr.resource_id.id] = rbcsr.id
+        for resource in current_rbcs.resource_category_id.resource_ids:
+            rbcsr_id = rbcsr_by_resource.get(resource.id, None)
+            if not self._resource_is_available(resource):
+                if rbcsr_id is not None:
+                    commands.append((2, rbcsr_id, 0))
+                continue
+            if rbcsr_id is None:
+                commands.append(
+                    (
+                        0,
+                        0,
+                        {
+                            "resource_booking_category_selection_id": current_rbcs.id,
+                            "resource_id": resource.id,
+                        },
+                    )
+                )
+        if commands:
+            current_rbcs.available_resource_ids = commands
+
     def _update_configure_step(self):
         self.current_resource_booking_category_selection_id = (
-            self.resource_booking_category_selection_ids[self.configure_step]
+            self.resource_booking_category_selection_ids.sorted()[self.configure_step]
         )
+        self._find_available_resources_for_current_step()
 
     @api.model
     def create(self, vals):
@@ -157,7 +196,6 @@ class ResourceBookingCombinationWizard(models.TransientModel):
         if not self.resource_booking_category_selection_ids:
             self.state = "final"
             return
-        self.find_available_resources()
         self._update_configure_step()
         self.state = "configure"
 
@@ -180,36 +218,6 @@ class ResourceBookingCombinationWizard(models.TransientModel):
         else:
             self.configure_step += 1
             self._update_configure_step()
-
-    def resource_is_available(self, resource_id):
-        # todo: implement this
-        return True
-
-    def find_available_resources(self):
-        rb_category_selection_resource_model = self.env[
-            "resource.booking.category.selection.resource"
-        ]
-        # fixme: don't delete all, to keep current selection?
-        rb_category_selection_resource_model.search(
-            [
-                (
-                    "resource_booking_category_selection_id"
-                    ".resource_booking_combination_wizard_id",
-                    "=",
-                    self.id,
-                )
-            ]
-        ).unlink()
-        for rbcs in self.resource_booking_category_selection_ids:
-            for resource_id in rbcs.resource_category_id.resource_ids:
-                if not self.resource_is_available(resource_id):
-                    continue
-                rb_category_selection_resource_model.create(
-                    {
-                        "resource_booking_category_selection_id": rbcs.id,
-                        "resource_id": resource_id.id,
-                    }
-                )
 
     def create_combination(self):
         # search for an existing combination that matched the selected resources.
