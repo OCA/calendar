@@ -24,3 +24,5 @@ class ResourceBookingCategorySelectionResource(models.TransientModel):
         required=True,
         ondelete="cascade",
     )
+    # this field is only needed for searching
+    selected_from = fields.Many2many("resource.booking.category.selection")

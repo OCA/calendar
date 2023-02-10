@@ -572,3 +572,55 @@ class ResourceCombinationWizardCase(TransactionCase):
         wizard.resource_category_ids = [(3, self.room_category.id, 0)]
         wizard.open_next()
         self.assertEqual(wizard.configure_step_count, 1)
+
+    def test_filter_out_booked_resources(self):
+        """
+        Resources that are already booked in the same timespan should not be
+        listed.
+        """
+        booking_1 = self._create_resource_booking()
+        wizard = self._create_wizard_with_selected_categories(
+            booking_1, [self.room_category, self.worker_category]
+        )
+        wizard.open_next()
+        self._select_resources_by_index_on_current_step(wizard, [1])
+        wizard.open_next()
+        self._select_resources_by_index_on_current_step(wizard, [0])
+        wizard.open_next()
+        wizard.create_combination()
+        booking_2 = self._create_resource_booking()
+        wizard = self._create_wizard_with_selected_categories(
+            booking_2, [self.room_category, self.worker_category]
+        )
+        wizard.open_next()
+        available_resources = self._get_available_resources_on_current_step(wizard)
+        self.assertEqual(len(available_resources), 1)
+        self.assertEqual(available_resources[0].resource_id, self.room_1)
+        wizard.open_next()
+        available_resources = self._get_available_resources_on_current_step(wizard)
+        self.assertEqual(len(available_resources), 1)
+        self.assertEqual(available_resources[0].resource_id, self.worker_2)
+
+    def test_list_booked_resources_by_current_booking(self):
+        """
+        Resources booked by the current booking should be listed as available.
+        """
+        booking = self._create_resource_booking()
+        wizard = self._create_wizard_with_selected_categories(
+            booking, [self.room_category, self.worker_category]
+        )
+        wizard.open_next()
+        self._select_resources_by_index_on_current_step(wizard, [1])
+        wizard.open_next()
+        self._select_resources_by_index_on_current_step(wizard, [0])
+        wizard.open_next()
+        wizard.create_combination()
+        wizard = self._create_wizard_with_selected_categories(
+            booking, [self.room_category, self.worker_category]
+        )
+        wizard.open_next()
+        available_resources = self._get_available_resources_on_current_step(wizard)
+        self.assertEqual(len(available_resources), 2)
+        wizard.open_next()
+        available_resources = self._get_available_resources_on_current_step(wizard)
+        self.assertEqual(len(available_resources), 2)

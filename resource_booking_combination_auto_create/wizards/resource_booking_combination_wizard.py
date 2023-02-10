@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+import pytz
+
 from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
 
@@ -139,13 +141,31 @@ class ResourceBookingCombinationWizard(models.TransientModel):
         act_window["name"] = self._compute_step_name()
         return act_window
 
-    def _resource_is_available(self, resource):
-        # todo: implement this
-        for rbcs in self.resource_booking_category_selection_ids:
-            if rbcs == self.current_resource_booking_category_selection_id:
-                continue
-            if resource in rbcs.mapped("resource_ids.resource_id"):
-                return False
+    def _get_resources_selected_in_other_steps(self):
+        return (
+            self.env["resource.booking.category.selection.resource"]
+            .search(
+                [
+                    (
+                        "selected_from.resource_booking_combination_wizard_id",
+                        "=",
+                        self.id,
+                    ),
+                    (
+                        "selected_from",
+                        "!=",
+                        self.current_resource_booking_category_selection_id.id,
+                    ),
+                ]
+            )
+            .mapped("resource_id")
+        )
+
+    def _resource_is_available(self, resource, selected_resources, start_dt, stop_dt):
+        if resource in selected_resources:
+            return False
+        if not resource.is_available(start_dt, stop_dt):
+            return False
         return True
 
     def _find_available_resources_for_current_step(self):
@@ -154,9 +174,17 @@ class ResourceBookingCombinationWizard(models.TransientModel):
         rbcsr_by_resource = {}
         for rbcsr in current_rbcs.available_resource_ids:
             rbcsr_by_resource[rbcsr.resource_id.id] = rbcsr.id
+        # resources currently assigned to the booking are considered as
+        # available.
+        current_resources = self.resource_booking_id.combination_id.resource_ids
+        selected_resources = self._get_resources_selected_in_other_steps()
+        start_dt = self.resource_booking_id.start.astimezone(pytz.utc)
+        stop_dt = self.resource_booking_id.stop.astimezone(pytz.utc)
         for resource in current_rbcs.resource_category_id.resource_ids:
             rbcsr_id = rbcsr_by_resource.get(resource.id, None)
-            if not self._resource_is_available(resource):
+            if resource not in current_resources and not self._resource_is_available(
+                resource, selected_resources, start_dt, stop_dt
+            ):
                 if rbcsr_id is not None:
                     commands.append((2, rbcsr_id, 0))
                 continue
@@ -220,7 +248,7 @@ class ResourceBookingCombinationWizard(models.TransientModel):
             self._update_configure_step()
 
     def create_combination(self):
-        # search for an existing combination that matched the selected resources.
+        # search for an existing combination that matches the selected resources.
         resource_combination_model = self.env["resource.booking.combination"]
         resources = self.selected_resource_ids
         if not resources:
