@@ -2,7 +2,8 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-from odoo import fields, models
+from odoo import _, fields, models
+from odoo.exceptions import ValidationError
 
 
 class ResourceBooking(models.Model):
@@ -40,3 +41,23 @@ class ResourceBooking(models.Model):
                 # stay in pending state when a start date is set but no
                 # combination.
                 rb.state = "pending"
+
+    def open_combination_wizard(self):
+        if not self.start or not self.duration:
+            raise ValidationError(
+                _(
+                    "To select resources, the booking must have a start date "
+                    "and a duration."
+                )
+            )
+        action = self.env.ref(
+            "resource_booking_combination_auto_create."
+            "resource_booking_combination_wizard_action"
+        )
+        act_dict = action.read()[0]
+        act_dict["context"] = {
+            "default_resource_category_ids": [
+                (6, 0, self.combination_id.resource_ids.resource_category_ids.ids)
+            ]
+        }
+        return act_dict

@@ -5,7 +5,6 @@
 import pytz
 
 from odoo import _, api, fields, models
-from odoo.exceptions import ValidationError
 
 
 class ResourceBookingCombinationWizard(models.TransientModel):
@@ -161,9 +160,13 @@ class ResourceBookingCombinationWizard(models.TransientModel):
             .mapped("resource_id")
         )
 
-    def _resource_is_available(self, resource, selected_resources, start_dt, stop_dt):
+    def _resource_is_available(
+        self, resource, selected_resources, current_resources, start_dt, stop_dt
+    ):
         if resource in selected_resources:
             return False
+        if resource in current_resources:
+            return True
         if not resource.is_available(start_dt, stop_dt):
             return False
         return True
@@ -182,8 +185,8 @@ class ResourceBookingCombinationWizard(models.TransientModel):
         stop_dt = self.resource_booking_id.stop.astimezone(pytz.utc)
         for resource in current_rbcs.resource_category_id.resource_ids:
             rbcsr_id = rbcsr_by_resource.get(resource.id, None)
-            if resource not in current_resources and not self._resource_is_available(
-                resource, selected_resources, start_dt, stop_dt
+            if not self._resource_is_available(
+                resource, selected_resources, current_resources, start_dt, stop_dt
             ):
                 if rbcsr_id is not None:
                     commands.append((2, rbcsr_id, 0))
@@ -208,17 +211,36 @@ class ResourceBookingCombinationWizard(models.TransientModel):
         )
         self._find_available_resources_for_current_step()
 
+    def _select_resources_from_current_combination(self):
+        resources = self.resource_booking_id.combination_id.resource_ids
+        if not resources:
+            return
+        already_selected_resource_ids = set()
+        for rbcs in self.resource_booking_category_selection_ids.sorted():
+            resource_ids_to_select = []
+            for resource in resources:
+                if resource.id in already_selected_resource_ids:
+                    continue
+                if rbcs.resource_category_id not in resource.resource_category_ids:
+                    continue
+                resource_ids_to_select.append(resource.id)
+                already_selected_resource_ids.add(resource.id)
+            if resource_ids_to_select:
+                rbcs.available_resource_ids = [
+                    (0, 0, {"resource_id": resource_id})
+                    for resource_id in resource_ids_to_select
+                ]
+                rbcs.resource_ids = [
+                    (6, 0, [r.id for r in rbcs.available_resource_ids])
+                ]
+
     @api.model
     def create(self, vals):
         resource_booking_id = self.env.context["active_id"]
-        resource_booking = self.env["resource.booking"].browse(resource_booking_id)
-        if not resource_booking.start or not resource_booking.duration:
-            raise ValidationError(
-                "To select resources, the booking must have a start date and "
-                "a duration."
-            )
         vals["resource_booking_id"] = resource_booking_id
-        return super().create(vals)
+        wizard = super().create(vals)
+        wizard._select_resources_from_current_combination()
+        return wizard
 
     def state_exit_start(self):
         if not self.resource_booking_category_selection_ids:

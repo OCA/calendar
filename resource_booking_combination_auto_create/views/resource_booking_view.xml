@@ -26,8 +26,8 @@
                         </tree>
                     </field>
                     <button
-                        name="%(resource_booking_combination_wizard_action)d"
-                        type="action"
+                        name="open_combination_wizard"
+                        type="object"
                         string="Select resources"
                     />
                 </div>

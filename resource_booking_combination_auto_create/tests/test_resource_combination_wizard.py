@@ -152,12 +152,25 @@ class ResourceCombinationWizardCase(TransactionCase):
             }
         )
 
+    def _create_wizard(self, resource_booking):
+        act_dict = resource_booking.open_combination_wizard()
+        context = act_dict["context"]
+        context["active_id"] = resource_booking.id
+        return (
+            self.env["resource.booking.combination.wizard"]
+            .with_context(context)
+            .create({})
+        )
+
     def _create_wizard_with_selected_categories(
         self, resource_booking, resource_categories
     ):
+        act_dict = resource_booking.open_combination_wizard()
+        context = act_dict["context"]
+        context["active_id"] = resource_booking.id
         return (
             self.env["resource.booking.combination.wizard"]
-            .with_context({"active_id": resource_booking.id})
+            .with_context(context)
             .create(
                 {"resource_category_ids": [(6, 0, [r.id for r in resource_categories])]}
             )
@@ -452,9 +465,7 @@ class ResourceCombinationWizardCase(TransactionCase):
             }
         )
         with self.assertRaises(ValidationError) as cm:
-            self._create_wizard_with_selected_categories(
-                booking, [self.room_category, self.worker_category]
-            )
+            booking.open_combination_wizard()
         self.assertEqual(
             str(cm.exception),
             "To select resources, the booking must have a start date and a "
@@ -469,9 +480,7 @@ class ResourceCombinationWizardCase(TransactionCase):
             }
         )
         with self.assertRaises(ValidationError) as cm:
-            self._create_wizard_with_selected_categories(
-                booking, [self.room_category, self.worker_category]
-            )
+            booking.open_combination_wizard()
         booking = self.env["resource.booking"].create(
             {
                 "partner_id": self.partner_1.id,
@@ -482,9 +491,7 @@ class ResourceCombinationWizardCase(TransactionCase):
         )
         # this does not fail because a default duration is taken from the
         # booking type.
-        self._create_wizard_with_selected_categories(
-            booking, [self.room_category, self.worker_category]
-        )
+        booking.open_combination_wizard()
         # if this default duration is set to 0.
         self.booking_type_1.duration = 0
         booking = self.env["resource.booking"].create(
@@ -496,9 +503,7 @@ class ResourceCombinationWizardCase(TransactionCase):
             }
         )
         with self.assertRaises(ValidationError) as cm:
-            self._create_wizard_with_selected_categories(
-                booking, [self.room_category, self.worker_category]
-            )
+            booking.open_combination_wizard()
 
     def test_no_categories_selected(self):
         """
@@ -534,7 +539,36 @@ class ResourceCombinationWizardCase(TransactionCase):
     def test_unassign_resources(self):
         """
         On a booking with a resource combination, re-opening the wizard and
-        selecting no resources should unassign the resource combination.
+        deselecting all resources should unassign the resource combination.
+        """
+        booking = self._create_resource_booking()
+        wizard = self._create_wizard_with_selected_categories(
+            booking, [self.room_category, self.worker_category]
+        )
+        wizard.open_next()
+        self._select_resources_by_index_on_current_step(wizard, [0])
+        wizard.open_next()
+        self._select_resources_by_index_on_current_step(wizard, [1])
+        wizard.open_next()
+        wizard.create_combination()
+        self.assertEqual(booking.state, "scheduled")
+        wizard = self._create_wizard(booking)
+        wizard.open_next()
+        available_resources = self._get_available_resources_on_current_step(wizard)
+        wizard.current_selected_resource_ids = [(3, available_resources[0].id, 0)]
+        wizard.open_next()
+        available_resources = self._get_available_resources_on_current_step(wizard)
+        wizard.current_selected_resource_ids = [(3, available_resources[1].id, 0)]
+        wizard.open_next()
+        wizard.create_combination()
+        self.assertFalse(booking.combination_id)
+        self.assertEqual(booking.state, "pending")
+
+    def test_unselect_categories(self):
+        """
+        On a booking with a resource combination, re-opening the wizard and
+        deselecting all resources categories should unassign the resource
+        combination.
         """
         booking = self._create_resource_booking()
         wizard = self._create_wizard_with_selected_categories(
@@ -547,10 +581,8 @@ class ResourceCombinationWizardCase(TransactionCase):
         wizard.open_next()
         wizard.create_combination()
         self.assertEqual(booking.state, "scheduled")
-        wizard = self._create_wizard_with_selected_categories(
-            booking, [self.room_category]
-        )
-        wizard.open_next()
+        wizard = self._create_wizard_with_selected_categories(booking, [])
+        self.assertEqual(wizard.configure_step_count, 0)
         wizard.open_next()
         wizard.create_combination()
         self.assertFalse(booking.combination_id)
@@ -624,3 +656,112 @@ class ResourceCombinationWizardCase(TransactionCase):
         wizard.open_next()
         available_resources = self._get_available_resources_on_current_step(wizard)
         self.assertEqual(len(available_resources), 2)
+
+    def test_booked_resources_by_current_booking_in_multiple_categories(self):
+        """
+        Resources booked by the current booking should be listed as available,
+        unless already selected in previous steps.
+        """
+        booking = self._create_resource_booking()
+        wizard = self._create_wizard_with_selected_categories(
+            booking, [self.room_category, self.worker_category]
+        )
+        wizard.open_next()
+        self._select_resources_by_index_on_current_step(wizard, [1])
+        wizard.open_next()
+        self._select_resources_by_index_on_current_step(wizard, [0])
+        wizard.open_next()
+        wizard.create_combination()
+        test_category = self.env["resource.category"].create(
+            {
+                "name": "test 1",
+                "resource_ids": [
+                    (6, 0, [self.worker_1.id, self.worker_2.id]),
+                ],
+            }
+        )
+        wizard = self._create_wizard_with_selected_categories(
+            booking, [self.room_category, self.worker_category, test_category]
+        )
+        wizard.open_next()
+        available_resources = self._get_available_resources_on_current_step(wizard)
+        self.assertEqual(len(available_resources), 2)
+        self._select_resources_by_index_on_current_step(wizard, [1])
+        wizard.open_next()
+        available_resources = self._get_available_resources_on_current_step(wizard)
+        self._select_resources_by_index_on_current_step(wizard, [0])
+        self.assertEqual(len(available_resources), 2)
+        wizard.open_next()
+        available_resources = self._get_available_resources_on_current_step(wizard)
+        self.assertEqual(len(available_resources), 1)
+
+    def test_keep_selection_across_wizards(self):
+        """
+        When opening the wizard, the resource categories and resources
+        corresponding to the currently assigned resources should be selected.
+        """
+        # since resources can be assigned to multiple categories, it is
+        # impossible to restore the exact selection. the goal here is to
+        # restore a selection that ensures that opening the wizard, and going
+        # through all of the steps without changing anything results in the
+        # same resources being assigned to the booking.
+        test_category_1 = self.env["resource.category"].create(
+            {
+                "name": "test 1",
+                "resource_ids": [
+                    (6, 0, [self.worker_1.id, self.worker_2.id]),
+                ],
+            }
+        )
+        test_category_2 = self.env["resource.category"].create(
+            {
+                "name": "test 2",
+            }
+        )
+        booking = self._create_resource_booking()
+        wizard = self._create_wizard_with_selected_categories(
+            booking, [self.room_category, self.worker_category, test_category_1]
+        )
+        wizard.open_next()
+        # select room 2
+        self._select_resources_by_index_on_current_step(wizard, [1])
+        wizard.open_next()
+        # select worker 1
+        self._select_resources_by_index_on_current_step(wizard, [0])
+        wizard.open_next()
+        # select worker 2
+        self._select_resources_by_index_on_current_step(wizard, [0])
+        wizard.open_next()
+        wizard.create_combination()
+        combination = booking.combination_id
+        # no changes to the category selection
+        wizard = self._create_wizard(booking)
+        resource_categories = wizard.resource_category_ids
+        self.assertEqual(wizard.configure_step_count, 3)
+        self.assertEqual(len(resource_categories), 3)
+        # all categories linked to booked resources should be selected
+        self.assertIn(self.room_category, resource_categories)
+        self.assertIn(self.worker_category, resource_categories)
+        self.assertIn(test_category_1, resource_categories)
+        self.assertNotIn(test_category_2, resource_categories)
+        wizard.open_next()
+        selected_resource_ids = (
+            wizard.current_resource_booking_category_selection_id.resource_ids.resource_id.ids
+        )
+        self.assertEqual(len(selected_resource_ids), 1)
+        self.assertIn(self.room_2.id, selected_resource_ids)
+        wizard.open_next()
+        selected_resource_ids = (
+            wizard.current_resource_booking_category_selection_id.resource_ids.resource_id.ids
+        )
+        self.assertEqual(len(selected_resource_ids), 2)
+        self.assertIn(self.worker_1.id, selected_resource_ids)
+        self.assertIn(self.worker_2.id, selected_resource_ids)
+        wizard.open_next()
+        selected_resource_ids = (
+            wizard.current_resource_booking_category_selection_id.resource_ids.resource_id.ids
+        )
+        self.assertEqual(len(selected_resource_ids), 0)
+        wizard.open_next()
+        wizard.create_combination()
+        self.assertEqual(booking.combination_id, combination)
