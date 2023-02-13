@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    SPDX-FileCopyrightText: 2023 Coop IT Easy SC
+
+    SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+<odoo>
+
+    <record id="resource_booking_view_calendar" model="ir.ui.view">
+        <field name="name">Resource booking calendar</field>
+        <field name="model">resource.booking</field>
+        <field
+            name="inherit_id"
+            ref="resource_booking.resource_booking_view_calendar"
+        />
+        <field name="arch" type="xml">
+            <xpath expr="/calendar" position="attributes">
+                <attribute name="color">type_id</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
