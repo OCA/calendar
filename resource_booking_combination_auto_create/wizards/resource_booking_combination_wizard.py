@@ -22,7 +22,7 @@ class ResourceBookingCombinationWizard(models.TransientModel):
         "resource.category",
         string="Resource Categories",
         compute="_compute_resource_category_ids",
-        inverse="_set_resource_category_ids",
+        inverse="_inverse_resource_category_ids",
     )
     resource_booking_category_selection_ids = fields.One2many(
         "resource.booking.category.selection",
@@ -65,7 +65,7 @@ class ResourceBookingCombinationWizard(models.TransientModel):
             self.resource_booking_category_selection_ids.mapped("resource_category_id")
         )
 
-    def _set_resource_category_ids(self):
+    def _inverse_resource_category_ids(self):
         resource_category_ids = set(self.resource_category_ids.ids)
         commands = []
         for rbcs in self.resource_booking_category_selection_ids:

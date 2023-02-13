@@ -10,6 +10,7 @@
         <field name="name">Resource booking form</field>
         <field name="model">resource.booking</field>
         <field name="inherit_id" ref="resource_booking.resource_booking_form" />
+        <field name="priority">200</field>
         <field name="arch" type="xml">
             <xpath expr="//label[@for='combination_id']" position="replace">
                 <label for="resource_ids" />
