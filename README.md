@@ -22,7 +22,7 @@ Available addons
 addon | version | maintainers | summary
 --- | --- | --- | ---
 [calendar_partner_color](calendar_partner_color/) | 14.0.0.1.0 | [![hparfr](https://github.com/hparfr.png?size=30px)](https://github.com/hparfr) | Adapt calendar color based on partner's color
-[resource_booking](resource_booking/) | 14.0.1.0.0 | [![pedrobaeza](https://github.com/pedrobaeza.png?size=30px)](https://github.com/pedrobaeza) | Manage appointments and resource booking
+[resource_booking](resource_booking/) | 14.0.1.0.1 | [![pedrobaeza](https://github.com/pedrobaeza.png?size=30px)](https://github.com/pedrobaeza) | Manage appointments and resource booking
 
 [//]: # (end addons)
 
