@@ -888,3 +888,82 @@ class BackendCase(SavepointCase):
                 utc.localize(datetime(2021, 3, 14, 2, 0)),
             )
         )
+
+    def test_assign_multiple_humans(self):
+        """
+        It should be possible to assign multiple humans to a booking.
+        """
+        user_4 = self.env["res.users"].create(
+            {
+                "email": "user_4@example.com",
+                "login": "user_4",
+                "name": "User 4",
+            }
+        )
+        r_user_4 = self.env["resource.resource"].create(
+            {
+                "calendar_id": self.r_calendars[0].id,
+                "name": user_4.name,
+                "resource_type": "user",
+                "tz": "UTC",
+                "user_id": user_4.id,
+            }
+        )
+        rbc = self.env["resource.booking.combination"].create(
+            {
+                "resource_ids": [(6, 0, [self.r_users[0].id, r_user_4.id])],
+                "type_rel_ids": [(6, 0, [self.rbt.id])],
+            }
+        )
+        self.env["resource.booking"].create(
+            {
+                "partner_id": self.partner.id,
+                "start": "2021-03-01 08:00:00",
+                "type_id": self.rbt.id,
+                "combination_id": rbc.id,
+                "combination_auto_assign": False,
+            }
+        )
+
+    def test_change_combination_to_multiple_humans(self):
+        """
+        It should be possible to change the combination of a booking to
+        another combination that contains multiple humans.
+        """
+        user_4 = self.env["res.users"].create(
+            {
+                "email": "user_4@example.com",
+                "login": "user_4",
+                "name": "User 4",
+            }
+        )
+        r_user_4 = self.env["resource.resource"].create(
+            {
+                "calendar_id": self.r_calendars[0].id,
+                "name": user_4.name,
+                "resource_type": "user",
+                "tz": "UTC",
+                "user_id": user_4.id,
+            }
+        )
+        rbc_1 = self.env["resource.booking.combination"].create(
+            {
+                "resource_ids": [(6, 0, [self.r_materials[0].id])],
+                "type_rel_ids": [(6, 0, [self.rbt.id])],
+            }
+        )
+        rbc_2 = self.env["resource.booking.combination"].create(
+            {
+                "resource_ids": [(6, 0, [self.r_users[0].id, r_user_4.id])],
+                "type_rel_ids": [(6, 0, [self.rbt.id])],
+            }
+        )
+        booking = self.env["resource.booking"].create(
+            {
+                "partner_id": self.partner.id,
+                "start": "2021-03-01 08:00:00",
+                "type_id": self.rbt.id,
+                "combination_id": rbc_1.id,
+            }
+        )
+        booking.combination_id = rbc_2
