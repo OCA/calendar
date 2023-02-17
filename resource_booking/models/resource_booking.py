@@ -63,6 +63,7 @@ class ResourceBooking(models.Model):
         ),
     )
     name = fields.Char(index=True, help="Leave empty to autogenerate a booking name.")
+    description = fields.Html("Description")
     partner_id = fields.Many2one(
         "res.partner",
         string="Requester",
