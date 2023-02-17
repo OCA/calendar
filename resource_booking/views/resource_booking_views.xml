@@ -156,6 +156,7 @@
                                 />
                             </div>
                             <field name="categ_ids" widget="many2many_tags" />
+                            <field name="description" />
                         </group>
                         <group name="meeting" string="Meeting">
                             <field
