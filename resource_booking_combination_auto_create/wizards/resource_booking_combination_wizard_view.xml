@@ -17,23 +17,29 @@
                     <field name="resource_category_ids" widget="many2many_checkboxes" />
                 </group>
                 <group
-                    name="configure"
-                    attrs="{'invisible': [('state', '!=', 'configure')]}"
+                    name="configuration"
+                    attrs="{'invisible': [('state', '!=', 'configuration')]}"
                 >
                     <p><field
-                            name="configure_step_message"
+                            name="current_configuration_step_message"
                             class="oe_inline"
                             readonly="True"
                         /></p>
                     <field
-                        name="current_resource_booking_category_selection_id_id"
+                        name="current_wizard_category_id_id"
                         readonly="True"
                         invisible="True"
                     />
+                    <!--
+                        by default, the many2many_checkboxes widget lists all
+                        existing records of the model. the domain allows to
+                        only list those corresponding to the current
+                        configuration step.
+                    -->
                     <field
                         name="current_selected_resource_ids"
                         widget="many2many_checkboxes"
-                        domain="[('resource_booking_category_selection_id', '=', current_resource_booking_category_selection_id_id)]"
+                        domain="[('rbc_wizard_category_id', '=', current_wizard_category_id_id)]"
                     />
                 </group>
                 <group name="final" attrs="{'invisible': [('state', '!=', 'final')]}">

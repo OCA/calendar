@@ -1,4 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 resource_booking_combination_wizard_write,Permission to write resource booking combination wizard,model_resource_booking_combination_wizard,resource_booking.group_manager,1,1,1,1
-resource_booking_category_selection,Permission to write resource booking category selection,model_resource_booking_category_selection,resource_booking.group_manager,1,1,1,1
-resource_booking_category_selection_resource,Permission to write resource booking category selection resource,model_resource_booking_category_selection_resource,resource_booking.group_manager,1,1,1,1
+rbc_wizard_category,Permission to write resource booking combination wizard category,model_rbc_wizard_category,resource_booking.group_manager,1,1,1,1
+rbc_wizard_resource,Permission to write resource booking combination wizard resource,model_rbc_wizard_resource,resource_booking.group_manager,1,1,1,1

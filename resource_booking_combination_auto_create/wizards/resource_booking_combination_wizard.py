@@ -24,34 +24,38 @@ class ResourceBookingCombinationWizard(models.TransientModel):
         compute="_compute_resource_category_ids",
         inverse="_inverse_resource_category_ids",
     )
-    resource_booking_category_selection_ids = fields.One2many(
-        "resource.booking.category.selection",
+    wizard_category_ids = fields.One2many(
+        "rbc.wizard.category",
         "resource_booking_combination_wizard_id",
-        "Resource Category Selections",
+        "Resource Categories (Wizard)",
     )
-    current_resource_booking_category_selection_id = fields.Many2one(
-        "resource.booking.category.selection",
-        "Current Resource Category Selection",
+    configuration_step = fields.Integer("Configuration Step", default=0)
+    num_configuration_steps = fields.Integer(
+        "Number of Configuration Steps",
+        compute="_compute_num_configuration_steps",
+    )
+    # these "current" fields relate to the wizard category of the current
+    # configuration step of the wizard.
+    current_wizard_category_id = fields.Many2one(
+        "rbc.wizard.category",
+        "Current Resource Category",
+        compute="_compute_current_wizard_category_id",
+        store=True,
         ondelete="set null",
     )
-    current_resource_booking_category_selection_id_id = fields.Integer(
-        "Current Resource Category Selection ID",
-        related="current_resource_booking_category_selection_id.id",
+    # this field is needed to set a domain in the view.
+    current_wizard_category_id_id = fields.Integer(
+        "Current Resource Category ID",
+        related="current_wizard_category_id.id",
     )
     current_selected_resource_ids = fields.Many2many(
-        "resource.booking.category.selection.resource",
-        related="current_resource_booking_category_selection_id.resource_ids",
+        "rbc.wizard.resource",
+        related="current_wizard_category_id.selected_resource_ids",
         readonly=False,
     )
-    configure_step = fields.Integer("Configuration Step", default=0)
-    configure_step_count = fields.Integer(
-        "Number of Configuration Steps",
-        compute="_compute_configure_step_count",
-        store=True,
-    )
-    configure_step_message = fields.Char(
-        "Current Configure Step message",
-        compute="_compute_configure_step_message",
+    current_configuration_step_message = fields.Char(
+        "Current Configuration Step message",
+        compute="_compute_current_configuration_step_message",
     )
     selected_resource_ids = fields.Many2many(
         "resource.resource",
@@ -59,65 +63,81 @@ class ResourceBookingCombinationWizard(models.TransientModel):
         compute="_compute_selected_resource_ids",
     )
 
-    @api.depends("resource_booking_category_selection_ids.resource_category_id")
+    @api.depends("wizard_category_ids.resource_category_id")
     def _compute_resource_category_ids(self):
-        self.resource_category_ids = (
-            self.resource_booking_category_selection_ids.mapped("resource_category_id")
-        )
+        for rec in self:
+            rec.resource_category_ids = rec.wizard_category_ids.mapped(
+                "resource_category_id"
+            )
 
     def _inverse_resource_category_ids(self):
-        resource_category_ids = set(self.resource_category_ids.ids)
-        commands = []
-        for rbcs in self.resource_booking_category_selection_ids:
-            resource_category_id = rbcs.resource_category_id.id
-            if resource_category_id not in resource_category_ids:
-                commands.append((2, rbcs.id, 0))
+        for rec in self:
+            resource_category_ids = set(rec.resource_category_ids.ids)
+            commands = []
+            for rbcwc in rec.wizard_category_ids:
+                resource_category_id = rbcwc.resource_category_id.id
+                if resource_category_id not in resource_category_ids:
+                    commands.append((2, rbcwc.id, 0))
+                else:
+                    resource_category_ids.remove(resource_category_id)
+            for resource_category in rec.resource_category_ids:
+                if resource_category.id not in resource_category_ids:
+                    continue
+                commands.append((0, 0, {"resource_category_id": resource_category.id}))
+            if commands:
+                rec.wizard_category_ids = commands
+
+    @api.depends("wizard_category_ids")
+    def _compute_num_configuration_steps(self):
+        for rec in self:
+            rec.num_configuration_steps = len(rec.wizard_category_ids)
+
+    @api.depends("state", "wizard_category_ids", "configuration_step")
+    def _compute_current_wizard_category_id(self):
+        for rec in self:
+            if rec.state != "configuration":
+                rec.current_wizard_category_id = False
             else:
-                resource_category_ids.remove(resource_category_id)
-        for resource_category in self.resource_category_ids:
-            if resource_category.id not in resource_category_ids:
-                continue
-            commands.append((0, 0, {"resource_category_id": resource_category.id}))
-        if commands:
-            self.resource_booking_category_selection_ids = commands
+                rec.current_wizard_category_id = rec.wizard_category_ids.sorted()[
+                    rec.configuration_step
+                ]
+                rec._update_available_resources_for_current_step()
 
-    @api.depends("resource_booking_category_selection_ids")
-    def _compute_configure_step_count(self):
-        self.configure_step_count = len(self.resource_booking_category_selection_ids)
-
-    @api.depends("current_resource_booking_category_selection_id")
-    def _compute_configure_step_message(self):
-        resource_category_name = (
-            self.current_resource_booking_category_selection_id.resource_category_id.name
-        )
-        if self.current_resource_booking_category_selection_id.available_resource_ids:
-            self.configure_step_message = _(
-                "Select resources for category {category}:".format(
-                    category=resource_category_name
-                )
+    @api.depends("current_wizard_category_id")
+    def _compute_current_configuration_step_message(self):
+        for rec in self:
+            resource_category_name = (
+                rec.current_wizard_category_id.resource_category_id.name
             )
-        else:
-            self.configure_step_message = _(
-                "No available resources found for category {category}.".format(
-                    category=resource_category_name
+            if rec.current_wizard_category_id.available_resource_ids:
+                rec.current_configuration_step_message = _(
+                    "Select resources for category {category}:".format(
+                        category=resource_category_name
+                    )
                 )
-            )
+            else:
+                rec.current_configuration_step_message = _(
+                    "No available resources found for category {category}.".format(
+                        category=resource_category_name
+                    )
+                )
 
-    @api.depends("resource_booking_category_selection_ids.resource_ids.resource_id")
+    @api.depends("wizard_category_ids.selected_resource_ids.resource_id")
     def _compute_selected_resource_ids(self):
-        self.selected_resource_ids = self.mapped(
-            "resource_booking_category_selection_ids.resource_ids.resource_id"
-        )
+        for rec in self:
+            rec.selected_resource_ids = rec.mapped(
+                "wizard_category_ids.selected_resource_ids.resource_id"
+            )
 
     @api.model
     def _selection_state(self):
         return [
             ("start", "Start"),
-            ("configure", "Configure"),
+            ("configuration", "Configuration"),
             ("final", "Final"),
         ]
 
-    def _compute_step_name(self):
+    def _step_name(self):
         state = self.state
         if state == "start":
             # the title for the initial step is defined in the xml definition
@@ -126,23 +146,25 @@ class ResourceBookingCombinationWizard(models.TransientModel):
                 "resource_booking_combination_auto_create."
                 "resource_booking_combination_wizard_action"
             ).name
-        if state == "configure":
+        if state == "configuration":
             return _(
                 "Select resources ({current_step}/{step_count})".format(
-                    current_step=self.configure_step + 1,
-                    step_count=self.configure_step_count,
+                    current_step=self.configuration_step + 1,
+                    step_count=self.num_configuration_steps,
                 )
             )
         return _("Confirm")
 
     def _reopen_self(self):
+        # this is overridden only to set the title of window from the current
+        # step.
         act_window = super()._reopen_self()
-        act_window["name"] = self._compute_step_name()
+        act_window["name"] = self._step_name()
         return act_window
 
     def _get_resources_selected_in_other_steps(self):
         return (
-            self.env["resource.booking.category.selection.resource"]
+            self.env["rbc.wizard.resource"]
             .search(
                 [
                     (
@@ -153,7 +175,7 @@ class ResourceBookingCombinationWizard(models.TransientModel):
                     (
                         "selected_from",
                         "!=",
-                        self.current_resource_booking_category_selection_id.id,
+                        self.current_wizard_category_id.id,
                     ),
                 ]
             )
@@ -171,67 +193,61 @@ class ResourceBookingCombinationWizard(models.TransientModel):
             return False
         return True
 
-    def _find_available_resources_for_current_step(self):
+    def _update_available_resources_for_current_step(self):
         commands = []
-        current_rbcs = self.current_resource_booking_category_selection_id
-        rbcsr_by_resource = {}
-        for rbcsr in current_rbcs.available_resource_ids:
-            rbcsr_by_resource[rbcsr.resource_id.id] = rbcsr.id
+        current_rbcwc = self.current_wizard_category_id
+        rbcwr_by_resource = {}
+        for rbcwr in current_rbcwc.available_resource_ids:
+            rbcwr_by_resource[rbcwr.resource_id.id] = rbcwr.id
         # resources currently assigned to the booking are considered as
         # available.
         current_resources = self.resource_booking_id.combination_id.resource_ids
         selected_resources = self._get_resources_selected_in_other_steps()
         start_dt = self.resource_booking_id.start.astimezone(pytz.utc)
         stop_dt = self.resource_booking_id.stop.astimezone(pytz.utc)
-        for resource in current_rbcs.resource_category_id.resource_ids:
-            rbcsr_id = rbcsr_by_resource.get(resource.id, None)
+        for resource in current_rbcwc.resource_category_id.resource_ids:
+            rbcwr_id = rbcwr_by_resource.get(resource.id, None)
             if not self._resource_is_available(
                 resource, selected_resources, current_resources, start_dt, stop_dt
             ):
-                if rbcsr_id is not None:
-                    commands.append((2, rbcsr_id, 0))
+                if rbcwr_id is not None:
+                    commands.append((2, rbcwr_id, 0))
                 continue
-            if rbcsr_id is None:
+            if rbcwr_id is None:
                 commands.append(
                     (
                         0,
                         0,
                         {
-                            "resource_booking_category_selection_id": current_rbcs.id,
+                            "rbc_wizard_category_id": current_rbcwc.id,
                             "resource_id": resource.id,
                         },
                     )
                 )
         if commands:
-            current_rbcs.available_resource_ids = commands
-
-    def _update_configure_step(self):
-        self.current_resource_booking_category_selection_id = (
-            self.resource_booking_category_selection_ids.sorted()[self.configure_step]
-        )
-        self._find_available_resources_for_current_step()
+            current_rbcwc.available_resource_ids = commands
 
     def _select_resources_from_current_combination(self):
         resources = self.resource_booking_id.combination_id.resource_ids
         if not resources:
             return
         already_selected_resource_ids = set()
-        for rbcs in self.resource_booking_category_selection_ids.sorted():
+        for rbcwc in self.wizard_category_ids.sorted():
             resource_ids_to_select = []
             for resource in resources:
                 if resource.id in already_selected_resource_ids:
                     continue
-                if rbcs.resource_category_id not in resource.resource_category_ids:
+                if rbcwc.resource_category_id not in resource.resource_category_ids:
                     continue
                 resource_ids_to_select.append(resource.id)
                 already_selected_resource_ids.add(resource.id)
             if resource_ids_to_select:
-                rbcs.available_resource_ids = [
+                rbcwc.available_resource_ids = [
                     (0, 0, {"resource_id": resource_id})
                     for resource_id in resource_ids_to_select
                 ]
-                rbcs.resource_ids = [
-                    (6, 0, [r.id for r in rbcs.available_resource_ids])
+                rbcwc.selected_resource_ids = [
+                    (6, 0, [r.id for r in rbcwc.available_resource_ids])
                 ]
 
     @api.model
@@ -243,40 +259,39 @@ class ResourceBookingCombinationWizard(models.TransientModel):
         return wizard
 
     def state_exit_start(self):
-        if not self.resource_booking_category_selection_ids:
+        if not self.wizard_category_ids:
+            # no categories are selected, jump directly to the final step.
             self.state = "final"
-            return
-        self._update_configure_step()
-        self.state = "configure"
+        else:
+            self.state = "configuration"
 
-    def state_previous_configure(self):
-        if self.configure_step == 0:
+    def state_previous_configuration(self):
+        if self.configuration_step == 0:
+            # the step before the first configuration step is the start step.
             self.state = "start"
         else:
-            self.configure_step -= 1
-            self._update_configure_step()
+            self.configuration_step -= 1
+
+    def state_exit_configuration(self):
+        if self.configuration_step == self.num_configuration_steps - 1:
+            # the step after the last configuration step is the start step.
+            self.state = "final"
+        else:
+            self.configuration_step += 1
 
     def state_previous_final(self):
-        if not self.resource_booking_category_selection_ids:
+        if not self.wizard_category_ids:
+            # no categories are selected, jump directly to the start step.
             self.state = "start"
         else:
-            self.state = "configure"
-
-    def state_exit_configure(self):
-        if self.configure_step == self.configure_step_count - 1:
-            self.state = "final"
-        else:
-            self.configure_step += 1
-            self._update_configure_step()
+            self.state = "configuration"
 
     def create_combination(self):
         # search for an existing combination that matches the selected resources.
         resource_combination_model = self.env["resource.booking.combination"]
         resources = self.selected_resource_ids
         if not resources:
-            self.resource_booking_id.combination_id = (
-                resource_combination_model.browse()
-            )
+            self.resource_booking_id.combination_id = False
             return
         domain = []
         for resource in resources:

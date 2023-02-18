@@ -180,19 +180,19 @@ class ResourceCombinationWizardCase(TransactionCase):
         wizard.resource_category_ids = [(6, 0, [r.id for r in resource_categories])]
 
     def _get_available_resources_on_current_step(self, wizard):
-        return self.env["resource.booking.category.selection.resource"].search(
+        return self.env["rbc.wizard.resource"].search(
             [
                 (
-                    "resource_booking_category_selection_id",
+                    "rbc_wizard_category_id",
                     "=",
-                    wizard.current_resource_booking_category_selection_id.id,
+                    wizard.current_wizard_category_id.id,
                 )
             ]
         )
 
     def _get_selected_resources_on_current_step(self, wizard):
-        return wizard.current_resource_booking_category_selection_id.mapped(
-            "resource_ids.resource_id"
+        return wizard.current_wizard_category_id.mapped(
+            "selected_resource_ids.resource_id"
         )
 
     def _select_resources_by_index_on_current_step(self, wizard, indexes):
@@ -223,7 +223,7 @@ class ResourceCombinationWizardCase(TransactionCase):
         )
         wizard.open_next()
         self.assertEqual(
-            wizard.configure_step_message,
+            wizard.current_configuration_step_message,
             "Select resources for category room:",
         )
         self._select_resources_by_index_on_current_step(wizard, [0])
@@ -305,7 +305,7 @@ class ResourceCombinationWizardCase(TransactionCase):
         self.assertFalse(booking.combination_id)
         self.assertEqual(booking.state, "pending")
 
-    def test_configure_step_order(self):
+    def test_configuration_step_order(self):
         """
         The configuration steps should propose each resource category in
         alphabetical order.
@@ -318,17 +318,17 @@ class ResourceCombinationWizardCase(TransactionCase):
         )
         wizard.open_next()
         self.assertEqual(
-            wizard.current_resource_booking_category_selection_id.resource_category_id.name,
+            wizard.current_wizard_category_id.resource_category_id.name,
             "room",
         )
         wizard.open_next()
         self.assertEqual(
-            wizard.current_resource_booking_category_selection_id.resource_category_id.name,
+            wizard.current_wizard_category_id.resource_category_id.name,
             "test",
         )
         wizard.open_next()
         self.assertEqual(
-            wizard.current_resource_booking_category_selection_id.resource_category_id.name,
+            wizard.current_wizard_category_id.resource_category_id.name,
             "worker",
         )
 
@@ -362,7 +362,7 @@ class ResourceCombinationWizardCase(TransactionCase):
         wizard = self._create_wizard_with_selected_categories(booking, [category])
         wizard.open_next()
         self.assertEqual(
-            wizard.configure_step_message,
+            wizard.current_configuration_step_message,
             "No available resources found for category test.",
         )
         wizard.open_next()
@@ -433,7 +433,7 @@ class ResourceCombinationWizardCase(TransactionCase):
         wizard = self._create_wizard_with_selected_categories(
             booking, [self.room_category, self.worker_category]
         )
-        self.assertEqual(wizard.configure_step_count, 2)
+        self.assertEqual(wizard.num_configuration_steps, 2)
         wizard.open_next()
         self._select_resources_by_index_on_current_step(wizard, [0])
         wizard.open_next()
@@ -447,7 +447,7 @@ class ResourceCombinationWizardCase(TransactionCase):
         wizard.open_previous()
         wizard.open_previous()
         self._set_wizard_categories(wizard, [self.worker_category])
-        self.assertEqual(wizard.configure_step_count, 1)
+        self.assertEqual(wizard.num_configuration_steps, 1)
         wizard.open_next()
         selected_resources = self._get_selected_resources_on_current_step(wizard)
         self.assertEqual(selected_resources, self.worker_2)
@@ -514,7 +514,7 @@ class ResourceCombinationWizardCase(TransactionCase):
         wizard = self._create_wizard_with_selected_categories(booking, [])
         # currently, we leave it like it is: there is simply no configuration
         # steps. this allows to easily all resources.
-        self.assertEqual(wizard.configure_step_count, 0)
+        self.assertEqual(wizard.num_configuration_steps, 0)
         wizard.open_next()
         wizard.create_combination()
         self.assertFalse(booking.combination_id)
@@ -582,7 +582,7 @@ class ResourceCombinationWizardCase(TransactionCase):
         wizard.create_combination()
         self.assertEqual(booking.state, "scheduled")
         wizard = self._create_wizard_with_selected_categories(booking, [])
-        self.assertEqual(wizard.configure_step_count, 0)
+        self.assertEqual(wizard.num_configuration_steps, 0)
         wizard.open_next()
         wizard.create_combination()
         self.assertFalse(booking.combination_id)
@@ -598,12 +598,12 @@ class ResourceCombinationWizardCase(TransactionCase):
             booking, [self.room_category, self.worker_category]
         )
         wizard.open_next()
-        self.assertEqual(wizard.configure_step_count, 2)
+        self.assertEqual(wizard.num_configuration_steps, 2)
         wizard.open_previous()
         # unselect the first category.
         wizard.resource_category_ids = [(3, self.room_category.id, 0)]
         wizard.open_next()
-        self.assertEqual(wizard.configure_step_count, 1)
+        self.assertEqual(wizard.num_configuration_steps, 1)
 
     def test_filter_out_booked_resources(self):
         """
@@ -737,7 +737,7 @@ class ResourceCombinationWizardCase(TransactionCase):
         # no changes to the category selection
         wizard = self._create_wizard(booking)
         resource_categories = wizard.resource_category_ids
-        self.assertEqual(wizard.configure_step_count, 3)
+        self.assertEqual(wizard.num_configuration_steps, 3)
         self.assertEqual(len(resource_categories), 3)
         # all categories linked to booked resources should be selected
         self.assertIn(self.room_category, resource_categories)
@@ -746,20 +746,20 @@ class ResourceCombinationWizardCase(TransactionCase):
         self.assertNotIn(test_category_2, resource_categories)
         wizard.open_next()
         selected_resource_ids = (
-            wizard.current_resource_booking_category_selection_id.resource_ids.resource_id.ids
+            wizard.current_wizard_category_id.resource_ids.resource_id.ids
         )
         self.assertEqual(len(selected_resource_ids), 1)
         self.assertIn(self.room_2.id, selected_resource_ids)
         wizard.open_next()
         selected_resource_ids = (
-            wizard.current_resource_booking_category_selection_id.resource_ids.resource_id.ids
+            wizard.current_wizard_category_id.resource_ids.resource_id.ids
         )
         self.assertEqual(len(selected_resource_ids), 2)
         self.assertIn(self.worker_1.id, selected_resource_ids)
         self.assertIn(self.worker_2.id, selected_resource_ids)
         wizard.open_next()
         selected_resource_ids = (
-            wizard.current_resource_booking_category_selection_id.resource_ids.resource_id.ids
+            wizard.current_wizard_category_id.resource_ids.resource_id.ids
         )
         self.assertEqual(len(selected_resource_ids), 0)
         wizard.open_next()

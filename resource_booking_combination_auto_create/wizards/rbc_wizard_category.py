@@ -5,10 +5,9 @@
 from odoo import fields, models
 
 
-class ResourceBookingCategorySelection(models.TransientModel):
-    _name = "resource.booking.category.selection"
-    _description = "Resource Booking Category Selection"
-    _table = "rb_category_selection"
+class RBCWizardCategory(models.TransientModel):
+    _name = "rbc.wizard.category"
+    _description = "Resource Booking Combination Wizard Category"
     _order = "name"
 
     name = fields.Char(related="resource_category_id.name", store=True)
@@ -24,12 +23,12 @@ class ResourceBookingCategorySelection(models.TransientModel):
         required=True,
         ondelete="cascade",
     )
-    resource_ids = fields.Many2many(
-        "resource.booking.category.selection.resource",
+    selected_resource_ids = fields.Many2many(
+        "rbc.wizard.resource",
         string="Resources",
     )
     available_resource_ids = fields.One2many(
-        "resource.booking.category.selection.resource",
-        "resource_booking_category_selection_id",
+        "rbc.wizard.resource",
+        "rbc_wizard_category_id",
         "Available Resources",
     )
