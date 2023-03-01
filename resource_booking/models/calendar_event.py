@@ -91,22 +91,21 @@ class CalendarEvent(models.Model):
         not a real case for now.
         """
         attendee_commands = super()._attendees_values(partner_commands)
-        ctx_partner_id = False
+        partner_ids = False
         for cmd in self.env.context.get("resource_booking_ids", []):
             if cmd[0] == 0 and not cmd[2].get("combination_auto_assign", True):
-                ctx_partner_id = cmd[2]["partner_id"]
+                partner_ids = [cmd[2]["partner_id"]]
             elif cmd[0] == 6:
                 rb = self.env["resource.booking"].browse(cmd[2])
                 if rb.combination_auto_assign:
                     continue  # only auto-confirm if handpicked combination
-                ctx_partner_id = rb.combination_id.resource_ids.user_id.partner_id.id
+                partner_ids = rb.combination_id.resource_ids.user_id.partner_id.ids
         for command in attendee_commands:
             if command[0] != 0:
                 continue
-            att_partner_id = ctx_partner_id
-            if not att_partner_id:
+            if not partner_ids:
                 rb = self.resource_booking_ids
-                att_partner_id = rb.combination_id.resource_ids.user_id.partner_id.id
-            if command[2]["partner_id"] == att_partner_id:
+                partner_ids = rb.combination_id.resource_ids.user_id.partner_id.ids
+            if command[2]["partner_id"] in partner_ids:
                 command[2]["state"] = "accepted"
         return attendee_commands
