@@ -9,10 +9,10 @@
             Dear user,
             <br />
             You have been assigned to the
-            <t t-esc="model_description or 'document'" />
-            <t t-esc="object.name_get()[0][1]" />
+            <t t-out="model_description or 'document'" />
+            <t t-out="object.name_get()[0][1]" />
             because you belong to the chosen resource combination:
-            <t t-esc="object.combination_id.name_get()[0][1]" />.
+            <t t-out="object.combination_id.name_get()[0][1]" />.
         </p>
         <p style="margin-top: 24px; margin-bottom: 16px;">
             <a
@@ -20,7 +20,7 @@
                 style="background-color:#875A7B; padding: 10px; text-decoration: none; color: #fff; border-radius: 5px;"
             >
                 View
-                <t t-esc="model_description or 'document'" />
+                <t t-out="model_description or 'document'" />
             </a>
         </p>
     </template>
