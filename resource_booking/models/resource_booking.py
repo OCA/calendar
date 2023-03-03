@@ -72,9 +72,9 @@ class ResourceBooking(models.Model):
         ),
     )
     name = fields.Char(index=True, help="Leave empty to autogenerate a booking name.")
-    description = fields.Html("Description")
+    description = fields.Html()
     partner_id = fields.Many2one(
-        "res.partner",
+        comodel_name="res.partner",
         string="Requester",
         index=True,
         ondelete="cascade",
@@ -83,7 +83,7 @@ class ResourceBooking(models.Model):
         help="Who requested this booking?",
     )
     user_id = fields.Many2one(
-        "res.users",
+        comodel_name="res.users",
         default=lambda self: self._default_user_id(),
         store=True,
         readonly=False,
@@ -168,17 +168,15 @@ class ResourceBooking(models.Model):
     @api.onchange("type_id")
     def _onchange_type_set_categ_ids(self):
         """Copy default tags from RBT when changing it."""
-        for one in self:
-            if one.type_id:
-                one.categ_ids = one.type_id.categ_ids
+        for one in self.filtered("type_id"):
+            one.categ_ids = one.type_id.categ_ids
 
     @api.depends("start", "type_id", "combination_auto_assign")
     def _compute_combination_id(self):
         """Select best combination candidate when changing booking dates."""
-        for one in self:
-            # Useless without the interval
-            if one.start and one.combination_auto_assign:
-                one.combination_id = one._get_best_combination()
+        # Useless without the interval
+        for one in self.filtered(lambda x: x.start and x.combination_auto_assign):
+            one.combination_id = one._get_best_combination()
 
     @api.depends("start")
     def _compute_is_overdue(self):
@@ -280,9 +278,32 @@ class ResourceBooking(models.Model):
     @api.depends("meeting_id.user_id")
     def _compute_user_id(self):
         """Get user from related meeting, if available."""
-        for record in self:
-            if record.meeting_id.user_id:
-                record.user_id = record.meeting_id.user_id
+        for record in self.filtered(lambda x: x.meeting_id.user_id):
+            record.user_id = record.meeting_id.user_id
+
+    def _prepare_meeting_vals(self):
+        resource_partners = self.combination_id.resource_ids.filtered(
+            lambda res: res.resource_type == "user"
+        ).mapped("user_id.partner_id")
+        return dict(
+            alarm_ids=[(6, 0, self.type_id.alarm_ids.ids)],
+            categ_ids=[(6, 0, self.categ_ids.ids)],
+            description=self.type_id.requester_advice,
+            duration=self.duration,
+            location=self.location,
+            name=self.name or self._get_name_formatted(self.partner_id, self.type_id),
+            partner_ids=[
+                (4, partner.id, 0) for partner in self.partner_id | resource_partners
+            ],
+            resource_booking_ids=[(6, 0, self.ids)],
+            start=self.start,
+            stop=self.stop,
+            user_id=self.user_id.id,
+            show_as="busy",
+            # These 2 avoid creating event as activity
+            res_model_id=False,
+            res_id=False,
+        )
 
     def _sync_meeting(self):
         """Lazy-create or destroy calendar.event."""
@@ -293,30 +314,7 @@ class ResourceBooking(models.Model):
         to_create, to_delete = [], _self.env["calendar.event"]
         for one in _self:
             if one.start:
-                resource_partners = one.combination_id.resource_ids.filtered(
-                    lambda res: res.resource_type == "user"
-                ).mapped("user_id.partner_id")
-                meeting_vals = dict(
-                    alarm_ids=[(6, 0, one.type_id.alarm_ids.ids)],
-                    categ_ids=[(6, 0, one.categ_ids.ids)],
-                    description=one.type_id.requester_advice,
-                    duration=one.duration,
-                    location=one.location,
-                    name=one.name
-                    or one._get_name_formatted(one.partner_id, one.type_id),
-                    partner_ids=[
-                        (4, partner.id, 0)
-                        for partner in one.partner_id | resource_partners
-                    ],
-                    resource_booking_ids=[(6, 0, one.ids)],
-                    start=one.start,
-                    stop=one.stop,
-                    user_id=one.user_id.id,
-                    show_as="busy",
-                    # These 2 avoid creating event as activity
-                    res_model_id=False,
-                    res_id=False,
-                )
+                meeting_vals = one._prepare_meeting_vals()
                 if one.meeting_id:
                     meeting = one.meeting_id
                     if not all(
@@ -482,7 +480,10 @@ class ResourceBooking(models.Model):
             analyzing_booking=booking_id, exclude_public_holidays=True
         )
         # RBT calendar uses no resources to restrict bookings
-        result = booking.type_id.resource_calendar_id._work_intervals(start_dt, end_dt)
+        resource = self.env["resource.resource"]
+        result = booking.type_id.resource_calendar_id._work_intervals_batch(
+            start_dt, end_dt
+        )[resource.id]
         # Restrict with the chosen combination, or to at least one of the
         # available ones
         combinations = (
@@ -502,10 +503,7 @@ class ResourceBooking(models.Model):
 
     def write(self, vals):
         """Sync booking with meeting if needed."""
-        # On a database with lots of recurrent calendar events we could get serious
-        # performance downgrades. As we'll be computing them with _sync_meeting later
-        # we'll be avoiding triggering on the super call (i.e. compute methods)
-        result = super(ResourceBooking, self.with_context(virtual_id=False)).write(vals)
+        result = super().write(vals)
         self._sync_meeting()
         return result
 

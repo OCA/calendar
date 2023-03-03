@@ -1308,39 +1308,3 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:resource_booking.message_combination_assigned
 msgid "because you belong to the chosen resource combination:"
 msgstr ""
-
-#~ msgid "Booking #"
-#~ msgstr "Reserva/cita nº"
-
-#~ msgid "Establish each interval's duration."
-#~ msgstr "Establezca la duración de cada intervalo."
-
-#~ msgid "Event"
-#~ msgstr "Evento"
-
-#~ msgid "If checked new messages require your attention."
-#~ msgstr "Si está marcado, hay nuevos mensajes que requieren de su atención."
-
-#~ msgid "Involves Me"
-#~ msgstr "Me corresponde"
-
-#~ msgid "Number of error"
-#~ msgstr "Número de errores"
-
-#~ msgid "Overdue"
-#~ msgstr "Atrasado"
-
-#~ msgid "Planned"
-#~ msgstr "Planificado"
-
-#~ msgid "Requesting partner"
-#~ msgstr "Solicitante"
-
-#~ msgid "Resource Leaves"
-#~ msgstr "Ausencias del recurso"
-
-#~ msgid "Start and stop must be filled or emptied together."
-#~ msgstr "El inicio y el fin deben rellenarse o vaciarse simultáneamente."
-
-#~ msgid "Today"
-#~ msgstr "Hoy"

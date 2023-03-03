@@ -16,7 +16,7 @@ class ResourceBookingType(models.Model):
         ("duration_positive", "CHECK(duration > 0)", "Duration must be positive."),
     ]
 
-    active = fields.Boolean(index=True, default=True)
+    active = fields.Boolean(default=True)
     alarm_ids = fields.Many2many(
         string="Default reminders",
         comodel_name="calendar.alarm",
@@ -49,7 +49,7 @@ class ResourceBookingType(models.Model):
     )
     company_id = fields.Many2one(
         comodel_name="res.company",
-        default=lambda self: self._default_company(),
+        default=lambda self: self.env.company,
         index=True,
         readonly=False,
         store=True,
@@ -77,8 +77,8 @@ class ResourceBookingType(models.Model):
     )
     name = fields.Char(index=True, translate=True, required=True)
     booking_ids = fields.One2many(
-        "resource.booking",
-        "type_id",
+        comodel_name="resource.booking",
+        inverse_name="type_id",
         string="Bookings",
         help="Bookings available for this type",
     )
@@ -100,17 +100,17 @@ class ResourceBookingType(models.Model):
     )
 
     @api.model
-    def _default_company(self):
-        return self.env.company
-
-    @api.model
     def _default_resource_calendar(self):
         return self._default_company().resource_calendar_id
 
     @api.depends("booking_ids")
     def _compute_booking_count(self):
+        data = self.env["resource.booking"].read_group(
+            [("type_id", "in", self.ids)], ["type_id"], ["type_id"]
+        )
+        mapping = {x["type_id"][0]: x["type_id_count"] for x in data}
         for one in self:
-            one.booking_count = len(one.booking_ids)
+            one.booking_count = mapping.get(one.id, 0)
 
     @api.constrains("booking_ids", "resource_calendar_id", "combination_rel_ids")
     def _check_bookings_scheduling(self):
@@ -144,11 +144,14 @@ class ResourceBookingType(models.Model):
         res_calendar = self.resource_calendar_id.with_context(
             exclude_public_holidays=True
         )
-        attendance_intervals = res_calendar._attendance_intervals(workday_min, end_dt)
+        resource = self.env["resource.resource"]
+        attendance_intervals = res_calendar._attendance_intervals_batch(
+            workday_min, end_dt
+        )[resource.id]
         try:
             workday_start, valid_end, _meta = attendance_intervals._items[-1]
             if valid_end != end_dt:
-                # Inteval found, but without enough time; same as no interval
+                # Interval found, but without enough time; same as no interval
                 raise IndexError
         except IndexError:
             try:
