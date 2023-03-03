@@ -42,8 +42,12 @@ class ResourceBookingCombination(models.Model):
 
     @api.depends("booking_ids")
     def _compute_booking_count(self):
+        data = self.env["resource.booking"].read_group(
+            [("combination_id", "in", self.ids)], ["combination_id"], ["combination_id"]
+        )
+        mapping = {x["combination_id"][0]: x["combination_id_count"] for x in data}
         for one in self:
-            one.booking_count = len(one.booking_ids)
+            one.booking_count = mapping.get(one.id, 0)
 
     @api.depends("resource_ids.name", "forced_calendar_id.name")
     def _compute_name(self):
@@ -59,8 +63,12 @@ class ResourceBookingCombination(models.Model):
 
     @api.depends("type_rel_ids")
     def _compute_type_count(self):
+        data = self.env["resource.booking.type.combination.rel"].read_group(
+            [("combination_id", "in", self.ids)], ["combination_id"], ["combination_id"]
+        )
+        mapping = {x["combination_id"][0]: x["combination_id_count"] for x in data}
         for one in self:
-            one.type_count = len(one.type_rel_ids)
+            one.type_count = mapping.get(one.id, 0)
 
     @api.constrains("booking_ids", "forced_calendar_id", "resource_ids")
     def _check_bookings_scheduling(self):
@@ -79,7 +87,10 @@ class ResourceBookingCombination(models.Model):
                 if not combination_intervals:
                     break  # Can't restrict more
                 calendar = combination.forced_calendar_id or res.calendar_id
-                combination_intervals &= calendar._work_intervals(start_dt, end_dt, res)
+                # combination_intervals &= calendar._work_intervals(start_dt, end_dt, res)
+                combination_intervals &= calendar._work_intervals_batch(
+                    start_dt, end_dt, res
+                )[res.id]
             result |= combination_intervals
         return result
 
