@@ -3,7 +3,6 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 from datetime import datetime
-from urllib.parse import quote_plus
 
 from dateutil.parser import isoparse
 
@@ -135,7 +134,7 @@ class CustomerPortal(portal.CustomerPortal):
         except ValidationError as error:
             url = booking_sudo.get_portal_url(
                 suffix="/schedule/{:%Y/%m}".format(when_tz_aware),
-                query_string="&error={}".format(quote_plus(error.name)),
+                query_string="&error={}".format(error.args[0]),
             )
             return request.redirect(url)
         booking_sudo.action_confirm()

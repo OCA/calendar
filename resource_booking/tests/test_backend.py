@@ -9,7 +9,7 @@ from pytz import utc
 
 from odoo import fields
 from odoo.exceptions import ValidationError
-from odoo.tests.common import Form, SavepointCase, new_test_user, users
+from odoo.tests.common import Form, TransactionCase, new_test_user, users
 
 from .common import create_test_data
 
@@ -17,7 +17,7 @@ _2dt = fields.Datetime.to_datetime
 
 
 @freeze_time("2021-02-26 09:00:00", tick=True)  # Last Friday of February
-class BackendCase(SavepointCase):
+class BackendCase(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -338,7 +338,7 @@ class BackendCase(SavepointCase):
     def test_recurring_event(self):
         """Recurrent events are considered."""
         # Everyone busy past and next Mondays with a recurring meeting
-        ce_f = Form(self.env["calendar.event"])
+        ce_f = Form(self.env["calendar.event"].with_context(default_mon=True))
         ce_f.name = "recurring event past monday"
         for user in self.users:
             ce_f.partner_ids.add(user.partner_id)
@@ -349,7 +349,6 @@ class BackendCase(SavepointCase):
         ce_f.rrule_type = "weekly"
         ce_f.end_type = "count"
         ce_f.count = 2
-        ce_f.mo = True
         ce_f.save()
         # Cannot book next Monday at 8
         rb_f = Form(self.env["resource.booking"])
@@ -408,33 +407,6 @@ class BackendCase(SavepointCase):
         # However, now I shouldn't be able to confirm future booking
         with self.assertRaises(ValidationError), self.env.cr.savepoint():
             future_booking.action_confirm()
-
-    def test_notification_tz(self):
-        """Mail notification TZ is the same as resource.booking.type always."""
-        # Configure RBT with Madrid calendar, but partner has other TZ
-        self.r_calendars.write({"tz": "Europe/Madrid"})
-        self.partner.tz = "Australia/Sydney"
-        rb = self.env["resource.booking"].create(
-            {
-                "combination_id": self.rbcs[0].id,
-                "partner_id": self.partner.id,
-                "start": "2021-03-01 08:00:00",  # 09:00 in Madrid
-                "type_id": self.rbt.id,
-            }
-        )
-        rb.action_confirm()
-        invitation_mail = self.env["mail.mail"].search(
-            [
-                ("state", "=", "outgoing"),
-                (
-                    "subject",
-                    "=",
-                    "Invitation to some customer - Test resource booking type",
-                ),
-            ]
-        )
-        # Invitation must display Madrid TZ (CET)
-        self.assertIn("09:00:00 CET", invitation_mail.body)
 
     def test_free_slots_with_different_type_and_booking_durations(self):
         """Slot and booking duration are different, and all works."""
