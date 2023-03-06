@@ -9,7 +9,7 @@ from pytz import utc
 
 from odoo import fields
 from odoo.exceptions import ValidationError
-from odoo.tests.common import Form, SavepointCase, new_test_user
+from odoo.tests.common import Form, SavepointCase, new_test_user, users
 
 from .common import create_test_data
 
@@ -22,6 +22,20 @@ class BackendCase(SavepointCase):
     def setUpClass(cls):
         super().setUpClass()
         create_test_data(cls)
+        cls.plain_user = new_test_user(cls.env, login="plain", groups="base.group_user")
+
+    @users("plain")
+    def test_plain_user_calendar_event(self):
+        """Check that a simple user is able to handle manual calendar events."""
+        event = self.env["calendar.event"].create(
+            {
+                "name": "Test calendar event",
+                "start": "2023-01-01 00:00:00",
+                "stop": "2023-01-01 01:00:00",
+            }
+        )
+        event.write({"partner_ids": [(4, self.partner.id)]})
+        event.unlink()
 
     def test_scheduling_conflict_constraints(self):
         # Combination is available on Mondays and Tuesdays
