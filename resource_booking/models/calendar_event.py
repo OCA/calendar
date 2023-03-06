@@ -19,12 +19,12 @@ class CalendarEvent(models.Model):
     @api.constrains("resource_booking_ids", "start", "stop")
     def _check_bookings_scheduling(self):
         """Scheduled bookings must have no conflicts."""
-        bookings = self.mapped("resource_booking_ids")
+        bookings = self.sudo().resource_booking_ids
         return bookings._check_scheduling()
 
     def _validate_booking_modifications(self):
         """Make sure you can cancel a booking meeting."""
-        bookings = self.mapped("resource_booking_ids")
+        bookings = self.sudo().resource_booking_ids
         modifiable = bookings.filtered("is_modifiable")
         frozen = bookings - modifiable
         if frozen:
@@ -104,7 +104,7 @@ class CalendarEvent(models.Model):
             if command[0] != 0:
                 continue
             if not partner_ids:
-                rb = self.resource_booking_ids
+                rb = self.sudo().resource_booking_ids
                 partner_ids = rb.combination_id.resource_ids.user_id.partner_id.ids
             if command[2]["partner_id"] in partner_ids:
                 command[2]["state"] = "accepted"
