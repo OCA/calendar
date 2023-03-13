@@ -57,6 +57,8 @@ class CalendarEvent(models.Model):
         """Transfer resource booking to _attendees_values by context.
 
         We need to serialize the creation in that case.
+        mail_notify_author key from context is necessary to force the notification
+        to be sent to author.
         """
         vals_list2 = []
         records = self.env["calendar.event"]
@@ -65,7 +67,8 @@ class CalendarEvent(models.Model):
                 records += super(
                     CalendarEvent,
                     self.with_context(
-                        resource_booking_ids=vals["resource_booking_ids"]
+                        resource_booking_ids=vals["resource_booking_ids"],
+                        mail_notify_author=True,
                     ),
                 ).create(vals)
             else:
