@@ -1,0 +1,1 @@
+* With *Only future events* option sync of recurring events does not work, because recurring events synchronization is done on master event. However, if a single event of a recurring sequence is modified, only this event will be synchronized.

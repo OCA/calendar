@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field
+            name="name"
+        >res.config.settings.view.form.inherit.microsoft.calendar.sync.option</field>
+        <field name="model">res.config.settings</field>
+        <field
+            name="inherit_id"
+            ref="microsoft_calendar.res_config_settings_view_form"
+        />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='cal_microsoft_client_secret']" position="after">
+                <div class="text-muted col-12">
+                    Define which events will be synchronized from Odoo to Outlook
+                </div>
+                <div class="col-12">
+                    <field name="cal_microsoft_sync_option" nolabel="1" required="1" />
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>
