@@ -19,6 +19,7 @@
                 <field name="partner_id" avatar_field="image_128" />
                 <field name="type_id" />
                 <field name="combination_id" />
+                <field name="description" />
             </calendar>
         </field>
     </record>
