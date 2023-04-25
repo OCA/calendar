@@ -279,7 +279,10 @@
                 <t t-foreach="bookings" t-as="booking">
                     <tr>
                         <td>
-                            <a t-att-href="booking.get_portal_url()">
+                            <a
+                                t-att-href="booking.get_portal_url()"
+                                t-attf-class="tr_resource_booking_link"
+                            >
                                 <span t-field="booking.display_name" />
                             </a>
                         </td>
