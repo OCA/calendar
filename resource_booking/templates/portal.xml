@@ -55,7 +55,7 @@
                         <th
                             class="align-middle"
                             colspan="5"
-                            t-esc="start.strftime('%B %Y')"
+                            t-out="start.strftime('%B %Y')"
                         />
                         <th class="text-right">
                             <a
@@ -73,7 +73,7 @@
                         <t t-foreach="calendar.iterweekdays()" t-as="weekday">
                             <th
                                 t-att-title="weekday_names[str(weekday + 1)]"
-                                t-esc="weekday_names[str(weekday + 1)][:3]"
+                                t-out="weekday_names[str(weekday + 1)][:3]"
                             />
                         </t>
                     </tr>
@@ -99,7 +99,7 @@
                                                 data-toggle="dropdown"
                                                 aria-haspopup="true"
                                                 aria-expanded="false"
-                                                t-esc="day.day"
+                                                t-out="day.day"
                                                 t-attf-id="dropdown-trigger-#{day.isoformat()}"
                                             />
                                             <div
@@ -113,14 +113,14 @@
                                                         type="button"
                                                         data-toggle="modal"
                                                         t-attf-data-target="#modal-confirm-#{int(slot.timestamp())}"
-                                                        t-esc="slot.strftime(time_format)"
+                                                        t-out="slot.strftime(time_format)"
                                                     />
                                                 </t>
                                             </div>
                                         </div>
                                     </t>
                                     <t t-else="">
-                                        <t t-esc="day.day" />
+                                        <t t-out="day.day" />
                                     </t>
                                 </td>
                             </t>
@@ -180,10 +180,10 @@
                                         <li>
                                             Start:
                                             <strong
-                                                t-esc="slot.strftime(date_format)"
+                                                t-out="slot.strftime(date_format)"
                                             />
                                             <strong
-                                                t-esc="slot.strftime(time_format)"
+                                                t-out="slot.strftime(time_format)"
                                             />
                                         </li>
                                         <li>
@@ -234,11 +234,11 @@
                     <t t-if="page_name == 'booking_schedule'">
                         <a
                             t-att-href="booking_sudo.get_portal_url()"
-                            t-esc="booking_sudo.display_name"
+                            t-out="booking_sudo.display_name"
                         />
                     </t>
                     <t t-else="">
-                        <t t-esc="booking_sudo.name" />
+                        <t t-out="booking_sudo.name" />
                     </t>
                 </li>
                 <li
@@ -514,7 +514,7 @@
                     <t t-if="error">
                         <br />
                         Error details:
-                        <span t-esc="error" />
+                        <span t-out="error" />
                     </t>
                 </div>
             </div>
