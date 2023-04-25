@@ -40,6 +40,7 @@
     ],
     "assets": {
         "web.assets_frontend": ["resource_booking/static/src/scss/portal.scss"],
+        "web.assets_tests": ["resource_booking/static/src/js/resource_booking_tour.js"],
     },
     "demo": ["demo/res_users_demo.xml"],
 }
