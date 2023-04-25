@@ -41,28 +41,14 @@ class PortalCase(HttpCase):
         return fromstring(response.content)
 
     def test_portal_no_bookings(self):
-        self.authenticate("ptl", "ptl")
-        page = fromstring(self.url_open("/my").content)
-        self.assertTrue(page.cssselect(".o_portal_docs"))
-        self.assertFalse(page.cssselect('.o_portal_docs a:contains("Bookings")'))
+        self.start_tour("/", "resource_booking_ptl_tour", login="ptl")
 
     def test_portal_list_with_bookings(self):
         # Create one pending booking
-        booking = self.env["resource.booking"].create(
+        self.env["resource.booking"].create(
             {"partner_id": self.user_portal.partner_id.id, "type_id": self.rbt.id}
         )
-        self.authenticate("ptl", "ptl")
-        # Main portal page contains bookings count
-        page = self._url_xml("/my")
-        link = page.cssselect('.o_portal_docs a:contains("Bookings")')[0]
-        self.assertEqual(link.cssselect(".badge")[0].text.strip(), "1")
-        # Bookings page lists 1 booking
-        page = self._url_xml(link.get("href"))
-        self.assertEqual(len(page.cssselect(".o_portal_my_doc_table tr")), 2)
-        link = page.cssselect('.o_portal_my_doc_table a:contains("%d")' % booking.id)[0]
-        # Booking page has schedule button
-        page = self._url_xml(link.get("href"))
-        self.assertTrue(page.cssselect('.badge:contains("Pending")'))
+        self.start_tour("/", "resource_booking_ptl2_tour", login="ptl")
 
     def test_portal_scheduling_conflict(self):
         """Produce a scheduling conflict and see how UI behaves.
