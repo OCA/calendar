@@ -23,9 +23,9 @@ class CustomerPortal(portal.CustomerPortal):
             using_portal=True, tz=booking_sudo.type_id.resource_calendar_id.tz
         )
 
-    def _prepare_portal_layout_values(self):
+    def _prepare_home_portal_values(self, counters):
         """Compute values for multi-booking portal views."""
-        values = super(CustomerPortal, self)._prepare_portal_layout_values()
+        values = super()._prepare_home_portal_values(counters)
         booking_count = request.env["resource.booking"].search_count([])
         values.update({"booking_count": booking_count})
         return values
@@ -51,9 +51,10 @@ class CustomerPortal(portal.CustomerPortal):
         """List bookings that I can access."""
         Booking = request.env["resource.booking"].with_context(using_portal=True)
         values = self._prepare_portal_layout_values()
+        booking_count = Booking.search_count([])
         pager = portal.pager(
             url="/my/bookings",
-            total=values["booking_count"],
+            total=booking_count,
             page=page,
             step=self._items_per_page,
         )
