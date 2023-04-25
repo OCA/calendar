@@ -101,7 +101,7 @@ class ResourceBookingType(models.Model):
 
     @api.model
     def _default_resource_calendar(self):
-        return self._default_company().resource_calendar_id
+        return self.env.company.resource_calendar_id
 
     @api.depends("booking_ids")
     def _compute_booking_count(self):
