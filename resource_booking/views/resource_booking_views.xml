@@ -13,7 +13,7 @@
                 date_stop="stop"
                 date_delay="duration"
                 quick_add="false"
-                color="combination_id"
+                color="type_id"
             >
                 <field name="name" invisible="True" />
                 <field name="partner_id" avatar_field="image_128" />
