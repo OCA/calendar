@@ -17,8 +17,6 @@
         "python": [
             # Used implicitly
             "cssselect",
-            # Only for tests
-            "freezegun",
         ],
     },
     "depends": [
