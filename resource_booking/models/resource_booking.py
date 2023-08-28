@@ -660,7 +660,7 @@ class ResourceBooking(models.Model):
                         # attendee.state='accepted'
                         attendees_to_confirm |= attendee
             attendees_to_confirm.write({"state": "accepted"})
-        self.recompute()
+        self.env.flush_all()  # booking.meeting_id.partner_ids and attendees_to_confirm
 
     def action_unschedule(self):
         """Remove associated meetings."""
