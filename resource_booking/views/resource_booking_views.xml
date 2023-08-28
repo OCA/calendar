@@ -29,7 +29,7 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="name" />
-                <field name="partner_ids" widget="many2many_tags" />
+                <field name="partner_ids" widget="many2many_tags" optional="hide" />
                 <field name="type_id" />
                 <field name="combination_id" />
                 <field name="state" />
@@ -38,7 +38,7 @@
             </tree>
         </field>
     </record>
-    <record id="resource_booking_form" model="ir.ui.view">
+    <record id="resource_booking_view_form" model="ir.ui.view">
         <field name="name">Resource booking form</field>
         <field name="model">resource.booking</field>
         <field name="arch" type="xml">
@@ -159,11 +159,7 @@
                             <field name="categ_ids" widget="many2many_tags" />
                         </group>
                         <group name="meeting" string="Meeting">
-                            <field
-                                name="meeting_id"
-                                groups="base.group_no_one"
-                                readonly="1"
-                            />
+                            <field name="meeting_id" readonly="1" />
                             <field name="user_id" />
                             <field name="is_overdue" invisible="1" />
                             <field name="is_modifiable" invisible="1" />
@@ -207,6 +203,7 @@
             <search>
                 <field name="partner_ids" />
                 <field name="type_id" />
+                <field name="combination_id" />
                 <filter
                     name="is_mine"
                     string="Involving me"

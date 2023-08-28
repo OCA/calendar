@@ -3,7 +3,7 @@
      License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
 <odoo>
     <!-- Views -->
-    <record id="resource_booking_type_form" model="ir.ui.view">
+    <record id="resource_booking_type_view_form" model="ir.ui.view">
         <field name="name">Resource booking type form</field>
         <field name="model">resource.booking.type</field>
         <field name="arch" type="xml">
@@ -40,6 +40,7 @@
                                 groups="base.group_multi_company"
                             />
                             <field name="duration" widget="float_time" />
+                            <field name="slot_duration" widget="float_time" />
                             <field name="modifications_deadline" widget="float_time" />
                             <field name="resource_calendar_id" />
                         </group>
