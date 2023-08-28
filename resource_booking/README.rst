@@ -161,6 +161,16 @@ Known issues / Roadmap
   impossibility reason, but that should be done without affecting performance.
 * Optimize ``_calendar_event_busy_intervals()`` to make it work in batch.
 
+Changelog
+=========
+
+14.0.1.3.2 (2023-08-28)
+~~~~~~~~~~~~~~~~~~~~~~~
+
+**Features**
+
+- Bookings can now span more than one calendar day. (`#77 <https://github.com/OCA/calendar/issues/77>`_)
+
 Bug Tracker
 ===========
 
