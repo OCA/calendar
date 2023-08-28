@@ -1,1 +1,0 @@
-Bookings can now span more than one calendar day.
