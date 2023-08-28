@@ -1,8 +1,6 @@
 # Copyright 2021 Tecnativa - Jairo Llopis
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
-from datetime import timedelta
-from math import ceil
 from random import random
 
 from odoo import _, api, fields, models
@@ -59,10 +57,12 @@ class ResourceBookingType(models.Model):
     duration = fields.Float(
         required=True,
         default=0.5,  # 30 minutes
-        help=(
-            "Interval offered to start each resource booking. "
-            "Also used as booking default duration."
-        ),
+        help=("Booking default duration."),
+    )
+    slot_duration = fields.Float(
+        required=True,
+        default=0.5,  # 30 minutes
+        help=("Interval offered to start each resource booking."),
     )
     location = fields.Char()
     videocall_location = fields.Char(string="Meeting URL")
@@ -128,46 +128,8 @@ class ResourceBookingType(models.Model):
         combinations = rels.mapped("combination_id")
         return combinations
 
-    def _get_next_slot_start(self, start_dt):
-        """Slot start as it would come from the beginning of work hours.
-
-        Returns a `datetime` object indicating the next slot start (which could
-        be the same as `start_dt` if it matches), or `False` if no slot is
-        found in the next 2 weeks.
-
-        If the RBT doesn't have a calendar, it returns `start_dt`, unaltered,
-        because there's no way to know when a slot would start.
-        """
-        duration_delta = timedelta(hours=self.duration)
-        end_dt = start_dt + duration_delta
-        workday_min = start_dt.replace(hour=0, minute=0, second=0, microsecond=0)
-        # Detached compatibility with hr_holidays_public
-        res_calendar = self.resource_calendar_id.with_context(
-            exclude_public_holidays=True
-        )
-        resource = self.env["resource.resource"]
-        attendance_intervals = res_calendar._attendance_intervals_batch(
-            workday_min, end_dt
-        )[resource.id]
-        try:
-            workday_start, valid_end, _meta = attendance_intervals._items[-1]
-            if valid_end != end_dt:
-                # Interval found, but without enough time; same as no interval
-                raise IndexError
-        except IndexError:
-            try:
-                # Returns `False` if no slot is found in the next 2 weeks
-                return (
-                    res_calendar.plan_hours(self.duration, end_dt, compute_leaves=True)
-                    - duration_delta
-                )
-            except TypeError:
-                return False
-        time_passed = valid_end - duration_delta - workday_start
-        return workday_start + duration_delta * ceil(time_passed / duration_delta)
-
     def action_open_bookings(self):
-        FloatTimeParser = self.env["ir.qweb.field.float_time"]
+        DurationParser = self.env["ir.qweb.field.duration"]
         return {
             "context": dict(
                 self.env.context,
@@ -176,8 +138,12 @@ class ResourceBookingType(models.Model):
                 default_duration=self.duration,
                 default_type_id=self.id,
                 # Context used by web_calendar_slot_duration module
-                calendar_slot_duration=FloatTimeParser.value_to_html(
-                    self.duration, False
+                calendar_slot_duration=DurationParser.value_to_html(
+                    self.slot_duration,
+                    {
+                        "unit": "hour",
+                        "digital": True,
+                    },
                 ),
             ),
             "domain": [("type_id", "=", self.id)],
