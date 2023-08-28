@@ -159,11 +159,7 @@
                             <field name="categ_ids" widget="many2many_tags" />
                         </group>
                         <group name="meeting" string="Meeting">
-                            <field
-                                name="meeting_id"
-                                groups="base.group_no_one"
-                                readonly="1"
-                            />
+                            <field name="meeting_id" readonly="1" />
                             <field name="user_id" />
                             <field name="is_overdue" invisible="1" />
                             <field name="is_modifiable" invisible="1" />
