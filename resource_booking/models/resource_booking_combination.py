@@ -101,6 +101,7 @@ class ResourceBookingCombination(models.Model):
             "res_model": "resource.booking",
             "type": "ir.actions.act_window",
             "view_mode": "calendar,tree,form",
+            "context": {"default_combination_id": self.id},
         }
 
     def action_open_resource_booking_types(self):

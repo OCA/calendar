@@ -1,4 +1,5 @@
 from . import calendar_event
+from . import res_partner
 from . import resource_booking
 from . import resource_booking_combination
 from . import resource_booking_type
