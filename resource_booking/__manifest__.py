@@ -33,6 +33,7 @@
         "security/ir.model.access.csv",
         "templates/portal.xml",
         "views/calendar_event_views.xml",
+        "views/res_partner_views.xml",
         "views/resource_booking_combination_views.xml",
         "views/resource_booking_type_views.xml",
         "views/resource_booking_views.xml",
