@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="calendar_recurrence_day_access" model="ir.model.access">
+        <field name="name">calendar_recurrence_day_access</field>
+        <field
+            name="model_id"
+            ref="calendar_monthly_multi.model_calendar_recurrence_day"
+        />
+        <field name="group_id" ref="base.group_user" />
+        <field name="perm_read" eval="True" />
+        <field name="perm_create" eval="False" />
+        <field name="perm_write" eval="False" />
+        <field name="perm_unlink" eval="False" />
+    </record>
+
+    <record id="calendar_recurrence_weekday_access" model="ir.model.access">
+        <field name="name">calendar_recurrence_weekday_access</field>
+        <field
+            name="model_id"
+            ref="calendar_monthly_multi.model_calendar_recurrence_weekday"
+        />
+        <field name="group_id" ref="base.group_user" />
+        <field name="perm_read" eval="True" />
+        <field name="perm_create" eval="False" />
+        <field name="perm_write" eval="False" />
+        <field name="perm_unlink" eval="False" />
+    </record>
+</odoo>
