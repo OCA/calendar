@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="day_1" model="calendar.recurrence.day">
+        <field name="day">1</field>
+    </record>
+    <record id="day_2" model="calendar.recurrence.day">
+        <field name="day">2</field>
+    </record>
+    <record id="day_3" model="calendar.recurrence.day">
+        <field name="day">3</field>
+    </record>
+    <record id="day_4" model="calendar.recurrence.day">
+        <field name="day">4</field>
+    </record>
+    <record id="day_5" model="calendar.recurrence.day">
+        <field name="day">5</field>
+    </record>
+    <record id="day_6" model="calendar.recurrence.day">
+        <field name="day">6</field>
+    </record>
+    <record id="day_7" model="calendar.recurrence.day">
+        <field name="day">7</field>
+    </record>
+    <record id="day_8" model="calendar.recurrence.day">
+        <field name="day">8</field>
+    </record>
+    <record id="day_9" model="calendar.recurrence.day">
+        <field name="day">9</field>
+    </record>
+    <record id="day_10" model="calendar.recurrence.day">
+        <field name="day">10</field>
+    </record>
+    <record id="day_11" model="calendar.recurrence.day">
+        <field name="day">11</field>
+    </record>
+    <record id="day_12" model="calendar.recurrence.day">
+        <field name="day">12</field>
+    </record>
+    <record id="day_13" model="calendar.recurrence.day">
+        <field name="day">13</field>
+    </record>
+    <record id="day_14" model="calendar.recurrence.day">
+        <field name="day">14</field>
+    </record>
+    <record id="day_15" model="calendar.recurrence.day">
+        <field name="day">15</field>
+    </record>
+    <record id="day_16" model="calendar.recurrence.day">
+        <field name="day">16</field>
+    </record>
+    <record id="day_17" model="calendar.recurrence.day">
+        <field name="day">17</field>
+    </record>
+    <record id="day_18" model="calendar.recurrence.day">
+        <field name="day">18</field>
+    </record>
+    <record id="day_19" model="calendar.recurrence.day">
+        <field name="day">19</field>
+    </record>
+    <record id="day_20" model="calendar.recurrence.day">
+        <field name="day">20</field>
+    </record>
+    <record id="day_21" model="calendar.recurrence.day">
+        <field name="day">21</field>
+    </record>
+    <record id="day_22" model="calendar.recurrence.day">
+        <field name="day">22</field>
+    </record>
+    <record id="day_23" model="calendar.recurrence.day">
+        <field name="day">23</field>
+    </record>
+    <record id="day_24" model="calendar.recurrence.day">
+        <field name="day">24</field>
+    </record>
+    <record id="day_25" model="calendar.recurrence.day">
+        <field name="day">25</field>
+    </record>
+    <record id="day_26" model="calendar.recurrence.day">
+        <field name="day">26</field>
+    </record>
+    <record id="day_27" model="calendar.recurrence.day">
+        <field name="day">27</field>
+    </record>
+    <record id="day_28" model="calendar.recurrence.day">
+        <field name="day">28</field>
+    </record>
+    <record id="day_29" model="calendar.recurrence.day">
+        <field name="day">29</field>
+    </record>
+    <record id="day_30" model="calendar.recurrence.day">
+        <field name="day">30</field>
+    </record>
+    <record id="day_31" model="calendar.recurrence.day">
+        <field name="day">31</field>
+    </record>
+</odoo>
