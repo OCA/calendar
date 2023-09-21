@@ -39,13 +39,13 @@
         groups="group_manager"
     />
     <menuitem
-        id="menu_resource_resource"
+        id="resource_resource_menu"
         parent="resource_booking_type_configuration_menu"
         action="resource.action_resource_resource_tree"
         sequence="100"
     />
     <menuitem
-        id="menu_resource_calendar"
+        id="resource_calendar_menu"
         parent="resource_booking_type_configuration_menu"
         action="resource.action_resource_calendar_form"
         sequence="200"

@@ -201,8 +201,16 @@ class BackendCase(TransactionCase):
         """
         recset = self.env["resource.booking"]
         tuples = [
-            (datetime(2021, 3, 1, 18, 0), datetime(2021, 3, 1, 23, 59), recset),
-            (datetime(2021, 3, 2, 0, 0), datetime(2021, 3, 2, 23, 59), recset),
+            (
+                datetime(2021, 3, 1, 18, 0),
+                datetime(2021, 3, 1, 23, 59, 59, 999999),
+                recset,
+            ),
+            (
+                datetime(2021, 3, 2, 0, 0),
+                datetime(2021, 3, 2, 23, 59, 59, 999999),
+                recset,
+            ),
             (datetime(2021, 3, 3, 0, 0), datetime(2021, 3, 3, 18, 0), recset),
         ]
         available_intervals = Intervals(tuples)
@@ -722,7 +730,7 @@ class BackendCase(TransactionCase):
         # Requester and combination must be suggested
         self.assertEqual(
             rb._message_get_suggested_recipients(),
-            {rb.id: [(rb.partner_id.id, "some customer", "Requester")]},
+            {rb.id: [(rb.partner_id.id, "some customer", None, "Requester")]},
         )
 
     def test_creating_rbt_has_tags(self):
