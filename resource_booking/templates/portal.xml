@@ -545,6 +545,7 @@
             </t>
             <!-- Scheduling form -->
             <t t-call="portal.portal_record_layout">
+                <t t-set="classes" t-value="'resource_booking_portal_schedule'" />
                 <t t-set="card_header">
                     <t t-call="resource_booking.resource_booking_portal_header" />
                 </t>
