@@ -391,7 +391,9 @@ class ResourceBooking(models.Model):
         if not has_meeting:
             return
         # Ensure all scheduled bookings have booked some resources
-        has_rbc = self.filtered("combination_id.resource_ids")
+        has_rbc = self.with_context(active_test=False).filtered(
+            "combination_id.resource_ids"
+        )
         missing_rbc = has_meeting - has_rbc
         if missing_rbc:
             raise ValidationError(
