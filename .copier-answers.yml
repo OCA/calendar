@@ -14,7 +14,8 @@ include_wkhtmltopdf: false
 odoo_version: 13.0
 org_name: Odoo Community Association (OCA)
 org_slug: OCA
-rebel_module_groups: []
+rebel_module_groups:
+- microsoft_calendar,microsoft_account,calendar_v14
 repo_description: Modules that extend Odoo calendar management tools
 repo_name: Calendar modules for Odoo
 repo_slug: calendar
