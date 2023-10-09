@@ -1,6 +1,6 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-#	* resource_booking
+# 	* resource_booking
 #
 msgid ""
 msgstr ""
@@ -42,7 +42,8 @@ msgstr "%(resources)s (utilisant le calendrier %(calendar)s)"
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.alert_availability_lost
-msgid "<br/>\n"
+msgid ""
+"<br/>\n"
 "                        Error details:"
 msgstr ""
 "<br/>\n"
@@ -50,7 +51,8 @@ msgstr ""
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_portal_form
-msgid "<i class=\"fa fa-calendar\"/>\n"
+msgid ""
+"<i class=\"fa fa-calendar\"/>\n"
 "                            Reschedule"
 msgstr ""
 "<i class=\"fa fa-calendar\"/>\n"
@@ -58,7 +60,8 @@ msgstr ""
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_portal_form
-msgid "<i class=\"fa fa-calendar\"/>\n"
+msgid ""
+"<i class=\"fa fa-calendar\"/>\n"
 "                            Schedule"
 msgstr ""
 "<i class=\"fa fa-calendar\"/>\n"
@@ -66,7 +69,8 @@ msgstr ""
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_portal_form
-msgid "<i class=\"fa fa-comment\"/>\n"
+msgid ""
+"<i class=\"fa fa-comment\"/>\n"
 "                        Feedback"
 msgstr ""
 "<i class=\"fa fa-comment\"/>\n"
@@ -74,7 +78,8 @@ msgstr ""
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_portal_form
-msgid "<i class=\"fa fa-times\"/>\n"
+msgid ""
+"<i class=\"fa fa-times\"/>\n"
 "                                Cancel this booking"
 msgstr ""
 "<i class=\"fa fa-times\"/>\n"
@@ -82,7 +87,8 @@ msgstr ""
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_portal_form
-msgid "<i class=\"fa fa-times\"/>\n"
+msgid ""
+"<i class=\"fa fa-times\"/>\n"
 "                            Cancel"
 msgstr ""
 "<i class=\"fa fa-times\"/>\n"
@@ -255,7 +261,8 @@ msgstr "Annulé"
 #. module: resource_booking
 #: code:addons/resource_booking/models/resource_booking.py:272
 #, python-format
-msgid "Cannot schedule these bookings because no resources are selected for them:\n"
+msgid ""
+"Cannot schedule these bookings because no resources are selected for them:\n"
 "\n"
 "- %s"
 msgstr ""
@@ -267,7 +274,9 @@ msgstr ""
 #. module: resource_booking
 #: code:addons/resource_booking/models/resource_booking.py:300
 #, python-format
-msgid "Cannot schedule these bookings because they do not fit in their type or resources calendars, or because all resources are busy:\n"
+msgid ""
+"Cannot schedule these bookings because they do not fit in their type or "
+"resources calendars, or because all resources are busy:\n"
 "\n"
 "- %s"
 msgstr ""
@@ -279,7 +288,9 @@ msgstr ""
 
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking_type__combination_assignment
-msgid "Choose how to auto-assign resource combinations. It has no effect if assiged manually."
+msgid ""
+"Choose how to auto-assign resource combinations. It has no effect if assiged "
+"manually."
 msgstr ""
 "Choisissez comment attribuer automatiquement les combinaisons de ressources. "
 "L'affectation manuelle n'est pas impactée."
@@ -335,7 +346,9 @@ msgstr "Confirmer la réservation"
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_form
-msgid "Confirm that the requesting partner and yourself will attend the scheduled meeting."
+msgid ""
+"Confirm that the requesting partner and yourself will attend the scheduled "
+"meeting."
 msgstr ""
 "Confirmez que le demandeur et vous-même serez présents à la réunion prévue."
 
@@ -377,7 +390,8 @@ msgstr "Date"
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.message_combination_assigned
-msgid "Dear user,\n"
+msgid ""
+"Dear user,\n"
 "            <br/>\n"
 "            You have been assigned to the"
 msgstr ""
@@ -745,7 +759,8 @@ msgstr "En attente"
 
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking__state
-msgid "Pending: No meeting scheduled.\n"
+msgid ""
+"Pending: No meeting scheduled.\n"
 "Scheduled: The requester has not confirmed attendance yet.\n"
 "Confirmed: Meeting scheduled, and requester attendance confirmed.\n"
 "Canceled: Meeting removed, booking archived."
@@ -838,7 +853,8 @@ msgstr "Types de réservation de ressources"
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking_combination__type_rel_ids
 msgid "Resource booking types where this combination is available."
-msgstr "Types de réservation de ressources où cette combinaison est disponible."
+msgstr ""
+"Types de réservation de ressources où cette combinaison est disponible."
 
 #. module: resource_booking
 #: model:ir.actions.act_window,name:resource_booking.resource_booking_combination_action
@@ -968,7 +984,8 @@ msgstr "État"
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking__activity_state
 #: model:ir.model.fields,help:resource_booking.field_resource_booking_type__activity_state
-msgid "Status based on activities\n"
+msgid ""
+"Status based on activities\n"
 "Overdue: Due date is already passed\n"
 "Today: Activity date is today\n"
 "Planned: Future activities."
@@ -991,7 +1008,9 @@ msgstr "Étiquettes"
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking__requester_advice
 #: model:ir.model.fields,help:resource_booking.field_resource_booking_type__requester_advice
-msgid "Text that will appear by default in portal invitation emails and in calendar views for scheduling."
+msgid ""
+"Text that will appear by default in portal invitation emails and in calendar "
+"views for scheduling."
 msgstr ""
 "Texte par défaut qui apparaîtra dans le mail d'invitation au portail et dans "
 "la vue calendrier pour la planification."
@@ -1003,7 +1022,10 @@ msgstr "Votre compte ne contient pour l'instant aucune réservation."
 
 #. module: resource_booking
 #: model_terms:ir.actions.act_window,help:resource_booking.resource_booking_type_action
-msgid "These records categorize resource bookings and apply restrictions to them, such as available resource combinations, availability schedules and interval duration."
+msgid ""
+"These records categorize resource bookings and apply restrictions to them, "
+"such as available resource combinations, availability schedules and interval "
+"duration."
 msgstr ""
 "Ces enregistrements catégorisent les réservations de ressources et leurs "
 "appliquent des restrictions de combinaisons de ressources, de disponibilité "
@@ -1011,7 +1033,9 @@ msgstr ""
 
 #. module: resource_booking
 #: model_terms:ir.actions.act_window,help:resource_booking.resource_booking_combination_action
-msgid "These records define resource combinations that can be booked together in specified schedules and intervals."
+msgid ""
+"These records define resource combinations that can be booked together in "
+"specified schedules and intervals."
 msgstr ""
 "Ces enregistrements définissent les réservations de ressources qui peuvent "
 "être planifiées ensemble avec des calendriers et périodes spécifiques."
@@ -1024,7 +1048,9 @@ msgstr "Cette réservation a dépassé sa date limite de modification."
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_form
-msgid "This will remove the associated meeting to unschedule the booking. Are you sure?"
+msgid ""
+"This will remove the associated meeting to unschedule the booking. Are you "
+"sure?"
 msgstr ""
 "Ceci va effacer le rendez-vous associé afin de dé-planifier la réservation. "
 "Êtes vous sûr?"
@@ -1037,7 +1063,8 @@ msgstr "Aujourd'hui"
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.scheduling_calendar
-msgid "Try next month\n"
+msgid ""
+"Try next month\n"
 "                    <i class=\"fa fa-chevron-right\"/>"
 msgstr ""
 "Essayez le mois suivant\n"
@@ -1120,14 +1147,19 @@ msgstr "Historique de communication du site web"
 
 #. module: resource_booking
 #: model_terms:ir.actions.act_window,help:resource_booking.resource_booking_action
-msgid "When scheduled, resources will be blocked. When pending, it means the requester didn't place the booking yet."
+msgid ""
+"When scheduled, resources will be blocked. When pending, it means the "
+"requester didn't place the booking yet."
 msgstr ""
 "Quand planifié, les ressources seront réservées. Quand en attente, cela "
 "signifie que le demandeur n'a pas encore planifié la réservation."
 
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking_type__modifications_deadline
-msgid "When this deadline has been exceeded, if a booking was not yet confirmed, it will be canceled automatically. Also, only booking managers will be able to unschedule or reschedule them. The value is expressed in hours."
+msgid ""
+"When this deadline has been exceeded, if a booking was not yet confirmed, it "
+"will be canceled automatically. Also, only booking managers will be able to "
+"unschedule or reschedule them. The value is expressed in hours."
 msgstr ""
 "Quand cette date limite est dépassée, si la réservation n'est pas encore "
 "confirmée, elle sera annulée automatiquement. De plus, seuls les "
@@ -1152,7 +1184,9 @@ msgstr "Vous êtes sur le point de confirmé cette réservation:"
 #. module: resource_booking
 #: code:addons/resource_booking/models/calendar_event.py:32
 #, python-format
-msgid "You are not allowed to alter these bookings because they exceeded their modification deadlines:\n"
+msgid ""
+"You are not allowed to alter these bookings because they exceeded their "
+"modification deadlines:\n"
 "\n"
 "- %s"
 msgstr ""
