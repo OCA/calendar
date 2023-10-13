@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-07-20 10:10+0000\n"
+"PO-Revision-Date: 2023-10-13 09:36+0000\n"
 "Last-Translator: Eugeni Chafer <eugeni@chafer.cat>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -374,7 +374,7 @@ msgstr ""
 #. module: resource_booking
 #: model:ir.ui.menu,name:resource_booking.resource_booking_type_configuration_menu
 msgid "Configuration"
-msgstr ""
+msgstr "Configuració"
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_form
@@ -1179,6 +1179,7 @@ msgstr ""
 #: model:res.groups,comment:resource_booking.group_manager
 msgid "Users allowed to manage resource booking configurations."
 msgstr ""
+"Usuaris autoritzats a gestionar la configuració de la reserva de recursos."
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.message_combination_assigned
@@ -1230,7 +1231,7 @@ msgstr ""
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking__partner_id
 msgid "Who requested this booking?"
-msgstr ""
+msgstr "Qui ha sol·licitat aquesta reserva?"
 
 #. module: resource_booking
 #: model:ir.ui.menu,name:resource_booking.menu_resource_calendar
@@ -1251,6 +1252,10 @@ msgid ""
 "\n"
 "- %s"
 msgstr ""
+"No podeu modificar aquesta reserva perquè s'ha superat la data permesa per a "
+"fer modificacions:\n"
+"\n"
+"- %s"
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.message_combination_assigned
