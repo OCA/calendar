@@ -607,6 +607,51 @@ class BackendCase(TransactionCase):
         self.assertFalse(rb.meeting_id)
         self.assertEqual(rb.location, "Office 3")
 
+    def test_videocall_location(self):
+        """Videocall location across records works as expected."""
+        rbt2 = self.rbt.copy({"videocall_location": "Videocall Office 2"})
+        rb_f = Form(self.env["resource.booking"])
+        rb_f.partner_id = self.partner
+        rb_f.type_id = self.rbt
+        rb = rb_f.save()
+        # Pending booking inherits videocall location from type
+        self.assertEqual(rb.state, "pending")
+        self.assertEqual(rb.videocall_location, "Videocall Main office")
+        # Booking can change videocall location independently now
+        with Form(rb) as rb_f:
+            rb_f.videocall_location = "Videocall Office 3"
+        self.assertEqual(self.rbt.videocall_location, "Videocall Main office")
+        self.assertEqual(rb.videocall_location, "Videocall Office 3")
+        # Changing booking type changes videocall location
+        with Form(rb) as rb_f:
+            rb_f.type_id = rbt2
+        self.assertEqual(rb.videocall_location, "Videocall Office 2")
+        # Still can change it independently
+        with Form(rb) as rb_f:
+            rb_f.videocall_location = "Videocall Office 1"
+        self.assertEqual(rb.videocall_location, "Videocall Office 1")
+        self.assertEqual(rbt2.videocall_location, "Videocall Office 2")
+        # Schedule the booking, meeting inherits videocall location from it
+        with Form(rb) as rb_f:
+            rb_f.start = "2021-03-01 08:00:00"
+        self.assertEqual(rb.state, "scheduled")
+        self.assertEqual(rb.videocall_location, "Videocall Office 1")
+        self.assertEqual(rb.meeting_id.videocall_location, "Videocall Office 1")
+        # Changing meeting videocall location changes videocall location of booking
+        with Form(rb.meeting_id) as meeting_f:
+            meeting_f.videocall_location = "Videocall Office 2"
+        self.assertEqual(rb.videocall_location, "Videocall Office 2")
+        self.assertEqual(rb.meeting_id.videocall_location, "Videocall Office 2")
+        # Changing booking videocall location changes meeting location
+        with Form(rb) as rb_f:
+            rb_f.videocall_location = "Videocall Office 3"
+        self.assertEqual(rb.meeting_id.videocall_location, "Videocall Office 3")
+        self.assertEqual(rb.videocall_location, "Videocall Office 3")
+        # When unscheduled, it keeps videocall location untouched
+        rb.action_unschedule()
+        self.assertFalse(rb.meeting_id)
+        self.assertEqual(rb.videocall_location, "Videocall Office 3")
+
     def test_organizer_sync(self):
         """Resource booking and meeting organizers are properly synced."""
         rb = self.env["resource.booking"].create(

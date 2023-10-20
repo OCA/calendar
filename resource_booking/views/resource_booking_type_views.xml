@@ -45,6 +45,7 @@
                         </group>
                         <group name="event_defaults" string="Meeting defaults">
                             <field name="location" />
+                            <field name="videocall_location" />
                             <field name="alarm_ids" widget="many2many_tags" />
                             <field
                                 name="categ_ids"

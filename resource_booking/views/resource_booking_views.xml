@@ -183,6 +183,7 @@
                             />
                             <field name="stop" />
                             <field name="location" />
+                            <field name="videocall_location" />
                         </group>
                         <field name="description" colspan="4" />
                     </group>
