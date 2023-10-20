@@ -71,6 +71,7 @@ class PortalCase(HttpCase):
                     "partner_id": self.partner.id,
                     "type_id": self.rbt.id,
                     "location": "Office 2",
+                    "videocall_location": "Videocall Office 2",
                 },
             ]
         )
@@ -85,6 +86,11 @@ class PortalCase(HttpCase):
         )
         self.assertTrue(
             portal_page.cssselect(':contains("Location:") + :contains("Main office")')
+        )
+        self.assertTrue(
+            portal_page.cssselect(
+                ':contains("Meeting URL:") + :contains("Videocall Main office")'
+            )
         )
         link = portal_page.cssselect('a:contains("Schedule")')[0]
         portal_url = link.get("href")
@@ -117,6 +123,11 @@ class PortalCase(HttpCase):
         )
         self.assertTrue(
             public_page.cssselect(':contains("Location:") + :contains("Office 2")')
+        )
+        self.assertTrue(
+            public_page.cssselect(
+                ':contains("Meeting URL:") + :contains("Videocall Office 2")'
+            )
         )
         self.assertTrue(public_page.cssselect('.badge:contains("Pending")'))
         link = public_page.cssselect('a:contains("Schedule")')[0]

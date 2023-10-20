@@ -1,5 +1,6 @@
 # Copyright 2021 Tecnativa - Jairo Llopis
 # Copyright 2022 Tecnativa - Pedro M. Baeza
+# Copyright 2023 Tecnativa - Carolina Fernandez
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 import calendar
@@ -151,6 +152,12 @@ class ResourceBooking(models.Model):
         readonly=False,
         store=True,
     )
+    videocall_location = fields.Char(
+        compute="_compute_videocall_location",
+        string="Meeting URL",
+        readonly=False,
+        store=True,
+    )
     requester_advice = fields.Text(related="type_id.requester_advice", readonly=True)
     is_modifiable = fields.Boolean(compute="_compute_is_modifiable")
     is_overdue = fields.Boolean(compute="_compute_is_overdue")
@@ -271,6 +278,20 @@ class ResourceBooking(models.Model):
             elif record.meeting_id:
                 record.location = record.meeting_id.location
 
+    @api.depends("meeting_id.videocall_location", "type_id")
+    def _compute_videocall_location(self):
+        """Get videocall location from meeting or type."""
+        for record in self:
+            # Get videocall_location from type when changing it or creating from ORM
+            if (
+                not record.videocall_location
+                or record._origin.type_id != record.type_id
+            ):
+                record.videocall_location = record.type_id.videocall_location
+            # Get it from meeting only when available
+            elif record.meeting_id:
+                record.videocall_location = record.meeting_id.videocall_location
+
     @api.depends("active", "meeting_id.attendee_ids.state")
     def _compute_state(self):
         """Obtain request state."""
@@ -340,6 +361,7 @@ class ResourceBooking(models.Model):
             description=self.type_id.requester_advice,
             duration=self.duration,
             location=self.location,
+            videocall_location=self.videocall_location,
             name=self.name or self._get_name_formatted(self.partner_id, self.type_id),
             partner_ids=[
                 (4, partner.id, 0) for partner in self.partner_id | resource_partners
