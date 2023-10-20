@@ -370,6 +370,15 @@
                                 <span t-field="booking_sudo.location" />
                             </div>
                             <div class="mb-1">
+                                <strong>Meeting URL:</strong>
+                                <a
+                                    t-att-href="booking_sudo.videocall_location"
+                                    target="_blank"
+                                >
+                                    <t t-out="booking_sudo.videocall_location or ''" />
+                                </a>
+                            </div>
+                            <div class="mb-1">
                                 <strong>Dates:</strong>
                                 <span t-field="booking_sudo.meeting_id.display_time" />
                             </div>
