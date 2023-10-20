@@ -130,6 +130,7 @@ def create_test_data(obj):
             ],
             "resource_calendar_id": obj.r_calendars[2].id,
             "location": "Main office",
+            "videocall_location": "Videocall Main office",
         }
     )
     # Create some partner

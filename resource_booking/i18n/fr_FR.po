@@ -143,6 +143,11 @@ msgstr "<strong>Emplacement:</strong>"
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_portal_form
+msgid "<strong>Meeting URL:</strong>"
+msgstr ""
+
+#. module: resource_booking
+#: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_portal_form
 msgid "<strong>Requested by:</strong>"
 msgstr "<strong>Demandé par:</strong>"
 
@@ -585,9 +590,7 @@ msgstr ""
 
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking__message_has_error
-#: model:ir.model.fields,help:resource_booking.field_resource_booking__message_has_sms_error
 #: model:ir.model.fields,help:resource_booking.field_resource_booking_type__message_has_error
-#: model:ir.model.fields,help:resource_booking.field_resource_booking_type__message_has_sms_error
 msgid "If checked, some messages have a delivery error."
 msgstr "Si coché, certains messages ont une erreur de livraison."
 
@@ -697,6 +700,12 @@ msgstr "Attribué manuellement :"
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_form
 msgid "Meeting"
 msgstr "Rencontre"
+
+#. module: resource_booking
+#: model:ir.model.fields,field_description:resource_booking.field_resource_booking__videocall_location
+#: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__videocall_location
+msgid "Meeting URL"
+msgstr ""
 
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking__meeting_id
@@ -988,12 +997,6 @@ msgstr "Utilisateur responsable"
 #: model:ir.model.fields,help:resource_booking.field_resource_booking_type__resource_calendar_id
 msgid "Restrict bookings to this schedule."
 msgstr "Limitez les réservations à cet horaire."
-
-#. module: resource_booking
-#: model:ir.model.fields,field_description:resource_booking.field_resource_booking__message_has_sms_error
-#: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__message_has_sms_error
-msgid "SMS Delivery error"
-msgstr "Erreur de livraison SMS"
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.portal_breadcrumbs
@@ -1315,6 +1318,9 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:resource_booking.message_combination_assigned
 msgid "because you belong to the chosen resource combination:"
 msgstr ""
+
+#~ msgid "SMS Delivery error"
+#~ msgstr "Erreur de livraison SMS"
 
 #~ msgid "Followers (Channels)"
 #~ msgstr "Abonnés (Chaînes)"
