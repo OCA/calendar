@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_calendar_event_form" model="ir.ui.view">
+        <field name="model">calendar.event</field>
+        <field name="inherit_id" ref="calendar.view_calendar_event_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='day']" position="after">
+                <field
+                    name="day_ids"
+                    widget="many2many_checkboxes"
+                    class="calendar_monthly_multi_day_ids"
+                    attrs="{'invisible': [('month_by', '!=', 'dates')]}"
+                />
+            </xpath>
+
+            <xpath expr="//field[@name='weekday']" position="after">
+                <field
+                    name="weekday_ids"
+                    widget="many2many_checkboxes"
+                    attrs="{'invisible': ['|', ('month_by', '!=', 'day'), ('weekday', '!=', 'custom')]}"
+                />
+            </xpath>
+        </field>
+    </record>
+</odoo>
