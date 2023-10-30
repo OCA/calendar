@@ -65,6 +65,7 @@ class ResourceBookingType(models.Model):
         ),
     )
     location = fields.Char()
+    videocall_location = fields.Char(string="Meeting URL")
     modifications_deadline = fields.Float(
         required=True,
         default=24,
