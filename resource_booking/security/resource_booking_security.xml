@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!-- Copyright 2021 Tecnativa - Jairo Llopis
+     Copyright 2023 Tecnativa - Carolina Fernandez
      License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
 <data>
     <record id="category_resource_booking" model="ir.module.category">
@@ -47,7 +48,7 @@
             <field name="groups" eval="[(4, ref('base.group_portal'))]" />
             <field
                 name="domain_force"
-            >['|', ('partner_id', 'child_of', user.partner_id.ids), ('message_partner_ids', 'child_of', user.partner_id.ids)]</field>
+            >['|', ('partner_ids', 'child_of', user.partner_id.ids), ('message_partner_ids', 'child_of', user.partner_id.ids)]</field>
         </record>
         <record id="rule_resource_booking_user" model="ir.rule">
             <field name="name">Resource booking user rule</field>
@@ -55,7 +56,7 @@
             <field name="groups" eval="[(4, ref('group_user'))]" />
             <field
                 name="domain_force"
-            >['|', '|', ('partner_id', 'child_of', user.partner_id.ids), ('message_partner_ids', 'child_of', user.partner_id.ids), ('combination_id.resource_ids.user_id', 'in', user.ids)]</field>
+            >['|', '|', ('partner_ids', 'child_of', user.partner_id.ids), ('message_partner_ids', 'child_of', user.partner_id.ids), ('combination_id.resource_ids.user_id', 'in', user.ids)]</field>
         </record>
         <record id="rule_resource_booking_manager" model="ir.rule">
             <field name="name">Resource booking manager rule</field>

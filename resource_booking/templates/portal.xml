@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!-- Copyright 2021 Tecnativa - Jairo Llopis
+     Copyright 2023 Tecnativa - Carolina Fernandez
      License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
 <data>
     <!--
@@ -348,7 +349,16 @@
                             </div>
                             <div class="mb-1">
                                 <strong>Requested by:</strong>
-                                <span t-field="booking_sudo.partner_id.display_name" />
+                                <ul>
+                                    <t
+                                        t-foreach="booking_sudo.partner_ids"
+                                        t-as="partner"
+                                    >
+                                        <li>
+                                            <span t-field="partner.display_name" />
+                                        </li>
+                                    </t>
+                                </ul>
                             </div>
                             <div class="mb-1">
                                 <strong>Booked resources:</strong>

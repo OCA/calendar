@@ -235,6 +235,11 @@ msgid "Attachment Count"
 msgstr "Nombre de pièces jointes"
 
 #. module: resource_booking
+#: model:ir.model.fields,field_description:resource_booking.field_resource_booking__partner_ids
+msgid "Attendees"
+msgstr ""
+
+#. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__combination_auto_assign
 msgid "Auto assigned"
 msgstr "Attribué automatiquement"
@@ -1286,9 +1291,9 @@ msgstr ""
 "est programmé, et les notifications du calendrier seront envoyées en son nom."
 
 #. module: resource_booking
-#: model:ir.model.fields,help:resource_booking.field_resource_booking__partner_id
-msgid "Who requested this booking?"
-msgstr "Qui a demandé cette réservation ?"
+#: model:ir.model.fields,help:resource_booking.field_resource_booking__partner_ids
+msgid "Who will attend this booking?"
+msgstr ""
 
 #. module: resource_booking
 #: model:ir.ui.menu,name:resource_booking.menu_resource_calendar
@@ -1318,6 +1323,9 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:resource_booking.message_combination_assigned
 msgid "because you belong to the chosen resource combination:"
 msgstr ""
+
+#~ msgid "Who requested this booking?"
+#~ msgstr "Qui a demandé cette réservation ?"
 
 #~ msgid "SMS Delivery error"
 #~ msgstr "Erreur de livraison SMS"
