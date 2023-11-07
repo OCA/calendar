@@ -221,6 +221,11 @@ msgid "Attachment Count"
 msgstr ""
 
 #. module: resource_booking
+#: model:ir.model.fields,field_description:resource_booking.field_resource_booking__partner_ids
+msgid "Attendees"
+msgstr ""
+
+#. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__combination_auto_assign
 msgid "Auto assigned"
 msgstr ""
@@ -1219,8 +1224,8 @@ msgid ""
 msgstr ""
 
 #. module: resource_booking
-#: model:ir.model.fields,help:resource_booking.field_resource_booking__partner_id
-msgid "Who requested this booking?"
+#: model:ir.model.fields,help:resource_booking.field_resource_booking__partner_ids
+msgid "Who will attend this booking?"
 msgstr ""
 
 #. module: resource_booking
