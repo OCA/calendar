@@ -125,12 +125,15 @@ class ResourceBooking(models.Model):
     description = fields.Html()
     partner_id = fields.Many2one(
         comodel_name="res.partner",
+        compute="_compute_partner_id",
         string="Requester",
-        index=True,
-        ondelete="cascade",
+    )
+    partner_ids = fields.Many2many(
+        comodel_name="res.partner",
+        string="Attendees",
         required=True,
         tracking=True,
-        help="Who requested this booking?",
+        help="Who will attend this booking?",
     )
     user_id = fields.Many2one(
         comodel_name="res.users",
@@ -211,6 +214,11 @@ class ResourceBooking(models.Model):
         tracking=True,
     )
 
+    @api.depends("partner_ids")
+    def _compute_partner_id(self):
+        for one in self:
+            one.partner_id = one.partner_ids[:1]
+
     @api.model
     def _default_user_id(self):
         return self.env.user
@@ -260,7 +268,7 @@ class ResourceBooking(models.Model):
             overdue = self.filtered("is_overdue")
             overdue.is_modifiable = False
 
-    @api.depends("name", "partner_id", "type_id", "meeting_id")
+    @api.depends("name", "partner_ids", "type_id", "meeting_id")
     @api.depends_context("uid", "using_portal")
     def _compute_display_name(self):
         """Overridden just for dependencies; see `name_get()` for implementation."""
@@ -302,7 +310,7 @@ class ResourceBooking(models.Model):
                 continue
             confirmed = False
             for attendee in one.meeting_id.attendee_ids:
-                if attendee.partner_id == one.partner_id:
+                if attendee.partner_id in one.partner_ids:
                     confirmed = attendee.state == "accepted"
                     break
             if confirmed:
@@ -362,9 +370,10 @@ class ResourceBooking(models.Model):
             duration=self.duration,
             location=self.location,
             videocall_location=self.videocall_location,
-            name=self.name or self._get_name_formatted(self.partner_id, self.type_id),
+            name=self.name
+            or self._get_name_formatted(self.partner_ids[0], self.type_id),
             partner_ids=[
-                (4, partner.id, 0) for partner in self.partner_id | resource_partners
+                (4, partner.id, 0) for partner in self.partner_ids | resource_partners
             ],
             resource_booking_ids=[(6, 0, self.ids)],
             start=self.start,
@@ -598,7 +607,7 @@ class ResourceBooking(models.Model):
             elif not record.name:
                 # Automatic name for backend users
                 name = self._get_name_formatted(
-                    record.partner_id, record.type_id, record.meeting_id
+                    record.partner_ids[0], record.type_id, record.meeting_id
                 )
             new.append((id_, name))
         return new
@@ -632,11 +641,12 @@ class ResourceBooking(models.Model):
         """Suggest related partners."""
         recipients = super()._message_get_suggested_recipients()
         for record in self:
-            record._message_add_suggested_recipient(
-                recipients,
-                partner=record.partner_id,
-                reason=self._fields["partner_id"].string,
-            )
+            for partner in record.partner_ids:
+                record._message_add_suggested_recipient(
+                    recipients,
+                    partner=partner,
+                    reason=self._fields["partner_ids"].string,
+                )
         return recipients
 
     def action_schedule(self):
@@ -673,12 +683,12 @@ class ResourceBooking(models.Model):
             for booking in self:
                 if not booking.meeting_id:
                     continue
-                # Make sure requester and user resources are meeting attendees
-                booking.meeting_id.partner_ids |= booking.partner_id | booking.mapped(
+                # Make sure requesters and user resources are meeting attendees
+                booking.meeting_id.partner_ids |= booking.partner_ids | booking.mapped(
                     "combination_id.resource_ids.user_id.partner_id"
                 )
                 # Find meeting attendees that should be confirmed
-                partners_to_confirm = confirm_always | booking.partner_id
+                partners_to_confirm = confirm_always | booking.partner_ids
                 for attendee in booking.meeting_id.attendee_ids:
                     if attendee.partner_id & partners_to_confirm:
                         # attendee.state='accepted'

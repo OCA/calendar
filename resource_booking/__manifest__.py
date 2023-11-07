@@ -1,11 +1,12 @@
 # Copyright 2021 Tecnativa - Jairo Llopis
 # Copyright 2022 Tecnativa - Pedro M. Baeza
+# Copyright 2023 Tecnativa - Carolina Fernandez
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 {
     "name": "Resource booking",
     "summary": "Manage appointments and resource booking",
-    "version": "15.0.1.3.0",
+    "version": "15.0.1.4.0",
     "development_status": "Production/Stable",
     "category": "Appointments",
     "website": "https://github.com/OCA/calendar",

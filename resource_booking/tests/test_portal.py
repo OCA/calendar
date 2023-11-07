@@ -1,4 +1,5 @@
 # Copyright 2021 Tecnativa - Jairo Llopis
+# Copyright 2023 Tecnativa - Carolina Fernandez
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 from datetime import datetime
@@ -46,7 +47,10 @@ class PortalCase(HttpCase):
     def test_portal_list_with_bookings(self):
         # Create one pending booking
         self.env["resource.booking"].create(
-            {"partner_id": self.user_portal.partner_id.id, "type_id": self.rbt.id}
+            {
+                "partner_ids": [(4, self.user_portal.partner_id.id)],
+                "type_id": self.rbt.id,
+            }
         )
         self.start_tour("/", "resource_booking_ptl2_tour", login="ptl")
 
@@ -63,12 +67,12 @@ class PortalCase(HttpCase):
         bookings = self.env["resource.booking"].create(
             [
                 {
-                    "partner_id": self.user_portal.partner_id.id,
+                    "partner_ids": [(4, self.user_portal.partner_id.id)],
                     "type_id": self.rbt.id,
                     "duration": 1,
                 },
                 {
-                    "partner_id": self.partner.id,
+                    "partner_ids": [(4, self.partner.id)],
                     "type_id": self.rbt.id,
                     "location": "Office 2",
                     "videocall_location": "Videocall Office 2",
