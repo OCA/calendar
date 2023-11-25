@@ -1225,11 +1225,6 @@ msgid "Who will attend this booking?"
 msgstr ""
 
 #. module: resource_booking
-#: model:ir.model.fields,help:resource_booking.field_resource_booking__partner_id
-msgid "Who requested this booking?"
-msgstr ""
-
-#. module: resource_booking
 #: model:ir.ui.menu,name:resource_booking.menu_resource_calendar
 msgid "Working Times"
 msgstr ""
