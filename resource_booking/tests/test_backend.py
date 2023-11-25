@@ -1,5 +1,6 @@
 # Copyright 2021 Tecnativa - Jairo Llopis
 # Copyright 2022 Tecnativa - Pedro M. Baeza
+# Copyright 2023 Tecnativa - Carolina Fernandezs
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 from datetime import date, datetime
 from unittest.mock import patch
@@ -52,7 +53,7 @@ class BackendCase(TransactionCase):
         with self.assertRaises(ValidationError), self.env.cr.savepoint():
             self.env["resource.booking"].create(
                 {
-                    "partner_id": self.partner.id,
+                    "partner_ids": [(4, self.partner.id)],
                     "start": "2021-03-02 08:00:00",
                     "type_id": self.rbt.id,
                     "combination_id": rbc_montue.id,
@@ -63,7 +64,7 @@ class BackendCase(TransactionCase):
         with self.assertRaises(ValidationError), self.env.cr.savepoint():
             self.env["resource.booking"].create(
                 {
-                    "partner_id": self.partner.id,
+                    "partner_ids": [(4, self.partner.id)],
                     "start": "2021-03-02 07:45:00",
                     "type_id": self.rbt.id,
                     "combination_id": rbc_montue.id,
@@ -74,7 +75,7 @@ class BackendCase(TransactionCase):
         with self.assertRaises(ValidationError), self.env.cr.savepoint():
             self.env["resource.booking"].create(
                 {
-                    "partner_id": self.partner.id,
+                    "partner_ids": [(4, self.partner.id)],
                     "start": "2021-03-02 16:45:00",
                     "type_id": self.rbt.id,
                     "combination_id": rbc_montue.id,
@@ -84,7 +85,7 @@ class BackendCase(TransactionCase):
         # Booking can be placed next Monday
         self.env["resource.booking"].create(
             {
-                "partner_id": self.partner.id,
+                "partner_ids": [(4, self.partner.id)],
                 "start": "2021-03-01 08:00:00",
                 "type_id": self.rbt.id,
                 "combination_id": rbc_montue.id,
@@ -95,7 +96,7 @@ class BackendCase(TransactionCase):
         with self.assertRaises(ValidationError), self.env.cr.savepoint():
             self.env["resource.booking"].create(
                 {
-                    "partner_id": self.partner.id,
+                    "partner_ids": [(4, self.partner.id)],
                     "start": "2021-03-01 08:29:59",
                     "type_id": self.rbt.id,
                     "combination_id": rbc_montue.id,
@@ -106,7 +107,7 @@ class BackendCase(TransactionCase):
         rbc_mon = self.rbcs[0]
         self.env["resource.booking"].create(
             {
-                "partner_id": self.partner.id,
+                "partner_ids": [(4, self.partner.id)],
                 "start": "2021-03-01 08:00:00",
                 "type_id": self.rbt.id,
                 "combination_id": rbc_mon.id,
@@ -121,7 +122,7 @@ class BackendCase(TransactionCase):
         self.rbt.resource_calendar_id = cal_frisun
         self.env["resource.booking"].create(
             {
-                "partner_id": self.partner.id,
+                "partner_ids": [(4, self.partner.id)],
                 "start": "2021-03-06 23:00:00",
                 "duration": 2,
                 "type_id": self.rbt.id,
@@ -133,7 +134,7 @@ class BackendCase(TransactionCase):
         with self.assertRaises(ValidationError), self.env.cr.savepoint():
             self.env["resource.booking"].create(
                 {
-                    "partner_id": self.partner.id,
+                    "partner_ids": [(4, self.partner.id)],
                     "start": "2021-03-06 22:00:00",
                     "duration": 4,
                     "type_id": self.rbt.id,
@@ -145,7 +146,7 @@ class BackendCase(TransactionCase):
         # 00:00 exactly.
         self.env["resource.booking"].create(
             {
-                "partner_id": self.partner.id,
+                "partner_ids": [(4, self.partner.id)],
                 "start": "2021-03-14 00:00:00",
                 "duration": 1,
                 "type_id": self.rbt.id,
@@ -156,7 +157,7 @@ class BackendCase(TransactionCase):
         with self.assertRaises(ValidationError), self.env.cr.savepoint():
             self.env["resource.booking"].create(
                 {
-                    "partner_id": self.partner.id,
+                    "partner_ids": [(4, self.partner.id)],
                     "start": "2021-03-13 23:00:00",
                     "duration": 4,
                     "type_id": self.rbt.id,
@@ -170,7 +171,7 @@ class BackendCase(TransactionCase):
         with self.assertRaises(ValidationError), self.env.cr.savepoint():
             self.env["resource.booking"].create(
                 {
-                    "partner_id": self.partner.id,
+                    "partner_ids": [(4, self.partner.id)],
                     "start": "2021-03-20 23:00:00",
                     "duration": 2,
                     "type_id": self.rbt.id,
@@ -186,7 +187,7 @@ class BackendCase(TransactionCase):
         self.rbt.resource_calendar_id = cal_frisun
         self.env["resource.booking"].create(
             {
-                "partner_id": self.partner.id,
+                "partner_ids": [(4, self.partner.id)],
                 "start": "2021-03-05 23:00:00",
                 "duration": 24 * 2,
                 "type_id": self.rbt.id,
@@ -233,7 +234,7 @@ class BackendCase(TransactionCase):
         with self.assertRaises(ValidationError), self.env.cr.savepoint():
             self.env["resource.booking"].create(
                 {
-                    "partner_id": self.partner.id,
+                    "partner_ids": [(4, self.partner.id)],
                     "start": "2021-03-01 08:00:00",
                     "type_id": self.rbt.id,
                     "combination_id": rbc_tue.id,
@@ -244,7 +245,7 @@ class BackendCase(TransactionCase):
         rbc_tue.forced_calendar_id = cal_mon
         rb = self.env["resource.booking"].create(
             {
-                "partner_id": self.partner.id,
+                "partner_ids": [(4, self.partner.id)],
                 "start": "2021-03-01 08:00:00",
                 "type_id": self.rbt.id,
                 "combination_auto_assign": False,
@@ -278,7 +279,7 @@ class BackendCase(TransactionCase):
         self.assertEqual(_2dt(booking_form.stop), datetime(2021, 3, 1, 9, 30))
         # If I change to next week's monday, then the stop date advances 1:30h
         booking_form.start = datetime(2021, 3, 8, 8)
-        booking_form.partner_id = self.partner
+        booking_form.partner_ids.add(self.partner)
         self.assertEqual(_2dt(booking_form.start), datetime(2021, 3, 8, 8))
         self.assertEqual(booking_form.duration, 1.5)
         self.assertEqual(_2dt(booking_form.stop), datetime(2021, 3, 8, 9, 30))
@@ -294,7 +295,7 @@ class BackendCase(TransactionCase):
         # Create a booking from scratch
         booking_form = Form(self.env["resource.booking"])
         booking_form.type_id = self.rbt
-        booking_form.partner_id = self.partner
+        booking_form.partner_ids.add(self.partner)
         self.assertFalse(booking_form.start)
         self.assertFalse(booking_form.stop)
         self.assertFalse(booking_form.combination_id)
@@ -324,7 +325,7 @@ class BackendCase(TransactionCase):
     def test_state(self):
         # I create a pending booking
         booking = self.env["resource.booking"].create(
-            {"type_id": self.rbt.id, "partner_id": self.partner.id}
+            {"type_id": self.rbt.id, "partner_ids": [(4, self.partner.id)]}
         )
         # Without dates, it's pending
         self.assertEqual(booking.state, "pending")
@@ -345,7 +346,7 @@ class BackendCase(TransactionCase):
         self.assertTrue(booking.combination_id)
         # When partner confirms attendance, it's confirmed
         booker_attendance = meeting.attendee_ids.filtered(
-            lambda one: one.partner_id == booking.partner_id
+            lambda one: one.partner_id in booking.partner_ids
         )
         self.assertTrue(booker_attendance)
         booker_attendance.do_accept()
@@ -380,7 +381,7 @@ class BackendCase(TransactionCase):
         # Book next monday at 10:00
         rb1_form = Form(self.env["resource.booking"])
         rb1_form.type_id = self.rbt
-        rb1_form.partner_id = self.partner
+        rb1_form.partner_ids.add(self.partner)
         rb1_form.start = datetime(2021, 3, 1, 10)
         self.assertEqual(rb1_form.combination_id, rbc_mon)
         rb1 = rb1_form.save()
@@ -388,7 +389,7 @@ class BackendCase(TransactionCase):
         # Another booking, same time
         rb2_form = Form(self.env["resource.booking"])
         rb2_form.type_id = self.rbt
-        rb2_form.partner_id = self.partner
+        rb2_form.partner_ids.add(self.partner)
         rb2_form.start = datetime(2021, 3, 1, 10)
         self.assertEqual(rb2_form.combination_id, rbc_montue)
         rb2 = rb2_form.save()
@@ -424,7 +425,7 @@ class BackendCase(TransactionCase):
         # Check it's not bookable
         rb_form = Form(self.env["resource.booking"])
         rb_form.type_id = self.rbt
-        rb_form.partner_id = self.partner
+        rb_form.partner_ids.add(self.partner)
         # No combination found
         rb_form.start = datetime(2021, 3, 1, 10)
         self.assertFalse(rb_form.combination_id)
@@ -437,7 +438,7 @@ class BackendCase(TransactionCase):
         """Scheduling the same slot twice fails, when not in UTC."""
         for loop in range(2):
             rb_f = Form(self.env["resource.booking"].with_context(tz="Europe/Madrid"))
-            rb_f.partner_id = self.partner
+            rb_f.partner_ids.add(self.partner)
             rb_f.type_id = self.rbt
             rb_f.start = datetime(2021, 3, 1, 10)
             rb_f.combination_auto_assign = False
@@ -467,7 +468,7 @@ class BackendCase(TransactionCase):
         ce_f.save()
         # Cannot book next Monday at 8
         rb_f = Form(self.env["resource.booking"])
-        rb_f.partner_id = self.partner
+        rb_f.partner_ids.add(self.partner)
         rb_f.type_id = self.rbt
         # No RBC when starting
         self.assertFalse(rb_f.combination_id)
@@ -486,7 +487,7 @@ class BackendCase(TransactionCase):
         past_booking = self.env["resource.booking"].create(
             {
                 "combination_id": rbc_mon.id,
-                "partner_id": self.partner.id,
+                "partner_ids": [(4, self.partner.id)],
                 "start": "2021-02-22 08:00:00",
                 "type_id": self.rbt.id,
             }
@@ -498,7 +499,7 @@ class BackendCase(TransactionCase):
         future_booking = self.env["resource.booking"].create(
             {
                 "combination_id": rbc_mon.id,
-                "partner_id": self.partner.id,
+                "partner_ids": [(4, self.partner.id)],
                 "start": "2021-03-01 08:00:00",
                 "type_id": self.rbt.id,
             }
@@ -529,7 +530,7 @@ class BackendCase(TransactionCase):
         # Tuesdays from 08:00 to 17:00 UTC. The booking will span for 3 slots.
         rb = self.env["resource.booking"].create(
             {
-                "partner_id": self.partner.id,
+                "partner_ids": [(4, self.partner.id)],
                 "type_id": self.rbt.id,
                 "duration": self.rbt.duration * 3,
             }
@@ -566,7 +567,7 @@ class BackendCase(TransactionCase):
         """Location across records works as expected."""
         rbt2 = self.rbt.copy({"location": "Office 2"})
         rb_f = Form(self.env["resource.booking"])
-        rb_f.partner_id = self.partner
+        rb_f.partner_ids.add(self.partner)
         rb_f.type_id = self.rbt
         rb = rb_f.save()
         # Pending booking inherits location from type
@@ -611,7 +612,7 @@ class BackendCase(TransactionCase):
         """Videocall location across records works as expected."""
         rbt2 = self.rbt.copy({"videocall_location": "Videocall Office 2"})
         rb_f = Form(self.env["resource.booking"])
-        rb_f.partner_id = self.partner
+        rb_f.partner_ids.add(self.partner)
         rb_f.type_id = self.rbt
         rb = rb_f.save()
         # Pending booking inherits videocall location from type
@@ -656,7 +657,7 @@ class BackendCase(TransactionCase):
         """Resource booking and meeting organizers are properly synced."""
         rb = self.env["resource.booking"].create(
             {
-                "partner_id": self.partner.id,
+                "partner_ids": [(4, self.partner.id)],
                 "type_id": self.rbt.id,
                 "start": "2021-03-01 08:00:00",
                 "duration": 1.5,
@@ -671,7 +672,7 @@ class BackendCase(TransactionCase):
     def test_resource_booking_display_name(self):
         # Pending booking with no name
         rb = self.env["resource.booking"].create(
-            {"partner_id": self.partner.id, "type_id": self.rbt.id}
+            {"partner_ids": [(4, self.partner.id)], "type_id": self.rbt.id}
         )
         self.assertEqual(rb.display_name, "some customer - Test resource booking type")
         self.assertEqual(
@@ -705,7 +706,7 @@ class BackendCase(TransactionCase):
         # Create an auto-assigned booking
         rb = self.env["resource.booking"].create(
             {
-                "partner_id": self.partner.id,
+                "partner_ids": [(4, self.partner.id)],
                 "type_id": self.rbt.id,
                 "start": "2021-03-01 08:00:00",
             }
@@ -723,7 +724,7 @@ class BackendCase(TransactionCase):
         # Create a booking with handpicked combination assignment
         rb = self.env["resource.booking"].create(
             {
-                "partner_id": self.partner.id,
+                "partner_ids": [(4, self.partner.id)],
                 "type_id": self.rbt.id,
                 "start": "2021-03-01 08:00:00",
                 "combination_auto_assign": False,
@@ -752,7 +753,7 @@ class BackendCase(TransactionCase):
                 .sudo()
                 .create(
                     {
-                        "partner_id": self.partner.id,
+                        "partner_ids": [(4, self.partner.id)],
                         "type_id": self.rbt.id,
                         "combination_auto_assign": False,
                         "combination_id": self.rbcs[0].id,
@@ -767,7 +768,7 @@ class BackendCase(TransactionCase):
         # Requester and combination must be suggested
         self.assertEqual(
             rb._message_get_suggested_recipients(),
-            {rb.id: [(rb.partner_id.id, "some customer", "Requester")]},
+            {rb.id: [(rb.partner_ids.id, "some customer", "Attendees")]},
         )
 
     def test_creating_rbt_has_tags(self):
@@ -775,7 +776,7 @@ class BackendCase(TransactionCase):
         categ = self.env["calendar.event.type"].create({"name": "test tag"})
         self.rbt.categ_ids = categ
         rb_f = Form(self.env["resource.booking"])
-        rb_f.partner_id = self.partner
+        rb_f.partner_ids.add(self.partner)
         rb_f.type_id = self.rbt
         rb = rb_f.save()
         self.assertEqual(rb.categ_ids, categ)
@@ -797,7 +798,7 @@ class BackendCase(TransactionCase):
         rb_f.type_id = self.rbt
         rb_f.start = "2021-03-01 09:00:00"
         rb_f.duration = 1
-        rb_f.partner_id = self.partner
+        rb_f.partner_ids.add(self.partner)
         rb1 = rb_f.save()
         # I'm not booked, so I'm free
         self.assertEqual(rb1.combination_id, self.rbcs[2])
@@ -807,7 +808,7 @@ class BackendCase(TransactionCase):
         rb_f.type_id = self.rbt
         rb_f.start = "2021-03-01 09:00:00"
         rb_f.duration = 1.5
-        rb_f.partner_id = self.partner.copy()
+        rb_f.partner_ids.add(self.partner.copy())
         # Saving works because I'm free
         rb2 = rb_f.save()
         # I'm booked this time, so I'm busy
@@ -818,7 +819,7 @@ class BackendCase(TransactionCase):
         rb_f.type_id = self.rbt
         rb_f.start = "2021-03-01 09:30:00"
         rb_f.duration = 0.5
-        rb_f.partner_id = self.partner.copy()
+        rb_f.partner_ids.add(self.partner.copy())
         with self.assertRaises(AssertionError):
             rb_f.save()
 
@@ -830,7 +831,7 @@ class BackendCase(TransactionCase):
         resource = rbc_montue.resource_ids[1]
         self.env["resource.booking"].create(
             {
-                "partner_id": self.partner.id,
+                "partner_ids": [(4, self.partner.id)],
                 "start": "2021-03-01 08:00:00",
                 "type_id": self.rbt.id,
                 "combination_id": rbc_montue.id,
@@ -884,7 +885,7 @@ class BackendCase(TransactionCase):
         self.rbt.resource_calendar_id = cal_satsun
         self.env["resource.booking"].create(
             {
-                "partner_id": self.partner.id,
+                "partner_ids": [(4, self.partner.id)],
                 "start": "2021-03-06 23:00:00",
                 "duration": 2,
                 "type_id": self.rbt.id,
