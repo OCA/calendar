@@ -233,6 +233,11 @@ msgid "Attachment Count"
 msgstr "Nº adjuntos"
 
 #. module: resource_booking
+#: model:ir.model.fields,field_description:resource_booking.field_resource_booking__partner_ids
+msgid "Attendees"
+msgstr "Asistentes"
+
+#. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__combination_auto_assign
 msgid "Auto assigned"
 msgstr ""
@@ -897,11 +902,6 @@ msgid "Requester"
 msgstr "Solicitante"
 
 #. module: resource_booking
-#: model:ir.model.fields,field_description:resource_booking.field_resource_booking__partner_ids
-msgid "Attendees"
-msgstr "Asistentes"
-
-#. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__requester_advice
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__requester_advice
 msgid "Requester Advice"
@@ -1285,11 +1285,6 @@ msgid "Who will attend this booking?"
 msgstr "¿Quién asistirá a esta reserva/cita?"
 
 #. module: resource_booking
-#: model:ir.model.fields,help:resource_booking.field_resource_booking__partner_id
-msgid "Who requested this booking?"
-msgstr "¿Quién solicitó esta reserva/cita?"
-
-#. module: resource_booking
 #: model:ir.ui.menu,name:resource_booking.menu_resource_calendar
 msgid "Working Times"
 msgstr "Tiempos de Trabajo"
@@ -1317,3 +1312,6 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:resource_booking.message_combination_assigned
 msgid "because you belong to the chosen resource combination:"
 msgstr ""
+
+#~ msgid "Who requested this booking?"
+#~ msgstr "¿Quién solicitó esta reserva/cita?"
