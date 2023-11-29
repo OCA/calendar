@@ -4,7 +4,7 @@ from openupgradelib import openupgrade
 
 
 def convert_resource_booking_partners(env):
-    openupgrade.m2o_to_x2x(
+    openupgrade.m2o_to_x2m(
         env.cr,
         env["resource.booking"],
         "resource_booking",
