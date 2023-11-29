@@ -126,6 +126,8 @@ class ResourceBooking(models.Model):
     partner_id = fields.Many2one(
         comodel_name="res.partner",
         compute="_compute_partner_id",
+        inverse="_inverse_partner_id",
+        readonly=False,
         string="Requester",
     )
     partner_ids = fields.Many2many(
@@ -218,6 +220,10 @@ class ResourceBooking(models.Model):
     def _compute_partner_id(self):
         for one in self:
             one.partner_id = one.partner_ids[:1]
+
+    def _inverse_partner_id(self):
+        for one in self:
+            one.partner_ids = one.partner_id
 
     @api.model
     def _default_user_id(self):
