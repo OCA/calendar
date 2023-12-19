@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    SPDX-FileCopyrightText: 2023 Coop IT Easy SC
+
+    SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+<odoo>
+
+    <record id="resource_booking_view_form" model="ir.ui.view">
+        <field name="name">Resource booking form</field>
+        <field name="model">resource.booking</field>
+        <field name="inherit_id" ref="resource_booking.resource_booking_form" />
+        <field name="priority">200</field>
+        <field name="arch" type="xml">
+            <xpath expr="//label[@for='combination_id']" position="replace">
+                <label for="resource_ids" />
+            </xpath>
+            <xpath expr="//div[field[@name='combination_id']]" position="replace">
+                <div>
+                    <field name="resource_ids">
+                        <tree>
+                            <field name="name" />
+                            <field
+                                name="resource_category_ids"
+                                widget="many2many_tags"
+                            />
+                        </tree>
+                    </field>
+                    <button
+                        name="open_combination_wizard"
+                        type="object"
+                        string="Select resources"
+                    />
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
