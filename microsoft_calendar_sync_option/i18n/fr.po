@@ -1,0 +1,61 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* microsoft_calendar_sync_option
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 14.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-03-15 13:08+0000\n"
+"PO-Revision-Date: 2023-03-15 13:08+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: microsoft_calendar_sync_option
+#: model:ir.model.fields.selection,name:microsoft_calendar_sync_option.selection__res_config_settings__cal_microsoft_sync_option__all
+msgid "All events"
+msgstr "Tous les évènements"
+
+#. module: microsoft_calendar_sync_option
+#: model:ir.model,name:microsoft_calendar_sync_option.model_calendar_event
+msgid "Calendar Event"
+msgstr "Calendrier de l'événement"
+
+#. module: microsoft_calendar_sync_option
+#: model:ir.model.fields,field_description:microsoft_calendar_sync_option.field_res_config_settings__cal_microsoft_sync_option
+msgid "Calendar synchronization option"
+msgstr "Option de synchronisation du calendrier"
+
+#. module: microsoft_calendar_sync_option
+#: model:ir.model,name:microsoft_calendar_sync_option.model_res_config_settings
+msgid "Config Settings"
+msgstr "Configuration"
+
+#. module: microsoft_calendar_sync_option
+#: model_terms:ir.ui.view,arch_db:microsoft_calendar_sync_option.res_config_settings_view_form
+msgid "Define which events will be synchronized from Odoo to Outlook"
+msgstr "Définition des évènements à synchroniser de Odoo vers Outlook"
+
+#. module: microsoft_calendar_sync_option
+#: model:ir.model.fields.selection,name:microsoft_calendar_sync_option.selection__res_config_settings__cal_microsoft_sync_option__none
+msgid "No event"
+msgstr "Aucun évènement"
+
+#. module: microsoft_calendar_sync_option
+#: model:ir.model.fields,help:microsoft_calendar_sync_option.field_res_config_settings__cal_microsoft_sync_option
+msgid "Odoo to Outlook events synchronization"
+msgstr "Synchronisation des évènements de Odoo vers Outlook"
+
+#. module: microsoft_calendar_sync_option
+#: model:ir.model.fields.selection,name:microsoft_calendar_sync_option.selection__res_config_settings__cal_microsoft_sync_option__future
+msgid "Only future events"
+msgstr "Seulement les évènements futurs"
+
+#. module: microsoft_calendar_sync_option
+#: model_terms:ir.ui.view,arch_db:microsoft_calendar_sync_option.res_config_settings_view_form
+msgid "Sync option"
+msgstr "Option de synchronisation"
