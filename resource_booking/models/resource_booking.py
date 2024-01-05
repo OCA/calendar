@@ -417,8 +417,10 @@ class ResourceBooking(models.Model):
                     to_create.append(meeting_vals)
             else:
                 to_delete |= one.meeting_id
-        to_delete.unlink()
-        _self.env["calendar.event"].create(to_create)
+        if to_delete:
+            to_delete.unlink()
+        if to_create:
+            _self.env["calendar.event"].create(to_create)
 
     @api.constrains("combination_id", "meeting_id", "type_id")
     def _check_scheduling(self):
