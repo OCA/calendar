@@ -167,10 +167,22 @@ msgid "Access warning"
 msgstr "Alerta de acceso"
 
 #. module: resource_booking
+#: model:ir.model.fields,field_description:resource_booking.field_mail_activity_type__category
+msgid "Action"
+msgstr ""
+
+#. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__message_needaction
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__message_needaction
 msgid "Action Needed"
 msgstr "Acción necesaria"
+
+#. module: resource_booking
+#: model:ir.model.fields,help:resource_booking.field_mail_activity_type__category
+msgid ""
+"Actions may trigger specific behavior like opening calendar view or "
+"automatically mark as done when a document is uploaded"
+msgstr ""
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__active
@@ -181,9 +193,15 @@ msgstr "Activo"
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__activity_ids
+#: model:ir.model.fields,field_description:resource_booking.field_resource_booking__booking_activity_ids
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__activity_ids
 msgid "Activities"
 msgstr "Actividades"
+
+#. module: resource_booking
+#: model:ir.model,name:resource_booking.model_mail_activity
+msgid "Activity"
+msgstr ""
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__activity_exception_decoration
@@ -196,6 +214,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__activity_state
 msgid "Activity State"
 msgstr "Estado de la actividad"
+
+#. module: resource_booking
+#: model:ir.model,name:resource_booking.model_mail_activity_type
+msgid "Activity Type"
+msgstr ""
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__activity_type_icon
@@ -516,6 +539,12 @@ msgstr "La duración debe ser positiva."
 #: model_terms:ir.ui.view,arch_db:resource_booking.scheduling_calendar
 msgid "Duration:"
 msgstr "Duración:"
+
+#. module: resource_booking
+#: code:addons/resource_booking/models/mail_activity.py:0
+#, python-format
+msgid "Feedback: %(feedback)s"
+msgstr "Retroalimentación: %(feedback)s"
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__message_follower_ids
@@ -845,6 +874,11 @@ msgid "Only one event per resource booking can exist."
 msgstr "Solo puede existir un evento por reserva de recursos."
 
 #. module: resource_booking
+#: model_terms:ir.ui.view,arch_db:resource_booking.mail_activity_view_form_popup
+msgid "Open Resource Booking"
+msgstr "Abrir una reserva de recursos"
+
+#. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_form
 msgid "Open a calendar to schedule a meeting for this booking request."
 msgstr ""
@@ -910,6 +944,7 @@ msgstr "Aviso al solicitante"
 #. module: resource_booking
 #: model:ir.model,name:resource_booking.model_resource_booking
 #: model:ir.module.category,name:resource_booking.category_resource_booking
+#: model:mail.activity.type,name:resource_booking.mail_activity_data_resource_booking
 msgid "Resource Booking"
 msgstr "Reserva de recursos"
 
@@ -940,6 +975,8 @@ msgstr "Tiempo de Trabajo de Recursos"
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_calendar_event__resource_booking_ids
+#: model:ir.model.fields,field_description:resource_booking.field_mail_activity__booking_id
+#: model:ir.model.fields.selection,name:resource_booking.selection__mail_activity_type__category__resource_booking
 msgid "Resource booking"
 msgstr "Reserva de recursos"
 
@@ -1312,6 +1349,9 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:resource_booking.message_combination_assigned
 msgid "because you belong to the chosen resource combination:"
 msgstr ""
+
+#~ msgid "Next Activity Resource Booking"
+#~ msgstr "Siguiente actividad de reserva de recursos"
 
 #~ msgid "Who requested this booking?"
 #~ msgstr "¿Quién solicitó esta reserva/cita?"
