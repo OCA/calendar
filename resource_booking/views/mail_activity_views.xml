@@ -1,0 +1,45 @@
+<?xml version="1.0" ?>
+<odoo>
+    <record id="mail_activity_view_form_popup" model="ir.ui.view">
+        <field name="name">mail.activity.form.inherit.booking</field>
+        <field name="model">mail.activity</field>
+        <field name="inherit_id" ref="mail.mail_activity_view_form_popup" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='date_deadline']" position="attributes">
+                  <attribute
+                    name="attrs"
+                >{'invisible': [('activity_category', 'in', ['resource_booking','meeting'])]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='user_id']" position="attributes">
+                  <attribute
+                    name="attrs"
+                >{'invisible': [('activity_category', 'in', ['resource_booking','meeting'])]}</attribute>
+            </xpath>
+            <xpath expr="//button[@id='mail_activity_schedule']" position="attributes">
+                  <attribute
+                    name="attrs"
+                >{'invisible': ['|', ('activity_category', 'in', ['resource_booking','meeting', 'phonecall']), ('id', '!=', False)]}</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_done']" position="attributes">
+                  <attribute
+                    name="attrs"
+                >{'invisible': ['|', ('activity_category', 'in', ['resource_booking','meeting']), ('chaining_type', '=', 'trigger')]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='note']" position="attributes">
+                  <attribute
+                    name="attrs"
+                >{'invisible': [('activity_category', 'in', ['resource_booking','meeting'])]}</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_close_dialog']" position="before">
+                  <field name="booking_id" invisible="1" />
+                  <button
+                    string="Open Resource Booking"
+                    attrs="{'invisible': [('activity_category', '!=', 'resource_booking')]}"
+                    name="action_open_resource_booking"
+                    type="object"
+                    class="btn-primary"
+                />
+            </xpath>
+        </field>
+    </record>
+</odoo>
