@@ -1,10 +1,11 @@
 # Copyright 2021 Tecnativa - Jairo Llopis
 # Copyright 2022 Tecnativa - Pedro M. Baeza
-# Copyright 2023 Tecnativa - Carolina Fernandezs
+# Copyright 2024 Tecnativa - Carolina Fernandez
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 from datetime import date, datetime
 from unittest.mock import patch
 
+from dateutil.relativedelta import relativedelta
 from freezegun import freeze_time
 from pytz import utc
 
@@ -905,4 +906,130 @@ class BackendCase(TransactionCase):
                 utc.localize(datetime(2021, 3, 13, 22, 0)),
                 utc.localize(datetime(2021, 3, 14, 2, 0)),
             )
+        )
+
+
+class TestMailActivity(TransactionCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.activity_type = cls.env.ref(
+            "resource_booking.mail_activity_data_resource_booking"
+        )
+        cls.partner = cls.env["res.partner"].create({"name": "T Partner"})
+        create_test_data(cls)
+        cls.mail_activity = cls.env["mail.activity"].create(
+            {
+                "activity_type_id": cls.activity_type.id,
+                "summary": "Test Summary",
+                "res_model_id": cls.env["ir.model"]._get_id("res.partner"),
+                "res_id": cls.partner.id,
+            }
+        )
+
+    def _create_booking_from_mail_activity(self, mail_activity):
+        action = mail_activity.action_open_resource_booking()
+        booking_form = Form(
+            self.env[action["res_model"]].with_context(**action["context"])
+        )
+        booking_form.start = "2021-03-01 08:00:00"
+        booking_form.type_id = self.rbt
+        booking_form.combination_auto_assign = False
+        booking_form.combination_id = self.rbcs[2]
+        booking_form.duration = 1
+        booking_form.description = "Booking Description"
+        return booking_form.save()
+
+    def test_action_open_resource_booking_full_process(self):
+        action = self.mail_activity.action_open_resource_booking()
+        self.assertEqual(action["res_id"], 0)
+        self.assertEqual(action["view_mode"], "form")
+        ctx = action["context"]
+        self.assertEqual(ctx["default_activity_type_id"], self.activity_type.id)
+        self.assertEqual(action["context"]["default_name"], "Test Summary")
+        self.assertEqual(
+            ctx["default_booking_activity_ids"],
+            [(6, 0, [self.mail_activity.id])],
+        )
+        booking = self._create_booking_from_mail_activity(self.mail_activity)
+        self.assertTrue(self.mail_activity.calendar_event_id)
+        self.assertEqual(
+            self.mail_activity.date_deadline, fields.Date.from_string("2021-03-01")
+        )
+        feedback = "Test Feedback"
+        messages, activities = self.mail_activity._action_done(feedback=feedback)
+        self.assertEqual(
+            booking.description,
+            "<p>Booking Description</p><br>Feedback: <p>Test Feedback</p>",
+        )
+        self.assertNotEqual(messages, [])
+        self.assertNotEqual(activities, [])
+
+    def test_action_done_without_feedback(self):
+        booking = self._create_booking_from_mail_activity(self.mail_activity)
+        messages, activities = self.mail_activity._action_done()
+        self.assertEqual(booking.description, "<p>Booking Description</p>")
+        self.assertNotEqual(messages, [])
+        self.assertNotEqual(activities, [])
+
+    @freeze_time("2021-03-01 06:00:00")
+    def test_sync_booking_activities(self):
+        booking = self._create_booking_from_mail_activity(self.mail_activity)
+        self.assertEqual(self.mail_activity.date_deadline, booking.start.date())
+        booking.start = "2021-03-02 08:00:00"
+        self.assertEqual(self.mail_activity.date_deadline, booking.start.date())
+
+    @freeze_time("2021-03-01 06:00:00")
+    def test_resource_booking_activity_without_date(self):
+        booking = self.env["resource.booking"].create(
+            {
+                "name": "Test Booking",
+                "description": "Booking Description",
+                "type_id": self.rbt.id,
+                "duration": 1,
+                "booking_activity_ids": [
+                    (
+                        0,
+                        0,
+                        {
+                            "activity_type_id": self.activity_type.id,
+                            "summary": "Test Summary",
+                            "note": "Test Note",
+                            "res_model_id": self.env["ir.model"]._get_id("res.partner"),
+                            "res_id": self.partner.id,
+                        },
+                    )
+                ],
+            }
+        )
+        mail_activity = booking.booking_activity_ids[0]
+        future_date = datetime.now() + relativedelta(years=1000)
+        self.assertEqual(mail_activity.date_deadline, future_date.date())
+        booking.combination_id = self.rbcs[2].id
+        booking.combination_auto_assign = False
+        booking.start = "2021-03-02 08:00:00"
+        self.assertEqual(mail_activity.date_deadline, booking.start.date())
+
+    def test_unlink_resource_booking_activity(self):
+        booking = self._create_booking_from_mail_activity(self.mail_activity)
+        booking.action_cancel()
+        self.assertNotEqual(
+            self.mail_activity.date_deadline, fields.Date.from_string("2021-03-01")
+        )
+        self.assertFalse(self.mail_activity.calendar_event_id)
+
+    def test_resource_booking_schedule_unschedule(self):
+        booking = self._create_booking_from_mail_activity(self.mail_activity)
+        res = booking.action_schedule()
+        self.assertTrue(self.mail_activity.calendar_event_id)
+        self.env[res["res_model"]].with_context(**res["context"]).create(
+            {"start": "2024-01-01 08:00:00", "stop": "2024-01-01 09:00:00"}
+        )
+        self.assertEqual(
+            self.mail_activity.date_deadline, fields.Date.from_string("2024-01-01")
+        )
+        booking.action_unschedule()
+        self.assertFalse(self.mail_activity.calendar_event_id)
+        self.assertNotEqual(
+            self.mail_activity.date_deadline, fields.Date.from_string("2024-01-01")
         )

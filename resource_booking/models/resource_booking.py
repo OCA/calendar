@@ -215,6 +215,9 @@ class ResourceBooking(models.Model):
         required=True,
         tracking=True,
     )
+    booking_activity_ids = fields.One2many(
+        "mail.activity", "booking_id", string="Activities"
+    )
 
     @api.depends("partner_ids")
     def _compute_partner_id(self):
@@ -584,22 +587,33 @@ class ResourceBooking(models.Model):
         result &= combinations._get_intervals(start_dt, end_dt)
         return result
 
+    def _sync_booking_activities_date(self):
+        for rec in self.filtered("booking_activity_ids"):
+            start = rec.start or (datetime.now() + relativedelta(years=1000))
+            rec.booking_activity_ids.date_deadline = start
+            # Set calendar_event_id to show Re-schedule button in activity block
+            rec.booking_activity_ids.calendar_event_id = rec.meeting_id
+
     @api.model_create_multi
     def create(self, vals_list):
         """Sync booking with meeting if needed."""
         result = super().create(vals_list)
         result._sync_meeting()
+        result._sync_booking_activities_date()
         return result
 
     def write(self, vals):
         """Sync booking with meeting if needed."""
         result = super().write(vals)
         self._sync_meeting()
+        if vals.get("start") or "meeting_id" in vals:
+            self._sync_booking_activities_date()
         return result
 
     def unlink(self):
         """Unlink meeting if needed."""
         self.meeting_id.unlink()
+        self.booking_activity_ids.unlink()
         return super().unlink()
 
     def name_get(self):
@@ -706,6 +720,7 @@ class ResourceBooking(models.Model):
 
     def action_unschedule(self):
         """Remove associated meetings."""
+        self.booking_activity_ids.calendar_event_id = False
         self.mapped("meeting_id").unlink()
         # Force recomputing, in case meeting_id is not visible in the form
         self.write({"meeting_id": False})
