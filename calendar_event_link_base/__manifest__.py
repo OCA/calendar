@@ -8,8 +8,7 @@
         any model to calendar events""",
     "version": "12.0.1.0.0",
     "license": "AGPL-3",
-    "author": "ACSONE SA/NV,"
-              "Odoo Community Association (OCA)",
+    "author": "ACSONE SA/NV," "Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/calendar",
     "depends": ["calendar"],
 }
