@@ -1,7 +1,7 @@
 # Copyright 2019 ACSONE SA/NV
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import _, api, fields, models
+from odoo import _, fields, models
 
 
 class CalendarEventLinkMixin(models.AbstractModel):
@@ -11,16 +11,16 @@ class CalendarEventLinkMixin(models.AbstractModel):
 
     event_count = fields.Integer(compute="_compute_event_count")
 
-    @api.multi
     def _compute_event_count(self):
-        for x in self.env["calendar.event"].read_group(
+        mapped_data = self.env["calendar.event"].read_group(
             [("res_model", "=", self._name), ("res_id", "in", self.ids)],
             ["id"],
             ["res_id"],
-        ):
-            self.browse(x["res_id"]).update({"event_count": x["res_id_count"]})
+        )
+        data = {x["res_id"]: x for x in mapped_data}
+        for record in self:
+            record.event_count = data.get(record.id, {}).get("res_id_count", 0)
 
-    @api.multi
     def action_show_events(self):
         self.ensure_one()
         context = {
