@@ -736,7 +736,7 @@ class ResourceBooking(models.Model):
                     self.duration, False
                 ),
                 default_resource_booking_ids=[(6, 0, self.ids)],
-                default_name=self.name,
+                default_name=self.name or "",
             ),
             "name": _("Schedule booking"),
             "res_model": "calendar.event",

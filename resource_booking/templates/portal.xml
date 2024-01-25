@@ -33,110 +33,117 @@
                 </a>
             </div>
             <!-- Monthly calendar -->
-            <table class="table table-responsive-md text-center">
-                <thead t-if="booking.requester_advice">
-                    <tr>
-                        <td colspan="7">
-                            <div t-field="booking.requester_advice" />
-                        </td>
-                    </tr>
-                </thead>
-                <thead class="thead-dark">
-                    <tr>
-                        <th class="text-left">
-                            <a
-                                t-if="start > now"
-                                t-att-href="booking.get_portal_url(suffix='/schedule/%d/%d' % (start_previous.year, start_previous.month))"
-                                class="btn btn-secondary"
-                                title="Previous month"
-                            >
-                                <i class="fa fa-chevron-left" />
-                            </a>
-                        </th>
-                        <th
-                            class="align-middle"
-                            colspan="5"
-                            t-out="start.strftime('%B %Y')"
-                        />
-                        <th class="text-right">
-                            <a
-                                t-att-href="booking.get_portal_url(suffix='/schedule/%d/%d' % (start_next.year, start_next.month))"
-                                class="btn btn-secondary"
-                                title="Next month"
-                            >
-                                <i class="fa fa-chevron-right" />
-                            </a>
-                        </th>
-                    </tr>
-                </thead>
-                <thead>
-                    <tr>
-                        <t t-foreach="calendar.iterweekdays()" t-as="weekday">
-                            <th
-                                t-att-title="weekday_names[str(weekday + 1)]"
-                                t-out="weekday_names[str(weekday + 1)][:3]"
-                            />
-                        </t>
-                    </tr>
-                </thead>
-                <tbody>
-                    <t
-                        t-foreach="calendar.monthdatescalendar(start.year, start.month)"
-                        t-as="week"
-                    >
+            <div class="table-responsive-md">
+                <table class="table text-center">
+                    <thead t-if="booking.requester_advice">
                         <tr>
-                            <t t-foreach="week" t-as="day">
-                                <td
-                                    t-att-class="day.month != start.month and 'text-muted'"
+                            <td colspan="7">
+                                <div t-field="booking.requester_advice" />
+                            </td>
+                        </tr>
+                    </thead>
+                    <thead class="thead-dark">
+                        <tr>
+                            <th class="text-left">
+                                <a
+                                    t-if="start > now"
+                                    t-att-href="booking.get_portal_url(suffix='/schedule/%d/%d' % (start_previous.year, start_previous.month))"
+                                    class="btn btn-secondary"
+                                    title="Previous month"
                                 >
-                                    <t
-                                        t-if="day.month == start.month and slots.get(day)"
-                                    >
-                                        <!-- Day dropdown -->
-                                        <div class="dropdown">
-                                            <button
-                                                class="btn btn-primary dropdown-toggle"
-                                                type="button"
-                                                data-bs-toggle="dropdown"
-                                                aria-haspopup="true"
-                                                aria-expanded="false"
-                                                t-out="day.day"
-                                                t-attf-id="dropdown-trigger-#{day.isoformat()}"
-                                            />
-                                            <div
-                                                class="dropdown-menu slots-dropdown"
-                                                t-attf-aria-labelledby="dropdown-trigger-#{day.isoformat()}"
-                                            >
-                                                <t t-foreach="slots[day]" t-as="slot">
-                                                    <!-- Hour item to open confirmation -->
-                                                    <button
-                                                        class="dropdown-item"
-                                                        type="button"
-                                                        data-bs-toggle="modal"
-                                                        t-attf-data-bs-target="#modal-confirm-#{int(slot.timestamp())}"
-                                                        t-out="slot.strftime(time_format)"
-                                                    />
-                                                </t>
-                                            </div>
-                                        </div>
-                                    </t>
-                                    <t t-else="">
-                                        <t t-out="day.day" />
-                                    </t>
-                                </td>
+                                    <i class="fa fa-chevron-left" />
+                                </a>
+                            </th>
+                            <th
+                                class="align-middle"
+                                colspan="5"
+                                t-out="start.strftime('%B %Y')"
+                            />
+                            <th class="text-right">
+                                <a
+                                    t-att-href="booking.get_portal_url(suffix='/schedule/%d/%d' % (start_next.year, start_next.month))"
+                                    class="btn btn-secondary"
+                                    title="Next month"
+                                >
+                                    <i class="fa fa-chevron-right" />
+                                </a>
+                            </th>
+                        </tr>
+                    </thead>
+                    <thead>
+                        <tr>
+                            <t t-foreach="calendar.iterweekdays()" t-as="weekday">
+                                <th
+                                    t-att-title="weekday_names[str(weekday + 1)]"
+                                    t-out="weekday_names[str(weekday + 1)][:3]"
+                                />
                             </t>
                         </tr>
-                    </t>
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td colspan="7">
-                            All times are displayed using this timezone:
-                            <strong t-field="booking.type_id.resource_calendar_id.tz" />
-                        </td>
-                    </tr>
-                </tfoot>
-            </table>
+                    </thead>
+                    <tbody>
+                        <t
+                            t-foreach="calendar.monthdatescalendar(start.year, start.month)"
+                            t-as="week"
+                        >
+                            <tr>
+                                <t t-foreach="week" t-as="day">
+                                    <td
+                                        t-att-class="day.month != start.month and 'text-muted'"
+                                    >
+                                        <t
+                                            t-if="day.month == start.month and slots.get(day)"
+                                        >
+                                            <!-- Day dropdown -->
+                                            <div class="dropdown">
+                                                <button
+                                                    class="btn btn-primary dropdown-toggle"
+                                                    type="button"
+                                                    data-bs-toggle="dropdown"
+                                                    aria-haspopup="true"
+                                                    aria-expanded="false"
+                                                    t-out="day.day"
+                                                    t-attf-id="dropdown-trigger-#{day.isoformat()}"
+                                                />
+                                                <div
+                                                    class="dropdown-menu slots-dropdown"
+                                                    t-attf-aria-labelledby="dropdown-trigger-#{day.isoformat()}"
+                                                >
+                                                    <t
+                                                        t-foreach="slots[day]"
+                                                        t-as="slot"
+                                                    >
+                                                        <!-- Hour item to open confirmation -->
+                                                        <button
+                                                            class="dropdown-item"
+                                                            type="button"
+                                                            data-bs-toggle="modal"
+                                                            t-attf-data-bs-target="#modal-confirm-#{int(slot.timestamp())}"
+                                                            t-out="slot.strftime(time_format)"
+                                                        />
+                                                    </t>
+                                                </div>
+                                            </div>
+                                        </t>
+                                        <t t-else="">
+                                            <t t-out="day.day" />
+                                        </t>
+                                    </td>
+                                </t>
+                            </tr>
+                        </t>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td
+                                colspan="7"
+                            > All times are displayed using this timezone: <strong
+                                    t-field="booking.type_id.resource_calendar_id.tz"
+                                />
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
             <!-- Hour confirmation modals -->
             <t
                 t-foreach="calendar.monthdatescalendar(start.year, start.month)"
@@ -249,7 +256,11 @@
             </t>
         </xpath>
     </template>
-    <template id="portal_my_home" inherit_id="portal.portal_my_home">
+    <template
+        id="portal_my_home"
+        inherit_id="portal.portal_my_home"
+        customize_show="True"
+    >
         <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
             <t t-call="portal.portal_docs_entry">
                 <t t-set="title">Bookings</t>
