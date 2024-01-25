@@ -44,8 +44,13 @@
         "views/menus.xml",
     ],
     "assets": {
-        "web.assets_frontend": ["resource_booking/static/src/scss/portal.scss"],
-        "web.assets_tests": ["resource_booking/static/src/js/resource_booking_tour.js"],
+        "web.assets_frontend": [
+            "resource_booking/static/src/js/booking_portal.js",
+            "resource_booking/static/src/scss/portal.scss",
+        ],
+        "web.assets_tests": [
+            "resource_booking/static/src/js/tours/resource_booking_tour.js"
+        ],
     },
     "demo": ["demo/res_users_demo.xml"],
 }

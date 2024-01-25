@@ -268,9 +268,9 @@ class BackendCase(TransactionCase):
         self.assertEqual(self.rbt.duration, 0.5)
         # Change it to 45 minutes
         self.rbt.duration = 0.75
-        # Bookings smart button configures calendar with slots of 45 minutes
+        # Bookings smart button configures calendar with slots from slot duration field
         button_context = self.rbt.action_open_bookings()["context"]
-        self.assertEqual(button_context["calendar_slot_duration"], "00:45")
+        self.assertEqual(button_context["calendar_slot_duration"], "00:30:00")
         self.assertEqual(button_context["default_duration"], 0.75)
         # When you click & drag on calendar to create an event, it adds the
         # start and duration as default; we imitate that here to book a meeting

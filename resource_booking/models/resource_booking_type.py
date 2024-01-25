@@ -35,7 +35,7 @@ class ResourceBookingType(models.Model):
         default="random",
         help=(
             "Choose how to auto-assign resource combinations. "
-            "It has no effect if assiged manually."
+            "It has no effect if assigned manually."
         ),
     )
     combination_rel_ids = fields.One2many(
