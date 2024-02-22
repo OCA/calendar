@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+  <record id="calendar_import_ics_form" model="ir.ui.view">
+        <field name="name">calendar.import.ics.form</field>
+        <field name="model">calendar.import.ics</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="import_start_date" />
+                    <field name="import_end_date" />
+                    <field name="do_remove_old_event" />
+                    <field name="import_ics_file" filename="import_ics_filename" />
+                </group>
+                <footer>
+                    <button
+                        name="button_import"
+                        type="object"
+                        class="oe_highlight"
+                        string="Import"
+                    />
+                    <button special="cancel" string="Cancel" class="oe_link" />
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_import_ics_wizard" model="ir.actions.act_window">
+        <field name="name">Import Ics File</field>
+        <field name="res_model">calendar.import.ics</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+    <menuitem
+        id="menu_calendar_import_ics"
+        parent="calendar.calendar_menu_config"
+        action="action_import_ics_wizard"
+        sequence="1"
+    />
+</odoo>
