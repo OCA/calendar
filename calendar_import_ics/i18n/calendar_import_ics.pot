@@ -1,0 +1,120 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* calendar_import_ics
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 15.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: calendar_import_ics
+#: model:ir.model,name:calendar_import_ics.model_calendar_event
+msgid "Calendar Event"
+msgstr ""
+
+#. module: calendar_import_ics
+#: model:ir.model,name:calendar_import_ics.model_calendar_import_ics
+#: model:res.groups,name:calendar_import_ics.group_calendar_import
+msgid "Calendar Import Ics"
+msgstr ""
+
+#. module: calendar_import_ics
+#: model_terms:ir.ui.view,arch_db:calendar_import_ics.calendar_import_ics_form
+msgid "Cancel"
+msgstr ""
+
+#. module: calendar_import_ics
+#: model:ir.model.fields,field_description:calendar_import_ics.field_calendar_import_ics__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: calendar_import_ics
+#: model:ir.model.fields,field_description:calendar_import_ics.field_calendar_import_ics__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: calendar_import_ics
+#: model:ir.model.fields,field_description:calendar_import_ics.field_calendar_import_ics__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: calendar_import_ics
+#: model:ir.model.fields,field_description:calendar_import_ics.field_calendar_import_ics__import_end_date
+msgid "End Import Date"
+msgstr ""
+
+#. module: calendar_import_ics
+#: model:ir.model.fields,field_description:calendar_import_ics.field_calendar_event__event_identifier
+msgid "Event Id"
+msgstr ""
+
+#. module: calendar_import_ics
+#: model:ir.model.fields,field_description:calendar_import_ics.field_calendar_import_ics__id
+msgid "ID"
+msgstr ""
+
+#. module: calendar_import_ics
+#: model:ir.model.fields,help:calendar_import_ics.field_calendar_import_ics__do_remove_old_event
+msgid ""
+"If checked, the previously imported events that are not in this import will "
+"be deleted"
+msgstr ""
+
+#. module: calendar_import_ics
+#: model_terms:ir.ui.view,arch_db:calendar_import_ics.calendar_import_ics_form
+msgid "Import"
+msgstr ""
+
+#. module: calendar_import_ics
+#: model:ir.actions.act_window,name:calendar_import_ics.action_import_ics_wizard
+#: model:ir.model.fields,field_description:calendar_import_ics.field_calendar_import_ics__import_ics_file
+#: model:ir.ui.menu,name:calendar_import_ics.menu_calendar_import_ics
+msgid "Import Ics File"
+msgstr ""
+
+#. module: calendar_import_ics
+#: model:ir.model.fields,field_description:calendar_import_ics.field_calendar_import_ics__import_ics_filename
+msgid "Import Ics Filename"
+msgstr ""
+
+#. module: calendar_import_ics
+#: model:ir.model.fields,field_description:calendar_import_ics.field_calendar_import_ics____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: calendar_import_ics
+#: model:ir.model.fields,field_description:calendar_import_ics.field_calendar_import_ics__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: calendar_import_ics
+#: model:ir.model.fields,field_description:calendar_import_ics.field_calendar_import_ics__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: calendar_import_ics
+#: code:addons/calendar_import_ics/wizards/wizard_import_ics.py:0
+#, python-format
+msgid "Only ics files are supported"
+msgstr ""
+
+#. module: calendar_import_ics
+#: model:ir.model.fields,field_description:calendar_import_ics.field_calendar_import_ics__partner_id
+msgid "Partner"
+msgstr ""
+
+#. module: calendar_import_ics
+#: model:ir.model.fields,field_description:calendar_import_ics.field_calendar_import_ics__do_remove_old_event
+msgid "Remove old events?"
+msgstr ""
+
+#. module: calendar_import_ics
+#: model:ir.model.fields,field_description:calendar_import_ics.field_calendar_import_ics__import_start_date
+msgid "Start Import Date"
+msgstr ""
