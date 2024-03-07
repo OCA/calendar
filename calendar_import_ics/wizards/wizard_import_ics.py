@@ -4,6 +4,9 @@
 import base64
 from datetime import datetime
 
+import pytz
+from dateutil import parser
+
 from odoo import _, fields, models
 from odoo.exceptions import ValidationError
 
@@ -42,6 +45,8 @@ class CalendarImportIcs(models.TransientModel):
         lines = file_str.split("\n")
         ics_event = {}
         for line in lines:
+            if line.startswith(("DTSTART", "DTEND")) and "TZID=" in line:
+                line = self.convert_date_to_z(line)
             if line.startswith("BEGIN:VEVENT"):
                 ics_event = {}
             elif line.startswith("END:VEVENT"):
@@ -116,3 +121,16 @@ class CalendarImportIcs(models.TransientModel):
             non_imported_event.write({"partner_ids": [(3, self.partner_id.id)]})
         if not non_imported_events.partner_ids:
             non_imported_events.unlink()
+
+    def convert_date_to_z(self, line):
+        split_parts = line.split(":")
+        event_phase = split_parts[0].split(";TZID=")[0]
+        tz_id = split_parts[0].split(";TZID=")[1]
+        date = split_parts[1]
+
+        date_obj = parser.parse(date)
+        tz = pytz.timezone(tz_id)
+
+        utc_date = tz.localize(date_obj).astimezone(pytz.UTC)
+        utc_date_string = utc_date.strftime(event_phase + ":%Y%m%dT%H%M%SZ")
+        return utc_date_string
