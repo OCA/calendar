@@ -1349,9 +1349,3 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:resource_booking.message_combination_assigned
 msgid "because you belong to the chosen resource combination:"
 msgstr ""
-
-#~ msgid "Next Activity Resource Booking"
-#~ msgstr "Siguiente actividad de reserva de recursos"
-
-#~ msgid "Who requested this booking?"
-#~ msgstr "¿Quién solicitó esta reserva/cita?"

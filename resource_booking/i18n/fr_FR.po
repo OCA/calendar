@@ -1360,12 +1360,3 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:resource_booking.message_combination_assigned
 msgid "because you belong to the chosen resource combination:"
 msgstr ""
-
-#~ msgid "Who requested this booking?"
-#~ msgstr "Qui a demandé cette réservation ?"
-
-#~ msgid "SMS Delivery error"
-#~ msgstr "Erreur de livraison SMS"
-
-#~ msgid "Followers (Channels)"
-#~ msgstr "Abonnés (Chaînes)"
