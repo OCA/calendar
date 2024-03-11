@@ -167,6 +167,7 @@ class ResourceBooking(models.Model):
     )
     partner_ids = fields.Many2many(
         comodel_name="res.partner",
+        relation="res_partner_resource_booking_rel",
         string="Attendees",
         required=True,
         tracking=True,
@@ -724,7 +725,7 @@ class ResourceBooking(models.Model):
 
     def action_schedule(self):
         """Redirect user to a simpler way to schedule this booking."""
-        FloatTimeParser = self.env["ir.qweb.field.float_time"]
+        DurationParser = self.env["ir.qweb.field.duration"]
         return {
             "context": dict(
                 self.env.context,
@@ -732,8 +733,12 @@ class ResourceBooking(models.Model):
                 default_res_model_id=False,
                 default_res_id=False,
                 # Context used by web_calendar_slot_duration module
-                calendar_slot_duration=FloatTimeParser.value_to_html(
-                    self.duration, False
+                calendar_slot_duration=DurationParser.value_to_html(
+                    self.duration,
+                    {
+                        "unit": "hour",
+                        "digital": True,
+                    },
                 ),
                 default_resource_booking_ids=[(6, 0, self.ids)],
                 default_name=self.name or "",

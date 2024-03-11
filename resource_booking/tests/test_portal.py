@@ -7,33 +7,28 @@ from datetime import datetime
 from freezegun import freeze_time
 from lxml.html import fromstring
 
+from odoo.tests import new_test_user, tagged
 from odoo.tests.common import HttpCase
 
 from .common import create_test_data
 
 
 @freeze_time("2021-02-26 09:00:00", tick=True)
+@tagged("post_install", "-at_install")
 class PortalCase(HttpCase):
-    def setUp(self):
-        super().setUp()
-        create_test_data(self)
-        self.user_portal, self.user_manager = self.env["res.users"].create(
-            [
-                {
-                    "name": "portal",
-                    "login": "ptl",
-                    "password": "ptl",
-                    "groups_id": [(4, self.env.ref("base.group_portal").id, 0)],
-                },
-                {
-                    "name": "manager",
-                    "login": "mgr",
-                    "password": "mgr",
-                    "groups_id": [
-                        (4, self.env.ref("resource_booking.group_manager").id, 0)
-                    ],
-                },
-            ]
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        create_test_data(cls)
+
+        cls.user_portal = new_test_user(
+            cls.env, login="ptl", password="ptl", groups="base.group_portal"
+        )
+        cls.user_manager = new_test_user(
+            cls.env,
+            login="mgr",
+            password="mgr",
+            groups="resource_booking.group_manager",
         )
 
     def _url_xml(self, url, data=None, timeout=10):
@@ -195,7 +190,7 @@ class PortalCase(HttpCase):
             )
         )
         # Public guy's booking and related meeting are OK in backend
-        booking_public.invalidate_cache(ids=booking_public.ids)
+        booking_public.invalidate_model()
         self.assertEqual(booking_public.state, "confirmed")
         self.assertEqual(len(booking_public.meeting_id.attendee_ids), 2)
         for attendee in booking_public.meeting_id.attendee_ids:
