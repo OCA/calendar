@@ -155,9 +155,21 @@ msgid "Access warning"
 msgstr ""
 
 #. module: resource_booking
+#: model:ir.model.fields,field_description:resource_booking.field_mail_activity_type__category
+msgid "Action"
+msgstr ""
+
+#. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__message_needaction
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__message_needaction
 msgid "Action Needed"
+msgstr ""
+
+#. module: resource_booking
+#: model:ir.model.fields,help:resource_booking.field_mail_activity_type__category
+msgid ""
+"Actions may trigger specific behavior like opening calendar view or "
+"automatically mark as done when a document is uploaded"
 msgstr ""
 
 #. module: resource_booking
@@ -169,8 +181,14 @@ msgstr ""
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__activity_ids
+#: model:ir.model.fields,field_description:resource_booking.field_resource_booking__booking_activity_ids
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__activity_ids
 msgid "Activities"
+msgstr ""
+
+#. module: resource_booking
+#: model:ir.model,name:resource_booking.model_mail_activity
+msgid "Activity"
 msgstr ""
 
 #. module: resource_booking
@@ -183,6 +201,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__activity_state
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__activity_state
 msgid "Activity State"
+msgstr ""
+
+#. module: resource_booking
+#: model:ir.model,name:resource_booking.model_mail_activity_type
+msgid "Activity Type"
 msgstr ""
 
 #. module: resource_booking
@@ -763,17 +786,6 @@ msgid "Next Activity Deadline"
 msgstr ""
 
 #. module: resource_booking
-#: model:ir.model.fields,field_description:resource_booking.field_mail_activity_mixin__activity_booking_id
-#: model:ir.model.fields,field_description:resource_booking.field_product_product__activity_booking_id
-#: model:ir.model.fields,field_description:resource_booking.field_product_template__activity_booking_id
-#: model:ir.model.fields,field_description:resource_booking.field_res_partner__activity_booking_id
-#: model:ir.model.fields,field_description:resource_booking.field_res_users__activity_booking_id
-#: model:ir.model.fields,field_description:resource_booking.field_resource_booking__activity_booking_id
-#: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__activity_booking_id
-msgid "Next Activity Resource Booking"
-msgstr ""
-
-#. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__activity_summary
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__activity_summary
 msgid "Next Activity Summary"
@@ -931,6 +943,8 @@ msgstr ""
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_calendar_event__resource_booking_ids
+#: model:ir.model.fields,field_description:resource_booking.field_mail_activity__booking_id
+#: model:ir.model.fields.selection,name:resource_booking.selection__mail_activity_type__category__resource_booking
 msgid "Resource booking"
 msgstr ""
 
