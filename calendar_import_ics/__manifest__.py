@@ -4,7 +4,7 @@
 {
     "name": "Calendar - Import ics",
     "summary": "Allow importing an ics file to our calendar",
-    "version": "15.0.1.0.0",
+    "version": "15.0.1.0.1",
     "author": "ForgeFlow S.L.,Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/calendar",
     "license": "AGPL-3",
