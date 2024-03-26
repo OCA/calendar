@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2021 Tecnativa - Jairo Llopis
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<data>
+    <!-- User menus -->
+    <menuitem
+        id="resource_booking_main_menu"
+        name="Resource Bookings"
+        groups="group_user"
+        web_icon="resource_booking,static/description/icon.png"
+    />
+    <menuitem
+        id="resource_booking_menu"
+        name="Bookings"
+        action="resource_booking_action"
+        parent="resource_booking_main_menu"
+        sequence="10"
+    />
+    <menuitem
+        id="resource_booking_type_menu"
+        name="Types"
+        action="resource_booking_type_action"
+        parent="resource_booking_main_menu"
+        sequence="20"
+    />
+    <menuitem
+        id="resource_booking_combination_menu"
+        name="Combinations"
+        action="resource_booking_combination_action"
+        parent="resource_booking_main_menu"
+        sequence="30"
+    />
+    <!-- Manager menus -->
+    <menuitem
+        id="resource_booking_type_configuration_menu"
+        name="Configuration"
+        parent="resource_booking_main_menu"
+        sequence="100"
+        groups="group_manager"
+    />
+    <menuitem
+        id="menu_resource_resource"
+        parent="resource_booking_type_configuration_menu"
+        action="resource.action_resource_resource_tree"
+        sequence="100"
+    />
+    <menuitem
+        id="menu_resource_calendar"
+        parent="resource_booking_type_configuration_menu"
+        action="resource.action_resource_calendar_form"
+        sequence="200"
+    />
+    <menuitem
+        id="menu_view_resource_calendar_leaves_search"
+        parent="resource_booking_type_configuration_menu"
+        action="resource.action_resource_calendar_leave_tree"
+        sequence="300"
+    />
+</data>
