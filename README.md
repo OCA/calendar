@@ -17,7 +17,11 @@ TODO: add repo description.
 
 [//]: # (addons)
 
-This part will be replaced when running the oca-gen-addons-table script from OCA/maintainer-tools.
+Available addons
+----------------
+addon | version | maintainers | summary
+--- | --- | --- | ---
+[resource_booking](resource_booking/) | 16.0.1.0.0 | [![pedrobaeza](https://github.com/pedrobaeza.png?size=30px)](https://github.com/pedrobaeza) [![ows-cloud](https://github.com/ows-cloud.png?size=30px)](https://github.com/ows-cloud) | Manage appointments and resource booking
 
 [//]: # (end addons)
 
