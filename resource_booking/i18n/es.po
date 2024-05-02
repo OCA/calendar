@@ -595,9 +595,7 @@ msgstr "Si está marcado, hay nuevos mensajes que requieren de su atención."
 
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking__message_has_error
-#: model:ir.model.fields,help:resource_booking.field_resource_booking__message_has_sms_error
 #: model:ir.model.fields,help:resource_booking.field_resource_booking_type__message_has_error
-#: model:ir.model.fields,help:resource_booking.field_resource_booking_type__message_has_sms_error
 msgid "If checked, some messages have a delivery error."
 msgstr "Si está marcado, algunos mensajes no se pudieron entregar."
 
@@ -997,12 +995,6 @@ msgid "Restrict bookings to this schedule."
 msgstr "Restringir reservas/citas a este horario."
 
 #. module: resource_booking
-#: model:ir.model.fields,field_description:resource_booking.field_resource_booking__message_has_sms_error
-#: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__message_has_sms_error
-msgid "SMS Delivery error"
-msgstr "Error de Entrega SMS"
-
-#. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.portal_breadcrumbs
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_form
 msgid "Schedule"
@@ -1321,6 +1313,9 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:resource_booking.message_combination_assigned
 msgid "because you belong to the chosen resource combination:"
 msgstr "porque perteneces a la combinación de recursos elegida:"
+
+#~ msgid "SMS Delivery error"
+#~ msgstr "Error de Entrega SMS"
 
 #~ msgid "Booking #"
 #~ msgstr "Reserva/cita nº"
