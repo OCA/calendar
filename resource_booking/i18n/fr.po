@@ -32,7 +32,7 @@ msgstr "# %(id)d - %(name)s"
 #: code:addons/resource_booking/models/resource_booking.py:0
 #, python-format
 msgid "%(partner)s - %(type)s"
-msgstr "%(partenaire)s - %(type)s"
+msgstr "%(partner)s - %(type)s"
 
 #. module: resource_booking
 #: code:addons/resource_booking/models/resource_booking.py:0
