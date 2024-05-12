@@ -7,28 +7,29 @@ msgstr ""
 "Project-Id-Version: Odoo Server 15.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-20 15:55+0000\n"
-"PO-Revision-Date: 2023-10-20 15:55+0000\n"
-"Last-Translator: \n"
+"PO-Revision-Date: 2024-05-13 01:28+0000\n"
+"Last-Translator: Sergio Ariel Ameghino <ariel.ameghino@gmail.com>\n"
 "Language-Team: \n"
-"Language: \n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Plural-Forms: \n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.17\n"
 
 #. module: resource_booking
 #. odoo-python
 #: code:addons/resource_booking/models/resource_booking.py:0
 #, python-format
 msgid "# %(id)d"
-msgstr ""
+msgstr "# %(id)d"
 
 #. module: resource_booking
 #. odoo-python
 #: code:addons/resource_booking/models/resource_booking.py:0
 #, python-format
 msgid "# %(id)d - %(name)s"
-msgstr ""
+msgstr "# %(id)d - %(name)s"
 
 #. module: resource_booking
 #. odoo-python
@@ -140,7 +141,7 @@ msgstr "<strong>Fechas:</strong>"
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_portal_form
 msgid "<strong>Duration:</strong>"
-msgstr ""
+msgstr "<strong>Duración:</strong>"
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_portal_form
@@ -150,7 +151,7 @@ msgstr "<strong>Ubicación:</strong>"
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_portal_form
 msgid "<strong>Meeting URL:</strong>"
-msgstr ""
+msgstr "<strong>URL de la reunión:</strong>"
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_portal_form
@@ -175,7 +176,7 @@ msgstr "Alerta de acceso"
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_mail_activity_type__category
 msgid "Action"
-msgstr ""
+msgstr "Acción"
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__message_needaction
@@ -189,6 +190,9 @@ msgid ""
 "Actions may trigger specific behavior like opening calendar view or "
 "automatically mark as done when a document is uploaded"
 msgstr ""
+"Las acciones pueden desencadenar un comportamiento específico, como abrir la "
+"vista de calendario o marcar automáticamente como finalizado cuando se carga "
+"un documento"
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__active
@@ -207,13 +211,13 @@ msgstr "Actividades"
 #. module: resource_booking
 #: model:ir.model,name:resource_booking.model_mail_activity
 msgid "Activity"
-msgstr ""
+msgstr "Actividad"
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__activity_exception_decoration
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__activity_exception_decoration
 msgid "Activity Exception Decoration"
-msgstr ""
+msgstr "Decoración de excepción de actividad"
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__activity_state
@@ -224,13 +228,13 @@ msgstr "Estado de la actividad"
 #. module: resource_booking
 #: model:ir.model,name:resource_booking.model_mail_activity_type
 msgid "Activity Type"
-msgstr ""
+msgstr "Tipo de actividad"
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__activity_type_icon
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__activity_type_icon
 msgid "Activity Type Icon"
-msgstr ""
+msgstr "Icono de tipo de actividad"
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.scheduling_calendar
@@ -242,13 +246,15 @@ msgstr "Todos los horarios se muestran usando esta zona horaria:"
 msgid ""
 "Amount of time that the resources will be booked and unavailable for others."
 msgstr ""
+"Cantidad de tiempo que los recursos estarán reservados y no estarán "
+"disponibles para otros."
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_combination_view_form
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_type_view_form
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_view_form
 msgid "Archived"
-msgstr ""
+msgstr "Archivado"
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.scheduling_calendar
@@ -269,12 +275,12 @@ msgstr "Asistentes"
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__combination_auto_assign
 msgid "Auto assigned"
-msgstr ""
+msgstr "Asignado automáticamente"
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_view_form
 msgid "Auto-assigned:"
-msgstr ""
+msgstr "Asignado automáticamente:"
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__resource_calendar_id
@@ -294,7 +300,7 @@ msgstr "Combinaciones de recursos reservables"
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_portal_header
 msgid "Booking"
-msgstr ""
+msgstr "Reserva"
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__booking_count
@@ -309,7 +315,7 @@ msgstr "Cuenta de reservas/citas"
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking_type__duration
 msgid "Booking default duration."
-msgstr ""
+msgstr "Duración por defecto de la reserva."
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.portal_my_bookings
@@ -400,6 +406,8 @@ msgid ""
 "Choose how to auto-assign resource combinations. It has no effect if "
 "assigned manually."
 msgstr ""
+"Elija cómo asignar automáticamente combinaciones de recursos. No tiene "
+"ningún efecto si se asigna manualmente."
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.alert_availability_lost
@@ -466,7 +474,7 @@ msgstr "Confirmado"
 #. module: resource_booking
 #: model:ir.model,name:resource_booking.model_res_partner
 msgid "Contact"
-msgstr ""
+msgstr "Contacto"
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__create_uid
@@ -506,6 +514,9 @@ msgid ""
 "            <br/>\n"
 "            You have been assigned to the"
 msgstr ""
+"Querido usuario,\n"
+"            <br/>\n"
+"            Ha siso asignado a la"
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__alarm_ids
@@ -535,7 +546,7 @@ msgstr "Defina las reservas/citas de recursos."
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__description
 msgid "Description"
-msgstr ""
+msgstr "Descripción"
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__display_name
@@ -584,7 +595,7 @@ msgstr "Seguidores (contactos)"
 #: model:ir.model.fields,help:resource_booking.field_resource_booking__activity_type_icon
 #: model:ir.model.fields,help:resource_booking.field_resource_booking_type__activity_type_icon
 msgid "Font awesome icon e.g. fa-tasks"
-msgstr ""
+msgstr "Font awesome icon e.g. fa-tasks"
 
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking_combination__forced_calendar_id
@@ -612,7 +623,7 @@ msgstr "Agrupar por"
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__has_message
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__has_message
 msgid "Has Message"
-msgstr ""
+msgstr "Tiene mensaje"
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__id
@@ -626,13 +637,13 @@ msgstr "ID"
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__activity_exception_icon
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__activity_exception_icon
 msgid "Icon"
-msgstr ""
+msgstr "Icono"
 
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking__activity_exception_icon
 #: model:ir.model.fields,help:resource_booking.field_resource_booking_type__activity_exception_icon
 msgid "Icon to indicate an exception activity."
-msgstr ""
+msgstr "Icono para indicar una actividad de excepción."
 
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking__message_needaction
@@ -654,7 +665,7 @@ msgstr "Si cancela esta reserva/cita:"
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking_type__slot_duration
 msgid "Interval offered to start each resource booking."
-msgstr ""
+msgstr "Intervalo ofrecido para iniciar la reserva de cada recurso."
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_view_form
@@ -719,7 +730,7 @@ msgstr "Última actualización en"
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking__name
 msgid "Leave empty to autogenerate a booking name."
-msgstr ""
+msgstr "Deje vacío para autogenerar un nombre de reserva."
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__location
@@ -741,7 +752,7 @@ msgstr "Responsable"
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_view_form
 msgid "Manually assigned:"
-msgstr ""
+msgstr "Asignado manualmente:"
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__meeting_id
@@ -753,7 +764,7 @@ msgstr "Reunión"
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__videocall_location
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__videocall_location
 msgid "Meeting URL"
-msgstr ""
+msgstr "URL de la reunión"
 
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking__meeting_id
@@ -806,7 +817,7 @@ msgstr "Fecha límite para modificaciones"
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__my_activity_date_deadline
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__my_activity_date_deadline
 msgid "My Activity Deadline"
-msgstr ""
+msgstr "Fecha límite de mi actividad"
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__name
@@ -820,7 +831,7 @@ msgstr "Nombre"
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__activity_calendar_event_id
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__activity_calendar_event_id
 msgid "Next Activity Calendar Event"
-msgstr ""
+msgstr "Próximo evento del calendario de actividades"
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__activity_date_deadline
@@ -867,13 +878,13 @@ msgstr "Número de acciones"
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__message_has_error_counter
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__message_has_error_counter
 msgid "Number of errors"
-msgstr ""
+msgstr "Número de errores"
 
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking__message_needaction_counter
 #: model:ir.model.fields,help:resource_booking.field_resource_booking_type__message_needaction_counter
 msgid "Number of messages requiring action"
-msgstr ""
+msgstr "Número de mensajes que requieren acción"
 
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking__message_has_error_counter
@@ -901,7 +912,7 @@ msgstr ""
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__user_id
 msgid "Organizer"
-msgstr ""
+msgstr "Organizador"
 
 #. module: resource_booking
 #: model:ir.model.fields.selection,name:resource_booking.selection__resource_booking__state__pending
@@ -964,7 +975,7 @@ msgstr "Reserva de recursos"
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_view_form
 msgid "Resource Booking Name"
-msgstr ""
+msgstr "Nombre de la reserva de recursos"
 
 #. module: resource_booking
 #: model:ir.model,name:resource_booking.model_resource_booking_type
@@ -979,7 +990,7 @@ msgstr "Reservas de recursos"
 #. module: resource_booking
 #: model:ir.ui.menu,name:resource_booking.menu_view_resource_calendar_leaves_search
 msgid "Resource Time Off"
-msgstr ""
+msgstr "Tiempo libre de recursos"
 
 #. module: resource_booking
 #: model:ir.model,name:resource_booking.model_resource_calendar
@@ -997,7 +1008,7 @@ msgstr "Reserva de recursos"
 #: model:ir.model.fields,field_description:resource_booking.field_res_partner__resource_booking_count
 #: model:ir.model.fields,field_description:resource_booking.field_res_users__resource_booking_count
 msgid "Resource booking count"
-msgstr ""
+msgstr "Cantidad de reservas de recursos"
 
 #. module: resource_booking
 #: model:ir.model,name:resource_booking.model_resource_booking_type_combination_rel
@@ -1111,7 +1122,7 @@ msgstr "Compartir"
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__slot_duration
 msgid "Slot Duration"
-msgstr ""
+msgstr "Duración del espacio"
 
 #. module: resource_booking
 #: model:ir.model.fields.selection,name:resource_booking.selection__resource_booking_type__combination_assignment__sorted
@@ -1236,7 +1247,7 @@ msgstr "Tipo"
 #: model:ir.model.fields,help:resource_booking.field_resource_booking__activity_exception_decoration
 #: model:ir.model.fields,help:resource_booking.field_resource_booking_type__activity_exception_decoration
 msgid "Type of the exception activity on record."
-msgstr ""
+msgstr "Tipo de actividad de excepción registrada."
 
 #. module: resource_booking
 #: model:ir.actions.act_window,name:resource_booking.resource_booking_type_action
@@ -1278,7 +1289,7 @@ msgstr ""
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.message_combination_assigned
 msgid "View"
-msgstr ""
+msgstr "Vista"
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__website_message_ids
@@ -1298,6 +1309,8 @@ msgid ""
 "When checked, resource combinations will be (un)assigned automatically based "
 "on their availability during the booking dates."
 msgstr ""
+"Cuando esté marcado, las combinaciones de recursos se (des)asignarán "
+"automáticamente según su disponibilidad durante las fechas de reserva."
 
 #. module: resource_booking
 #: model_terms:ir.actions.act_window,help:resource_booking.resource_booking_action
@@ -1328,6 +1341,9 @@ msgid ""
 "appear as the calendar event organizer, when scheduled, and calendar "
 "notifications will be sent in his/her name."
 msgstr ""
+"¿Quién organizó esta reserva? Por lo general, quien creó el registro. "
+"Aparecerá como el organizador del evento del calendario, cuando esté "
+"programado, y las notificaciones del calendario se enviarán en su nombre."
 
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking__partner_ids
@@ -1362,7 +1378,7 @@ msgstr ""
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.message_combination_assigned
 msgid "because you belong to the chosen resource combination:"
-msgstr ""
+msgstr "porque pertenece a la combinación de recursos elegida:"
 
 #~ msgid ""
 #~ "Choose how to auto-assign resource combinations. It has no effect if "
