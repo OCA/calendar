@@ -26,8 +26,9 @@ class CustomerPortal(portal.CustomerPortal):
     def _prepare_home_portal_values(self, counters):
         """Compute values for multi-booking portal views."""
         values = super()._prepare_home_portal_values(counters)
-        booking_count = request.env["resource.booking"].search_count([])
-        values.update({"booking_count": booking_count})
+        if "booking_count" in counters:
+            booking_count = request.env["resource.booking"].search_count([])
+            values.update({"booking_count": booking_count})
         return values
 
     def _booking_get_page_view_values(self, booking_sudo, access_token, **kwargs):
