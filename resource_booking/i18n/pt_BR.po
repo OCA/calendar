@@ -202,7 +202,6 @@ msgstr "Ativo"
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__activity_ids
-#: model:ir.model.fields,field_description:resource_booking.field_resource_booking__booking_activity_ids
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__activity_ids
 msgid "Activities"
 msgstr "Atividades"
@@ -302,6 +301,11 @@ msgid "Booking"
 msgstr "Agendamento"
 
 #. module: resource_booking
+#: model:ir.model.fields,field_description:resource_booking.field_resource_booking__booking_activity_ids
+msgid "Booking Activities"
+msgstr ""
+
+#. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__booking_count
 msgid "Booking Count"
 msgstr "No. de Agendamentos"
@@ -387,7 +391,8 @@ msgstr ""
 #: code:addons/resource_booking/models/resource_booking.py:0
 #, python-format
 msgid ""
-"Cannot schedule these bookings because they do not fit in their type or resources calendars, or because all resources are busy:\n"
+"Cannot schedule these bookings because they do not fit in their type or "
+"resources calendars, or because all resources are busy:\n"
 "\n"
 "- %s"
 msgstr ""
@@ -1163,8 +1168,8 @@ msgstr ""
 #: model:ir.model.fields,help:resource_booking.field_resource_booking__requester_advice
 #: model:ir.model.fields,help:resource_booking.field_resource_booking_type__requester_advice
 msgid ""
-"Text that will appear by default in portal invitation emails and in calendar"
-" views for scheduling."
+"Text that will appear by default in portal invitation emails and in calendar "
+"views for scheduling."
 msgstr ""
 
 #. module: resource_booking
@@ -1176,8 +1181,8 @@ msgstr ""
 #: model_terms:ir.actions.act_window,help:resource_booking.resource_booking_type_action
 msgid ""
 "These records categorize resource bookings and apply restrictions to them, "
-"such as available resource combinations, availability schedules and interval"
-" duration."
+"such as available resource combinations, availability schedules and interval "
+"duration."
 msgstr ""
 
 #. module: resource_booking
@@ -1277,8 +1282,8 @@ msgstr ""
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking__combination_auto_assign
 msgid ""
-"When checked, resource combinations will be (un)assigned automatically based"
-" on their availability during the booking dates."
+"When checked, resource combinations will be (un)assigned automatically based "
+"on their availability during the booking dates."
 msgstr ""
 
 #. module: resource_booking
@@ -1291,9 +1296,9 @@ msgstr ""
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking_type__modifications_deadline
 msgid ""
-"When this deadline has been exceeded, if a booking was not yet confirmed, it"
-" will be canceled automatically. Also, only booking managers will be able to"
-" unschedule or reschedule them. The value is expressed in hours."
+"When this deadline has been exceeded, if a booking was not yet confirmed, it "
+"will be canceled automatically. Also, only booking managers will be able to "
+"unschedule or reschedule them. The value is expressed in hours."
 msgstr ""
 
 #. module: resource_booking
@@ -1324,7 +1329,8 @@ msgstr ""
 #: code:addons/resource_booking/models/calendar_event.py:0
 #, python-format
 msgid ""
-"You are not allowed to alter these bookings because they exceeded their modification deadlines:\n"
+"You are not allowed to alter these bookings because they exceeded their "
+"modification deadlines:\n"
 "\n"
 "- %s"
 msgstr ""
