@@ -252,7 +252,7 @@ class ResourceBooking(models.Model):
         tracking=True,
     )
     booking_activity_ids = fields.One2many(
-        "mail.activity", "booking_id", string="Activities"
+        "mail.activity", "booking_id", string="Booking Activities"
     )
 
     @api.depends("partner_ids")
