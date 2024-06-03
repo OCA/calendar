@@ -6,11 +6,11 @@ from datetime import datetime
 from freezegun import freeze_time
 
 from odoo.exceptions import ValidationError
-from odoo.tests.common import SavepointCase
+from odoo.tests.common import TransactionCase
 
 
 @freeze_time("2021-1-1")
-class TestResourceCalendar(SavepointCase):
+class TestResourceCalendar(TransactionCase):
     @classmethod
     def setUpClass(cls, *args, **kwargs):
         super().setUpClass(*args, **kwargs)

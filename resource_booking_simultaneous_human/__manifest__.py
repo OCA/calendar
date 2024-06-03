@@ -6,7 +6,7 @@
     "summary": """
         When a resource of type human is scheduled for a booking, they will remain
         simultaneously available for other bookings.""",
-    "version": "14.0.1.0.0",
+    "version": "16.0.1.0.0",
     "category": "Appointments",
     "website": "https://github.com/OCA/calendar",
     "author": "Odoo Community Association (OCA), Coop IT Easy SC",
