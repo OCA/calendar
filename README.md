@@ -21,7 +21,7 @@ Available addons
 ----------------
 addon | version | maintainers | summary
 --- | --- | --- | ---
-[resource_booking](resource_booking/) | 16.0.1.2.1 | [![pedrobaeza](https://github.com/pedrobaeza.png?size=30px)](https://github.com/pedrobaeza) [![ows-cloud](https://github.com/ows-cloud.png?size=30px)](https://github.com/ows-cloud) | Manage appointments and resource booking
+[resource_booking](resource_booking/) | 16.0.1.2.2 | [![pedrobaeza](https://github.com/pedrobaeza.png?size=30px)](https://github.com/pedrobaeza) [![ows-cloud](https://github.com/ows-cloud.png?size=30px)](https://github.com/ows-cloud) | Manage appointments and resource booking
 
 [//]: # (end addons)
 
