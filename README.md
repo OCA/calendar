@@ -21,6 +21,7 @@ Available addons
 ----------------
 addon | version | maintainers | summary
 --- | --- | --- | ---
+[calendar_export_ics](calendar_export_ics/) | 15.0.1.0.1 |  | Allow exporting odoo calendar to an ics file
 [calendar_import_ics](calendar_import_ics/) | 15.0.1.0.1 |  | Allow importing an ics file to our calendar
 [resource_booking](resource_booking/) | 15.0.2.0.0 | [![pedrobaeza](https://github.com/pedrobaeza.png?size=30px)](https://github.com/pedrobaeza) | Manage appointments and resource booking
 
