@@ -23,14 +23,16 @@ from .common import create_test_data
 _2dt = fields.Datetime.to_datetime
 
 
-@freeze_time("2021-02-26 09:00:00", tick=True)  # Last Friday of February
-class BackendCase(TransactionCase):
+class BackendCaseBase(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
         create_test_data(cls)
         cls.plain_user = new_test_user(cls.env, login="plain", groups="base.group_user")
 
+
+@freeze_time("2021-02-26 09:00:00", tick=True)  # Last Friday of February
+class BackendCaseMisc(BackendCaseBase):
     @users("plain")
     def test_plain_user_calendar_event(self):
         """Check that a simple user is able to handle manual calendar events."""
@@ -1042,3 +1044,49 @@ class TestMailActivity(TransactionCase):
         self.assertNotEqual(
             self.mail_activity.date_deadline, fields.Date.from_string("2024-01-01")
         )
+
+
+@freeze_time("2021-02-26 09:00:00", tick=True)  # Last Friday of February
+class BackendCaseCustom(BackendCaseBase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.env = cls.env(context=dict(cls.env.context, tracking_disable=False))
+        cls.mt_note = cls.env.ref("mail.mt_note")
+        cls.mt_note.default = True
+        cls.partner.email = "ŧest@test.com"
+
+    def test_resource_booking_message(self):
+        rb_model = self.env["resource.booking"]
+        rb = rb_model.create(
+            {
+                "partner_ids": [(4, self.partner.id)],
+                "type_id": self.rbt.id,
+                "combination_auto_assign": False,
+                "combination_id": self.rbcs[0].id,
+                "user_id": self.users[0].id,
+            }
+        )
+        # Simulate the same as portal_booking_confirm
+        booking_sudo = rb_model.sudo().browse(rb.id)
+        booking_sudo = booking_sudo.with_context(
+            using_portal=True, tz=booking_sudo.type_id.resource_calendar_id.tz
+        )
+        with Form(booking_sudo) as booking_form:
+            booking_form.start = datetime(2021, 3, 1, 10)
+        booking_sudo.action_confirm()
+        meeting = rb.meeting_id
+        follower = meeting.message_follower_ids.filtered(
+            lambda x: x.partner_id == meeting.user_id.partner_id
+        )
+        self.assertIn(self.mt_note, follower.subtype_ids)
+        meesages = meeting.message_ids.filtered(
+            lambda x: x.message_type != "notification"
+        )
+        self.assertEqual(len(meesages), 2)
+        partner_message = meesages.filtered(lambda x: self.partner in x.partner_ids)
+        self.assertNotIn(rb.user_id.partner_id, partner_message.notified_partner_ids)
+        user_message = meesages.filtered(
+            lambda x: meeting.user_id.partner_id in x.partner_ids
+        )
+        self.assertIn(meeting.user_id.partner_id, user_message.notified_partner_ids)
