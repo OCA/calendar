@@ -1056,7 +1056,7 @@ class BackendCaseCustom(BackendCaseBase):
         cls.mt_note.default = True
         cls.partner.email = "ŧest@test.com"
 
-    def test_resource_booking_message(self):
+    def test_resource_booking_message_01(self):
         rb_model = self.env["resource.booking"]
         rb = rb_model.create(
             {
@@ -1090,3 +1090,46 @@ class BackendCaseCustom(BackendCaseBase):
             lambda x: meeting.user_id.partner_id in x.partner_ids
         )
         self.assertIn(meeting.user_id.partner_id, user_message.notified_partner_ids)
+
+    def test_resource_booking_message_02(self):
+        rb_model = self.env["resource.booking"]
+        combination = self.rbcs[0]
+        user_0 = self.users[0]
+        user_1 = self.users[1]
+        r_user_1 = self.r_users.filtered(lambda x: x.user_id == user_1)
+        combination.write({"resource_ids": [(4, r_user_1.id)]})
+        cal_mon = self.r_calendars[0]
+        combination.forced_calendar_id = cal_mon
+        rb = rb_model.create(
+            {
+                "partner_ids": [(4, self.partner.id)],
+                "type_id": self.rbt.id,
+                "combination_auto_assign": False,
+                "combination_id": combination.id,
+                "user_id": user_0.id,
+            }
+        )
+        # Simulate the same as portal_booking_confirm
+        booking_sudo = rb_model.sudo().browse(rb.id)
+        booking_sudo = booking_sudo.with_context(
+            using_portal=True, tz=booking_sudo.type_id.resource_calendar_id.tz
+        )
+        with Form(booking_sudo) as booking_form:
+            booking_form.start = datetime(2021, 3, 1, 10)
+        booking_sudo.action_confirm()
+        meeting = rb.meeting_id
+        follower = meeting.message_follower_ids.filtered(
+            lambda x: x.partner_id == meeting.user_id.partner_id
+        )
+        self.assertIn(self.mt_note, follower.subtype_ids)
+        meesages = meeting.message_ids.filtered(
+            lambda x: x.message_type != "notification"
+        )
+        self.assertEqual(len(meesages), 3)
+        partner_message = meesages.filtered(lambda x: self.partner in x.partner_ids)
+        self.assertNotIn(user_0.partner_id, partner_message.notified_partner_ids)
+        self.assertNotIn(user_1.partner_id, partner_message.notified_partner_ids)
+        user_0_message = meesages.filtered(lambda x: user_0.partner_id in x.partner_ids)
+        self.assertIn(user_0.partner_id, user_0_message.notified_partner_ids)
+        user_1_message = meesages.filtered(lambda x: user_1.partner_id in x.partner_ids)
+        self.assertIn(user_1.partner_id, user_1_message.notified_partner_ids)
