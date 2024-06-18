@@ -67,6 +67,25 @@ class CalendarEvent(models.Model):
             self = self.with_context(mail_notify_author=True)
         return super()._notify_thread(message=message, msg_vals=msg_vals, **kwargs)
 
+    def _notify_get_recipients(self, message, msg_vals, **kwargs):
+        """If we are creating the calendar event from resource booking, we want to
+        notify only the partner_ids and not all the followers (to avoid that each email
+        is sent to all followers). Example: Resource booking with combination of several
+        users. This only happens when the subtype note is enabled by default in the
+        instance.
+        """
+        res = super()._notify_get_recipients(
+            message=message, msg_vals=msg_vals, **kwargs
+        )
+        if self.env.context.get("resource_booking_event"):
+            res2 = []
+            partner_ids = msg_vals.get("partner_ids", [])
+            for item in res:
+                if item["id"] in partner_ids:
+                    res2.append(item)
+            return res2
+        return res
+
     @api.model_create_multi
     def create(self, vals_list):
         """Transfer resource booking to _attendees_values by context.
