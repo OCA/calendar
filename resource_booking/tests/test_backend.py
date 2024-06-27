@@ -821,7 +821,7 @@ class BackendCase(TransactionCase):
         rb_f.start = "2021-03-01 09:30:00"
         rb_f.duration = 0.5
         rb_f.partner_ids.add(self.partner.copy())
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValidationError):
             rb_f.save()
 
     def test_resource_is_available(self):
