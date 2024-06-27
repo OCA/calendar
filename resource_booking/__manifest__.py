@@ -6,7 +6,7 @@
 {
     "name": "Resource booking",
     "summary": "Manage appointments and resource booking",
-    "version": "16.0.1.2.3",
+    "version": "16.0.1.3.0",
     "development_status": "Production/Stable",
     "category": "Appointments",
     "website": "https://github.com/OCA/calendar",
