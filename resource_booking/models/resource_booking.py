@@ -162,6 +162,7 @@ class ResourceBooking(models.Model):
         comodel_name="res.partner",
         compute="_compute_partner_id",
         inverse="_inverse_partner_id",
+        search="_search_partner_id",
         readonly=False,
         string="Requester",
     )
@@ -269,6 +270,14 @@ class ResourceBooking(models.Model):
     def _inverse_partner_id(self):
         for one in self:
             one.partner_ids = one.partner_id
+
+    @api.model
+    def _search_partner_id(self, operator, value):
+        """Overwrite this for security, partner_id field is not stored and if we search
+        for it by mistake (or out of ignorance) we will get all the records.
+        To avoid this behavior, we search for the correct field: partner_ids
+        """
+        return [("partner_ids", operator, value)]
 
     @api.model
     def _default_user_id(self):
