@@ -17,3 +17,6 @@ def convert_resource_booking_partners(env):
 def migrate(env, version):
     """Put partner_id in partner_ids"""
     convert_resource_booking_partners(env)
+    openupgrade.load_data(
+        env.cr, "resource_booking", "migrations/15.0.1.4.0/noupdate_changes.xml"
+    )
