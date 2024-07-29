@@ -201,6 +201,7 @@
         <field name="model">resource.booking</field>
         <field name="arch" type="xml">
             <search>
+                <field name="name" />
                 <field name="partner_ids" />
                 <field name="type_id" />
                 <field name="combination_id" />
