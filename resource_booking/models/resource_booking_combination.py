@@ -87,7 +87,7 @@ class ResourceBookingCombination(models.Model):
                 if not combination_intervals:
                     break  # Can't restrict more
                 calendar = combination.forced_calendar_id or res.calendar_id
-                # combination_intervals &= calendar._work_intervals(start_dt, end_dt, res)
+                # Get available intervals (see resource_calendar.py)
                 combination_intervals &= calendar._work_intervals_batch(
                     start_dt, end_dt, res
                 )[res.id]

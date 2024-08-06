@@ -624,7 +624,7 @@ class ResourceBooking(models.Model):
                 test_start += slot_duration
         return result
 
-    def _get_intervals(self, start_dt, end_dt, combination=None):
+    def _get_intervals(self, start_dt, end_dt, combination=None, type=None):
         """Get available intervals for this booking,
         based on the calendar of the booking type
         and the calendar(s) of the relevant resource combination(s)."""
@@ -638,10 +638,11 @@ class ResourceBooking(models.Model):
             analyzing_booking=booking_id, exclude_public_holidays=True
         )
         # RBT calendar uses no resources to restrict bookings
-        if booking.type_id:
-            result = booking.type_id.resource_calendar_id._work_intervals_batch(
-                start_dt, end_dt
-            )[False]
+        if not type:
+            type = booking.type_id
+        if type and len(type) == 1:
+            r = type.resource_calendar_id._work_intervals_batch(start_dt, end_dt)[False]
+            result = r
         else:
             result = Intervals([])
         # Restrict with the chosen combination, or to at least one of the

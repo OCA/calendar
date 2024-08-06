@@ -11,7 +11,7 @@
     "category": "Appointments",
     "website": "https://github.com/OCA/calendar",
     "author": "Tecnativa, Odoo Community Association (OCA)",
-    "maintainers": ["pedrobaeza", "ows-cloud"],
+    "maintainers": ["pedrobaeza", "norlinhenrik"],
     "license": "AGPL-3",
     "application": True,
     "installable": True,
