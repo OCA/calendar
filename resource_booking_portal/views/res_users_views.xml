@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="res_users_portal_form_view_inherit" model="ir.ui.view">
+            <field name="name">res.users.portal.form.view.inherit</field>
+            <field name="model">res.users</field>
+            <field name="inherit_id" ref="base.view_users_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//page[@name='access_rights']" position="inside">
+                    <field name="is_portal_user" invisible="1" />
+                    <group
+                        name="portal"
+                        string="Portal"
+                        attrs="{'invisible' : [('is_portal_user', '=', False)]}"
+                    >
+                        <group name="create_booking" string="Booking">
+                            <field name="create_booking_from_portal" />
+                        </group>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

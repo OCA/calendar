@@ -1,0 +1,125 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* resource_booking_portal
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 14.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-09-03 10:36+0000\n"
+"PO-Revision-Date: 2024-09-03 11:38+0100\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.4.4\n"
+
+#. module: resource_booking_portal
+#: model_terms:ir.ui.view,arch_db:resource_booking_portal.portal_my_home_menu
+msgid "<span>Create booking</span>"
+msgstr "<span>Crear reserva</span>"
+
+#. module: resource_booking_portal
+#: model_terms:ir.ui.view,arch_db:resource_booking_portal.portal_my_home
+msgid "Actions"
+msgstr "Acciones"
+
+#. module: resource_booking_portal
+#: model_terms:ir.ui.view,arch_db:resource_booking_portal.res_users_portal_form_view_inherit
+msgid "Booking"
+msgstr "Reserva"
+
+#. module: resource_booking_portal
+#: code:addons/resource_booking_portal/wizard/portal_wizard.py:0
+#: model:ir.model.fields,field_description:resource_booking_portal.field_portal_wizard_user__booking_from_portal
+#, python-format
+msgid "Booking from portal"
+msgstr "Reserva desde el portal"
+
+#. module: resource_booking_portal
+#: model:res.groups,name:resource_booking_portal.group_portal_sellers_bookings
+msgid "Can create booking from portal"
+msgstr "Puede crear reservas desde el portal"
+
+#. module: resource_booking_portal
+#: model_terms:ir.ui.view,arch_db:resource_booking_portal.booking_create_form
+msgid "Continue"
+msgstr "Continuar"
+
+#. module: resource_booking_portal
+#: model_terms:ir.ui.view,arch_db:resource_booking_portal.portal_my_home
+msgid "Create a booking"
+msgstr "Crear una reserva"
+
+#. module: resource_booking_portal
+#: code:addons/resource_booking_portal/models/res_users.py:0
+#: model:ir.model.fields,field_description:resource_booking_portal.field_res_users__create_booking_from_portal
+#, python-format
+msgid "Create booking from portal"
+msgstr "Crear reserva desde el portal"
+
+#. module: resource_booking_portal
+#: model_terms:ir.ui.view,arch_db:resource_booking_portal.booking_create_form
+msgid "Description"
+msgstr "Descripción"
+
+#. module: resource_booking_portal
+#: model:ir.model.fields,field_description:resource_booking_portal.field_portal_wizard_user__display_name
+#: model:ir.model.fields,field_description:resource_booking_portal.field_res_users__display_name
+msgid "Display Name"
+msgstr "Nombre a mostrar"
+
+#. module: resource_booking_portal
+#: model:ir.model.fields,field_description:resource_booking_portal.field_portal_wizard_user__id
+#: model:ir.model.fields,field_description:resource_booking_portal.field_res_users__id
+msgid "ID"
+msgstr "ID"
+
+#. module: resource_booking_portal
+#: model:ir.model.fields,field_description:resource_booking_portal.field_res_users__is_portal_user
+msgid "Is Portal User"
+msgstr "Es usuario de portal"
+
+#. module: resource_booking_portal
+#: model:ir.model.fields,field_description:resource_booking_portal.field_portal_wizard_user____last_update
+#: model:ir.model.fields,field_description:resource_booking_portal.field_res_users____last_update
+msgid "Last Modified on"
+msgstr "Última modificación el"
+
+#. module: resource_booking_portal
+#: model_terms:ir.ui.view,arch_db:resource_booking_portal.booking_create_form
+msgid "Name"
+msgstr "Asunto"
+
+#. module: resource_booking_portal
+#: model_terms:ir.ui.view,arch_db:resource_booking_portal.res_users_portal_form_view_inherit
+msgid "Portal"
+msgstr "Portal"
+
+#. module: resource_booking_portal
+#: model:ir.model,name:resource_booking_portal.model_portal_wizard_user
+msgid "Portal User Config"
+msgstr "Configuración de usuario de portal"
+
+#. module: resource_booking_portal
+#: model_terms:ir.ui.view,arch_db:resource_booking_portal.booking_create_form
+msgid "Resource Name"
+msgstr "Asunto"
+
+#. module: resource_booking_portal
+#: model_terms:ir.ui.view,arch_db:resource_booking_portal.booking_create_confirmation
+msgid "TEST"
+msgstr ""
+
+#. module: resource_booking_portal
+#: model_terms:ir.ui.view,arch_db:resource_booking_portal.booking_create_form
+msgid "Type"
+msgstr "Tipo"
+
+#. module: resource_booking_portal
+#: model:ir.model,name:resource_booking_portal.model_res_users
+msgid "Users"
+msgstr "Usuarios"
