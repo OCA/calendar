@@ -52,51 +52,13 @@ class CalendarEvent(models.Model):
         rescheduled._validate_booking_modifications()
         return result
 
-    def _notify_thread(self, message, msg_vals=False, **kwargs):
-        """If we are creating the calendar event from the resource booking
-        (detected from the resource_booking_event context key), we need to
-        inject the standard mail context `mail_notify_author` to super to get
-        the own author notified when someone books a reservation, but only
-        in the case that the mail is being sent to them, as if not the author
-        may receive one copy per each of the attendees. This happens only when
-        the the subtype not is enabled by default in the instance.
-        """
-        if self.env.context.get("resource_booking_event") and msg_vals.get(
-            "author_id"
-        ) in msg_vals.get("partner_ids", []):
-            self = self.with_context(mail_notify_author=True)
-        return super()._notify_thread(message=message, msg_vals=msg_vals, **kwargs)
-
-    def _notify_get_recipients(self, message, msg_vals, **kwargs):
-        """If we are creating the calendar event from resource booking, we want to
-        notify only the partner_ids and not all the followers (to avoid that each email
-        is sent to all followers). Example: Resource booking with combination of several
-        users. This only happens when the subtype note is enabled by default in the
-        instance.
-        """
-        res = super()._notify_get_recipients(
-            message=message, msg_vals=msg_vals, **kwargs
-        )
-        if self.env.context.get("resource_booking_event"):
-            res2 = []
-            partner_ids = msg_vals.get("partner_ids", [])
-            for item in res:
-                if item["id"] in partner_ids:
-                    res2.append(item)
-            return res2
-        return res
-
     @api.model_create_multi
     def create(self, vals_list):
         """Transfer resource booking to _attendees_values by context.
 
         We need to serialize the creation in that case.
-        resource_booking_event custom key from context is necessary.
-        We cannot use mail_notify_author key in the context because if the mail_note
-        subtype is set by default, the email of each attendee would be sent also to
-        the author (example: a meeting with 2 attendees would send 2 emails but
-        each of them would be sent to the partner of the attendee + author of
-        the email).
+        mail_notify_author key from context is necessary to force the notification
+        to be sent to author.
         """
         vals_list2 = []
         records = self.env["calendar.event"]
@@ -106,7 +68,7 @@ class CalendarEvent(models.Model):
                     CalendarEvent,
                     self.with_context(
                         resource_booking_ids=vals["resource_booking_ids"],
-                        resource_booking_event=True,
+                        mail_notify_author=True,
                     ),
                 ).create(vals)
             else:
