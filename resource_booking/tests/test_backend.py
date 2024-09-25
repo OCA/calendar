@@ -1080,13 +1080,17 @@ class BackendCaseCustom(BackendCaseBase):
             lambda x: x.partner_id == meeting.user_id.partner_id
         )
         self.assertIn(self.mt_note, follower.subtype_ids)
-        meesages = meeting.message_ids.filtered(
-            lambda x: x.message_type != "notification"
+        messages = self.env["mail.message"].search(
+            [
+                ("model", "=", meeting._name),
+                ("res_id", "=", meeting.id),
+                ("message_type", "=", "user_notification"),
+            ]
         )
-        self.assertEqual(len(meesages), 2)
-        partner_message = meesages.filtered(lambda x: self.partner in x.partner_ids)
+        self.assertEqual(len(messages), 2)
+        partner_message = messages.filtered(lambda x: self.partner in x.partner_ids)
         self.assertNotIn(rb.user_id.partner_id, partner_message.notified_partner_ids)
-        user_message = meesages.filtered(
+        user_message = messages.filtered(
             lambda x: meeting.user_id.partner_id in x.partner_ids
         )
         self.assertIn(meeting.user_id.partner_id, user_message.notified_partner_ids)
@@ -1122,14 +1126,18 @@ class BackendCaseCustom(BackendCaseBase):
             lambda x: x.partner_id == meeting.user_id.partner_id
         )
         self.assertIn(self.mt_note, follower.subtype_ids)
-        meesages = meeting.message_ids.filtered(
-            lambda x: x.message_type != "notification"
+        messages = self.env["mail.message"].search(
+            [
+                ("model", "=", meeting._name),
+                ("res_id", "=", meeting.id),
+                ("message_type", "=", "user_notification"),
+            ]
         )
-        self.assertEqual(len(meesages), 3)
-        partner_message = meesages.filtered(lambda x: self.partner in x.partner_ids)
+        self.assertEqual(len(messages), 3)
+        partner_message = messages.filtered(lambda x: self.partner in x.partner_ids)
         self.assertNotIn(user_0.partner_id, partner_message.notified_partner_ids)
         self.assertNotIn(user_1.partner_id, partner_message.notified_partner_ids)
-        user_0_message = meesages.filtered(lambda x: user_0.partner_id in x.partner_ids)
+        user_0_message = messages.filtered(lambda x: user_0.partner_id in x.partner_ids)
         self.assertIn(user_0.partner_id, user_0_message.notified_partner_ids)
-        user_1_message = meesages.filtered(lambda x: user_1.partner_id in x.partner_ids)
+        user_1_message = messages.filtered(lambda x: user_1.partner_id in x.partner_ids)
         self.assertIn(user_1.partner_id, user_1_message.notified_partner_ids)
