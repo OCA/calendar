@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="MO" model="calendar.recurrence.weekday">
+        <field name="sequence">0</field>
+        <field name="key">MO</field>
+        <field name="name">Monday</field>
+    </record>
+    <record id="TU" model="calendar.recurrence.weekday">
+        <field name="sequence">1</field>
+        <field name="key">TU</field>
+        <field name="name">Tuesday</field>
+    </record>
+    <record id="WE" model="calendar.recurrence.weekday">
+        <field name="sequence">2</field>
+        <field name="key">WE</field>
+        <field name="name">Wednesday</field>
+    </record>
+    <record id="TH" model="calendar.recurrence.weekday">
+        <field name="sequence">3</field>
+        <field name="key">TH</field>
+        <field name="name">Thursday</field>
+    </record>
+    <record id="FR" model="calendar.recurrence.weekday">
+        <field name="sequence">4</field>
+        <field name="key">FR</field>
+        <field name="name">Friday</field>
+    </record>
+    <record id="SA" model="calendar.recurrence.weekday">
+        <field name="sequence">5</field>
+        <field name="key">SA</field>
+        <field name="name">Saturday</field>
+        <field name="weekend_day">True</field>
+    </record>
+    <record id="SU" model="calendar.recurrence.weekday">
+        <field name="sequence">6</field>
+        <field name="key">SU</field>
+        <field name="name">Sunday</field>
+        <field name="weekend_day">True</field>
+    </record>
+</odoo>
