@@ -21,6 +21,7 @@ Available addons
 ----------------
 addon | version | maintainers | summary
 --- | --- | --- | ---
+[calendar_monthly_multi](calendar_monthly_multi/) | 16.0.1.0.0 |  | Calendar Monthly Extension
 [resource_booking](resource_booking/) | 16.0.1.4.1 | [![pedrobaeza](https://github.com/pedrobaeza.png?size=30px)](https://github.com/pedrobaeza) [![ows-cloud](https://github.com/ows-cloud.png?size=30px)](https://github.com/ows-cloud) | Manage appointments and resource booking
 
 [//]: # (end addons)
