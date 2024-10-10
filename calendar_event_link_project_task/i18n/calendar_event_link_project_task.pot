@@ -1,0 +1,26 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* calendar_event_link_project_task
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 12.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: calendar_event_link_project_task
+#: model_terms:ir.ui.view,arch_db:calendar_event_link_project_task.project_task_form_view
+msgid "<span class=\"o_stat_text\" attrs=\"{'invisible': [('event_count', '&lt;', 2)]}\">Meetings</span>\n"
+"                        <span class=\"o_stat_text\" attrs=\"{'invisible': [('event_count', '&gt;', 1)]}\">Meeting</span>"
+msgstr ""
+
+#. module: calendar_event_link_project_task
+#: model:ir.model,name:calendar_event_link_project_task.model_project_task
+msgid "Task"
+msgstr ""
+
