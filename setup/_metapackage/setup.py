@@ -8,6 +8,7 @@ setuptools.setup(
     description="Meta package for oca-calendar Odoo addons",
     version=version,
     install_requires=[
+        'odoo-addon-calendar_event_type_color>=16.0dev,<16.1dev',
         'odoo-addon-calendar_monthly_multi>=16.0dev,<16.1dev',
         'odoo-addon-resource_booking>=16.0dev,<16.1dev',
     ],

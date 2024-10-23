@@ -21,6 +21,7 @@ Available addons
 ----------------
 addon | version | maintainers | summary
 --- | --- | --- | ---
+[calendar_event_type_color](calendar_event_type_color/) | 16.0.1.0.0 | [![yankinmax](https://github.com/yankinmax.png?size=30px)](https://github.com/yankinmax) | Colorize calendar view depending on event type color
 [calendar_monthly_multi](calendar_monthly_multi/) | 16.0.1.0.0 |  | Calendar Monthly Extension
 [resource_booking](resource_booking/) | 16.0.1.4.1 | [![pedrobaeza](https://github.com/pedrobaeza.png?size=30px)](https://github.com/pedrobaeza) [![ows-cloud](https://github.com/ows-cloud.png?size=30px)](https://github.com/ows-cloud) | Manage appointments and resource booking
 
