@@ -369,9 +369,9 @@ ul.auto-toc {
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !! source digest: sha256:59ca230a37d737431cbc0df890d5f8ed789435503c356ddc3142d2f11e4b3ed1
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
-<p><a class="reference external image-reference" href="https://odoo-community.org/page/development-status"><img alt="Production/Stable" src="https://img.shields.io/badge/maturity-Production%2FStable-green.png" /></a> <a class="reference external image-reference" href="http://www.gnu.org/licenses/agpl-3.0-standalone.html"><img alt="License: AGPL-3" src="https://img.shields.io/badge/licence-AGPL--3-blue.png" /></a> <a class="reference external image-reference" href="https://github.com/OCA/calendar/tree/16.0/resource_booking"><img alt="OCA/calendar" src="https://img.shields.io/badge/github-OCA%2Fcalendar-lightgray.png?logo=github" /></a> <a class="reference external image-reference" href="https://translation.odoo-community.org/projects/calendar-16-0/calendar-16-0-resource_booking"><img alt="Translate me on Weblate" src="https://img.shields.io/badge/weblate-Translate%20me-F47D42.png" /></a> <a class="reference external image-reference" href="https://runboat.odoo-community.org/builds?repo=OCA/calendar&amp;target_branch=16.0"><img alt="Try me on Runboat" src="https://img.shields.io/badge/runboat-Try%20me-875A7B.png" /></a></p>
-<p>This module adds a new app to allow you to book resource combinations in given
-schedules.</p>
+<p><a class="reference external image-reference" href="https://odoo-community.org/page/development-status"><img alt="Production/Stable" src="https://img.shields.io/badge/maturity-Production%2FStable-green.png" /></a> <a class="reference external image-reference" href="http://www.gnu.org/licenses/agpl-3.0-standalone.html"><img alt="License: AGPL-3" src="https://img.shields.io/badge/licence-AGPL--3-blue.png" /></a> <a class="reference external image-reference" href="https://github.com/OCA/calendar/tree/17.0/resource_booking"><img alt="OCA/calendar" src="https://img.shields.io/badge/github-OCA%2Fcalendar-lightgray.png?logo=github" /></a> <a class="reference external image-reference" href="https://translation.odoo-community.org/projects/calendar-17-0/calendar-17-0-resource_booking"><img alt="Translate me on Weblate" src="https://img.shields.io/badge/weblate-Translate%20me-F47D42.png" /></a> <a class="reference external image-reference" href="https://runboat.odoo-community.org/builds?repo=OCA/calendar&amp;target_branch=17.0"><img alt="Try me on Runboat" src="https://img.shields.io/badge/runboat-Try%20me-875A7B.png" /></a></p>
+<p>This module adds a new app to allow you to book resource combinations in
+given schedules.</p>
 <p>Example use cases:</p>
 <ul class="simple">
 <li>Management of consultations in a clinic.</li>
@@ -381,11 +381,15 @@ schedules.</p>
 </ul>
 <p>Among the things you can do:</p>
 <ul class="simple">
-<li>Specify the type of booking, which includes a calendar of availability.</li>
-<li>Specify which resources can be booked together. All of them must be free to be booked.</li>
-<li>Place pending bookings, effectively giving permissions to someone to see the availability calendar and choose one slot.</li>
+<li>Specify the type of booking, which includes a calendar of
+availability.</li>
+<li>Specify which resources can be booked together. All of them must be
+free to be booked.</li>
+<li>Place pending bookings, effectively giving permissions to someone to
+see the availability calendar and choose one slot.</li>
 <li>Partners can do that from their portals.</li>
-<li>If a partner has no user, he can still do the same via a tokenized URL.</li>
+<li>If a partner has no user, he can still do the same via a tokenized
+URL.</li>
 <li>Backend users can also do that from the backend.</li>
 <li>Booking lifecycle with computed states.</li>
 <li>Automatic meeting creation and deletion.</li>
@@ -417,12 +421,15 @@ schedules.</p>
 </ol>
 <p>When someone is a manager, he will have access to <em>Resource Bookings &gt;
 Configuration</em>, where he will be able to configure resources, leaves and
-schedules. This menu is just provided as a shortcut. However, if you want to
-manage that stuff more comfortably:</p>
+schedules. This menu is just provided as a shortcut. However, if you
+want to manage that stuff more comfortably:</p>
 <ul class="simple">
-<li>To manage human resources, install <a class="reference external" href="https://apps.odoo.com/app/employees">hr</a>.</li>
-<li>To manage their leaves, install <a class="reference external" href="https://apps.odoo.com/app/time-off">hr_holidays</a>.</li>
-<li>To manage work centers, install <a class="reference external" href="https://apps.odoo.com/app/manufacturing">mrp</a>.</li>
+<li>To manage human resources, install
+<a class="reference external" href="https://apps.odoo.com/app/employees">hr</a>.</li>
+<li>To manage their leaves, install
+<a class="reference external" href="https://apps.odoo.com/app/time-off">hr_holidays</a>.</li>
+<li>To manage work centers, install
+<a class="reference external" href="https://apps.odoo.com/app/manufacturing">mrp</a>.</li>
 </ul>
 </div>
 <div class="section" id="configuration">
@@ -433,8 +440,8 @@ manage that stuff more comfortably:</p>
 <li>Pick or create one.</li>
 <li>Assign <em>Resource Booking &gt; User</em>.</li>
 </ol>
-<p>To let some backend user to configure types and combinations, and to be able to
-modify overdue bookings:</p>
+<p>To let some backend user to configure types and combinations, and to be
+able to modify overdue bookings:</p>
 <ol class="arabic simple">
 <li>Go to <em>Settings &gt; Users &amp; Companies &gt; Users</em>.</li>
 <li>Pick or create one.</li>
@@ -445,21 +452,22 @@ modify overdue bookings:</p>
 <li>Go to <em>Resource Bookings &gt; Types</em>.</li>
 <li>Create one.</li>
 <li>Give it a <em>name</em>.</li>
-<li>Set the <em>Duration</em>, to know the time assigned to each calendar slot. It will
-also be the default duration for each booking, although that can be changed
-later if necessary.</li>
-<li>Set the <em>Modifications Deadline</em>, to forbid non-managers to alter dates of
-a booking when it’s too late.</li>
-<li>Choose one <em>Availability Calendar</em>. No bookings will exist outside of it.</li>
-<li>Under <em>Meeting defaults</em>, you will be able to fill some values that will
-be used by default on calendar meetings. These will appear in the global
-calendar when some booking is reserved.</li>
-<li>Choose some <em>Available resource combinations</em>. All combinations in the same
-line must be free to be booked together; otherwise the booking will not be
-able to be scheduled. You can sort them.</li>
-<li>Pick up one <em>Combination Assignment</em>. If you choose <em>Sorted</em>, then the order
-of the combinations you chose will indicate the one that is selected first.
-Of course, it must be free to be selected.</li>
+<li>Set the <em>Duration</em>, to know the time assigned to each calendar slot.
+It will also be the default duration for each booking, although that
+can be changed later if necessary.</li>
+<li>Set the <em>Modifications Deadline</em>, to forbid non-managers to alter
+dates of a booking when it’s too late.</li>
+<li>Choose one <em>Availability Calendar</em>. No bookings will exist outside
+of it.</li>
+<li>Under <em>Meeting defaults</em>, you will be able to fill some values that
+will be used by default on calendar meetings. These will appear in
+the global calendar when some booking is reserved.</li>
+<li>Choose some <em>Available resource combinations</em>. All combinations in
+the same line must be free to be booked together; otherwise the
+booking will not be able to be scheduled. You can sort them.</li>
+<li>Pick up one <em>Combination Assignment</em>. If you choose <em>Sorted</em>, then
+the order of the combinations you chose will indicate the one that
+is selected first. Of course, it must be free to be selected.</li>
 <li>Save.</li>
 </ol>
 </div>
@@ -469,14 +477,16 @@ Of course, it must be free to be selected.</li>
 <p>Bookings may involve you:</p>
 <ul class="simple">
 <li>Maybe because you requested to book something.</li>
-<li>Maybe because you are one of the booked resources, if a booking represents
-some kind of appointment.</li>
+<li>Maybe because you are one of the booked resources, if a booking
+represents some kind of appointment.</li>
 </ul>
 <p>To see which bookings involve you:</p>
 <ol class="arabic simple">
 <li>Go to <em>Resource Bookings &gt; Bookings</em>.</li>
-<li>You can switch to the list view if you need to see also the pending ones.</li>
-<li>You can remove the “Involving me” filter if you want to see others’ bookings.</li>
+<li>You can switch to the list view if you need to see also the pending
+ones.</li>
+<li>You can remove the “Involving me” filter if you want to see others’
+bookings.</li>
 </ol>
 <p>To book some resources:</p>
 <ol class="arabic simple">
@@ -485,8 +495,8 @@ some kind of appointment.</li>
 <li>Click on <em>Booking Count</em>.</li>
 <li>Click on a free slot.</li>
 <li>Fill the <em>Requester</em>, which may or not be yourself.</li>
-<li>Uncheck <em>Auto assign</em> and pick one <em>Resources combination</em>, in case the one
-assigned automatically isn’t the one you want.</li>
+<li>Uncheck <em>Auto assign</em> and pick one <em>Resources combination</em>, in case
+the one assigned automatically isn’t the one you want.</li>
 </ol>
 <p>To invite someone to book a resource combination from the portal:</p>
 <ol class="arabic simple">
@@ -496,14 +506,15 @@ assigned automatically isn’t the one you want.</li>
 <li>Click on the list view icon.</li>
 <li>Click on <em>Create</em>.</li>
 <li>Fill the <em>Requester</em>.</li>
-<li>Uncheck <em>Auto assign</em> and pick one <em>Resources combination</em>, if you want that
-the requester is assigned to that combination. Otherwise, leave it empty,
-and some free combination will be assigned automatically when the requester
-picks a free slot.</li>
-<li>Choose the <em>duration</em>, in case it is different from the one specified in the
-resource booking type.</li>
+<li>Uncheck <em>Auto assign</em> and pick one <em>Resources combination</em>, if you
+want that the requester is assigned to that combination. Otherwise,
+leave it empty, and some free combination will be assigned
+automatically when the requester picks a free slot.</li>
+<li>Choose the <em>duration</em>, in case it is different from the one
+specified in the resource booking type.</li>
 <li>Click on <em>Share &gt; Send</em>.</li>
-<li>The requester will receive an email to select a calendar slot from his portal.</li>
+<li>The requester will receive an email to select a calendar slot from
+his portal.</li>
 </ol>
 </div>
 <div class="section" id="known-issues-roadmap">
@@ -511,9 +522,11 @@ resource booking type.</li>
 <ul class="simple">
 <li>Allow combination auto-assignment based on least used combination.</li>
 <li>Allow customer to choose combination.</li>
-<li>Some error messages would be a bit more helpful if they specify the schedule
-impossibility reason, but that should be done without affecting performance.</li>
-<li>Optimize <tt class="docutils literal">_calendar_event_busy_intervals()</tt> to make it work in batch.</li>
+<li>Some error messages would be a bit more helpful if they specify the
+schedule impossibility reason, but that should be done without
+affecting performance.</li>
+<li>Optimize <tt class="docutils literal">_calendar_event_busy_intervals()</tt> to make it work in
+batch.</li>
 </ul>
 </div>
 <div class="section" id="bug-tracker">
@@ -521,7 +534,7 @@ impossibility reason, but that should be done without affecting performance.</li
 <p>Bugs are tracked on <a class="reference external" href="https://github.com/OCA/calendar/issues">GitHub Issues</a>.
 In case of trouble, please check there if your issue has already been reported.
 If you spotted it first, help us to smash it by providing a detailed and welcomed
-<a class="reference external" href="https://github.com/OCA/calendar/issues/new?body=module:%20resource_booking%0Aversion:%2016.0%0A%0A**Steps%20to%20reproduce**%0A-%20...%0A%0A**Current%20behavior**%0A%0A**Expected%20behavior**">feedback</a>.</p>
+<a class="reference external" href="https://github.com/OCA/calendar/issues/new?body=module:%20resource_booking%0Aversion:%2017.0%0A%0A**Steps%20to%20reproduce**%0A-%20...%0A%0A**Current%20behavior**%0A%0A**Expected%20behavior**">feedback</a>.</p>
 <p>Do not contact contributors directly about support or help with technical issues.</p>
 </div>
 <div class="section" id="credits">
@@ -535,7 +548,8 @@ If you spotted it first, help us to smash it by providing a detailed and welcome
 <div class="section" id="contributors">
 <h2><a class="toc-backref" href="#toc-entry-8">Contributors</a></h2>
 <ul class="simple">
-<li>Jairo Llopis &lt;<a class="reference external" href="mailto:jairo.llopis&#64;tecnativa.com">jairo.llopis&#64;tecnativa.com</a>&gt; (<a class="reference external" href="https://www.tecnativa.com/">https://www.tecnativa.com/</a>)</li>
+<li>Jairo Llopis &lt;<a class="reference external" href="mailto:jairo.llopis&#64;tecnativa.com">jairo.llopis&#64;tecnativa.com</a>&gt;
+(<a class="reference external" href="https://www.tecnativa.com/">https://www.tecnativa.com/</a>)</li>
 <li>Henrik Norlin (<a class="reference external" href="https://ows.cloud">https://ows.cloud</a>)</li>
 </ul>
 </div>
@@ -550,7 +564,7 @@ mission is to support the collaborative development of Odoo features and
 promote its widespread use.</p>
 <p>Current <a class="reference external" href="https://odoo-community.org/page/maintainer-role">maintainers</a>:</p>
 <p><a class="reference external image-reference" href="https://github.com/pedrobaeza"><img alt="pedrobaeza" src="https://github.com/pedrobaeza.png?size=40px" /></a> <a class="reference external image-reference" href="https://github.com/ows-cloud"><img alt="ows-cloud" src="https://github.com/ows-cloud.png?size=40px" /></a></p>
-<p>This module is part of the <a class="reference external" href="https://github.com/OCA/calendar/tree/16.0/resource_booking">OCA/calendar</a> project on GitHub.</p>
+<p>This module is part of the <a class="reference external" href="https://github.com/OCA/calendar/tree/17.0/resource_booking">OCA/calendar</a> project on GitHub.</p>
 <p>You are welcome to contribute. To learn how please visit <a class="reference external" href="https://odoo-community.org/page/Contribute">https://odoo-community.org/page/Contribute</a>.</p>
 </div>
 </div>

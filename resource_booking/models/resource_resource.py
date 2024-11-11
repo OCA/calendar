@@ -29,7 +29,5 @@ class ResourceResource(models.Model):
             analyzing_booking=-1
         )._work_intervals_batch(
             start_dt, end_dt, resources=[self], domain=domain, tz=tz
-        )[
-            self.id
-        ]
+        )[self.id]
         return _availability_is_fitting(result, start_dt, end_dt)

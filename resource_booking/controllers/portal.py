@@ -39,7 +39,7 @@ class CustomerPortal(portal.CustomerPortal):
             {"page_name": "booking", "booking_sudo": booking_sudo},
             "my_bookings_history",
             False,
-            **kwargs
+            **kwargs,
         )
 
     @route(
@@ -135,8 +135,8 @@ class CustomerPortal(portal.CustomerPortal):
                 booking_form.start = when_naive
         except ValidationError as error:
             url = booking_sudo.get_portal_url(
-                suffix="/schedule/{:%Y/%m}".format(when_tz_aware),
-                query_string="&error={}".format(error.args[0]),
+                suffix=f"/schedule/{when_tz_aware:%Y/%m}",
+                query_string=f"&error={error.args[0]}",
             )
             return request.redirect(url)
         booking_sudo.action_confirm()
