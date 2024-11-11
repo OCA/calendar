@@ -17,39 +17,43 @@ Resource booking
     :target: http://www.gnu.org/licenses/agpl-3.0-standalone.html
     :alt: License: AGPL-3
 .. |badge3| image:: https://img.shields.io/badge/github-OCA%2Fcalendar-lightgray.png?logo=github
-    :target: https://github.com/OCA/calendar/tree/16.0/resource_booking
+    :target: https://github.com/OCA/calendar/tree/17.0/resource_booking
     :alt: OCA/calendar
 .. |badge4| image:: https://img.shields.io/badge/weblate-Translate%20me-F47D42.png
-    :target: https://translation.odoo-community.org/projects/calendar-16-0/calendar-16-0-resource_booking
+    :target: https://translation.odoo-community.org/projects/calendar-17-0/calendar-17-0-resource_booking
     :alt: Translate me on Weblate
 .. |badge5| image:: https://img.shields.io/badge/runboat-Try%20me-875A7B.png
-    :target: https://runboat.odoo-community.org/builds?repo=OCA/calendar&target_branch=16.0
+    :target: https://runboat.odoo-community.org/builds?repo=OCA/calendar&target_branch=17.0
     :alt: Try me on Runboat
 
 |badge1| |badge2| |badge3| |badge4| |badge5|
 
-This module adds a new app to allow you to book resource combinations in given
-schedules.
+This module adds a new app to allow you to book resource combinations in
+given schedules.
 
 Example use cases:
 
-* Management of consultations in a clinic.
-* Salesman appointments.
-* Classroom and projector reservations.
-* Hotel room booking.
+-  Management of consultations in a clinic.
+-  Salesman appointments.
+-  Classroom and projector reservations.
+-  Hotel room booking.
 
 Among the things you can do:
 
-* Specify the type of booking, which includes a calendar of availability.
-* Specify which resources can be booked together. All of them must be free to be booked.
-* Place pending bookings, effectively giving permissions to someone to see the availability calendar and choose one slot.
-* Partners can do that from their portals.
-* If a partner has no user, he can still do the same via a tokenized URL.
-* Backend users can also do that from the backend.
-* Booking lifecycle with computed states.
-* Automatic meeting creation and deletion.
-* Automatic conflict detection.
-* Deadline to block modifications.
+-  Specify the type of booking, which includes a calendar of
+   availability.
+-  Specify which resources can be booked together. All of them must be
+   free to be booked.
+-  Place pending bookings, effectively giving permissions to someone to
+   see the availability calendar and choose one slot.
+-  Partners can do that from their portals.
+-  If a partner has no user, he can still do the same via a tokenized
+   URL.
+-  Backend users can also do that from the backend.
+-  Booking lifecycle with computed states.
+-  Automatic meeting creation and deletion.
+-  Automatic conflict detection.
+-  Deadline to block modifications.
 
 **Table of contents**
 
@@ -61,55 +65,59 @@ Installation
 
 To install this module, you need to install these dependencies:
 
-#. `freezegun <https://github.com/spulec/freezegun>`__
-#. `web_calendar_slot_duration <https://odoo-community.org/shop/product/calendar-slot-duration-6202>`__
+1. `freezegun <https://github.com/spulec/freezegun>`__
+2. `web_calendar_slot_duration <https://odoo-community.org/shop/product/calendar-slot-duration-6202>`__
 
 When someone is a manager, he will have access to *Resource Bookings >
 Configuration*, where he will be able to configure resources, leaves and
-schedules. This menu is just provided as a shortcut. However, if you want to
-manage that stuff more comfortably:
+schedules. This menu is just provided as a shortcut. However, if you
+want to manage that stuff more comfortably:
 
-* To manage human resources, install `hr <https://apps.odoo.com/app/employees>`__.
-* To manage their leaves, install `hr_holidays <https://apps.odoo.com/app/time-off>`__.
-* To manage work centers, install `mrp <https://apps.odoo.com/app/manufacturing>`__.
+-  To manage human resources, install
+   `hr <https://apps.odoo.com/app/employees>`__.
+-  To manage their leaves, install
+   `hr_holidays <https://apps.odoo.com/app/time-off>`__.
+-  To manage work centers, install
+   `mrp <https://apps.odoo.com/app/manufacturing>`__.
 
 Configuration
 =============
 
 To let some backend user to book resources:
 
-#. Go to *Settings > Users & Companies > Users*.
-#. Pick or create one.
-#. Assign *Resource Booking > User*.
+1. Go to *Settings > Users & Companies > Users*.
+2. Pick or create one.
+3. Assign *Resource Booking > User*.
 
-To let some backend user to configure types and combinations, and to be able to
-modify overdue bookings:
+To let some backend user to configure types and combinations, and to be
+able to modify overdue bookings:
 
-#. Go to *Settings > Users & Companies > Users*.
-#. Pick or create one.
-#. Assign *Resource Booking > Manager*.
+1. Go to *Settings > Users & Companies > Users*.
+2. Pick or create one.
+3. Assign *Resource Booking > Manager*.
 
 To configure one booking type:
 
-#. Go to *Resource Bookings > Types*.
-#. Create one.
-#. Give it a *name*.
-#. Set the *Duration*, to know the time assigned to each calendar slot. It will
-   also be the default duration for each booking, although that can be changed
-   later if necessary.
-#. Set the *Modifications Deadline*, to forbid non-managers to alter dates of
-   a booking when it's too late.
-#. Choose one *Availability Calendar*. No bookings will exist outside of it.
-#. Under *Meeting defaults*, you will be able to fill some values that will
-   be used by default on calendar meetings. These will appear in the global
-   calendar when some booking is reserved.
-#. Choose some *Available resource combinations*. All combinations in the same
-   line must be free to be booked together; otherwise the booking will not be
-   able to be scheduled. You can sort them.
-#. Pick up one *Combination Assignment*. If you choose *Sorted*, then the order
-   of the combinations you chose will indicate the one that is selected first.
-   Of course, it must be free to be selected.
-#. Save.
+1.  Go to *Resource Bookings > Types*.
+2.  Create one.
+3.  Give it a *name*.
+4.  Set the *Duration*, to know the time assigned to each calendar slot.
+    It will also be the default duration for each booking, although that
+    can be changed later if necessary.
+5.  Set the *Modifications Deadline*, to forbid non-managers to alter
+    dates of a booking when it's too late.
+6.  Choose one *Availability Calendar*. No bookings will exist outside
+    of it.
+7.  Under *Meeting defaults*, you will be able to fill some values that
+    will be used by default on calendar meetings. These will appear in
+    the global calendar when some booking is reserved.
+8.  Choose some *Available resource combinations*. All combinations in
+    the same line must be free to be booked together; otherwise the
+    booking will not be able to be scheduled. You can sort them.
+9.  Pick up one *Combination Assignment*. If you choose *Sorted*, then
+    the order of the combinations you chose will indicate the one that
+    is selected first. Of course, it must be free to be selected.
+10. Save.
 
 Usage
 =====
@@ -118,51 +126,56 @@ This module installs a new app, "Resource bookings".
 
 Bookings may involve you:
 
-* Maybe because you requested to book something.
-* Maybe because you are one of the booked resources, if a booking represents
-  some kind of appointment.
+-  Maybe because you requested to book something.
+-  Maybe because you are one of the booked resources, if a booking
+   represents some kind of appointment.
 
 To see which bookings involve you:
 
-#. Go to *Resource Bookings > Bookings*.
-#. You can switch to the list view if you need to see also the pending ones.
-#. You can remove the "Involving me" filter if you want to see others' bookings.
+1. Go to *Resource Bookings > Bookings*.
+2. You can switch to the list view if you need to see also the pending
+   ones.
+3. You can remove the "Involving me" filter if you want to see others'
+   bookings.
 
 To book some resources:
 
-#. Go to *Resource Bookings > Types*.
-#. Pick the type of booking you want.
-#. Click on *Booking Count*.
-#. Click on a free slot.
-#. Fill the *Requester*, which may or not be yourself.
-#. Uncheck *Auto assign* and pick one *Resources combination*, in case the one
-   assigned automatically isn't the one you want.
+1. Go to *Resource Bookings > Types*.
+2. Pick the type of booking you want.
+3. Click on *Booking Count*.
+4. Click on a free slot.
+5. Fill the *Requester*, which may or not be yourself.
+6. Uncheck *Auto assign* and pick one *Resources combination*, in case
+   the one assigned automatically isn't the one you want.
 
 To invite someone to book a resource combination from the portal:
 
-#. Go to *Resource Bookings > Types*.
-#. Pick the type of booking you want.
-#. Click on *Booking Count*.
-#. Click on the list view icon.
-#. Click on *Create*.
-#. Fill the *Requester*.
-#. Uncheck *Auto assign* and pick one *Resources combination*, if you want that
-   the requester is assigned to that combination. Otherwise, leave it empty,
-   and some free combination will be assigned automatically when the requester
-   picks a free slot.
-#. Choose the *duration*, in case it is different from the one specified in the
-   resource booking type.
-#. Click on *Share > Send*.
-#. The requester will receive an email to select a calendar slot from his portal.
+1.  Go to *Resource Bookings > Types*.
+2.  Pick the type of booking you want.
+3.  Click on *Booking Count*.
+4.  Click on the list view icon.
+5.  Click on *Create*.
+6.  Fill the *Requester*.
+7.  Uncheck *Auto assign* and pick one *Resources combination*, if you
+    want that the requester is assigned to that combination. Otherwise,
+    leave it empty, and some free combination will be assigned
+    automatically when the requester picks a free slot.
+8.  Choose the *duration*, in case it is different from the one
+    specified in the resource booking type.
+9.  Click on *Share > Send*.
+10. The requester will receive an email to select a calendar slot from
+    his portal.
 
 Known issues / Roadmap
 ======================
 
-* Allow combination auto-assignment based on least used combination.
-* Allow customer to choose combination.
-* Some error messages would be a bit more helpful if they specify the schedule
-  impossibility reason, but that should be done without affecting performance.
-* Optimize ``_calendar_event_busy_intervals()`` to make it work in batch.
+-  Allow combination auto-assignment based on least used combination.
+-  Allow customer to choose combination.
+-  Some error messages would be a bit more helpful if they specify the
+   schedule impossibility reason, but that should be done without
+   affecting performance.
+-  Optimize ``_calendar_event_busy_intervals()`` to make it work in
+   batch.
 
 Bug Tracker
 ===========
@@ -170,7 +183,7 @@ Bug Tracker
 Bugs are tracked on `GitHub Issues <https://github.com/OCA/calendar/issues>`_.
 In case of trouble, please check there if your issue has already been reported.
 If you spotted it first, help us to smash it by providing a detailed and welcomed
-`feedback <https://github.com/OCA/calendar/issues/new?body=module:%20resource_booking%0Aversion:%2016.0%0A%0A**Steps%20to%20reproduce**%0A-%20...%0A%0A**Current%20behavior**%0A%0A**Expected%20behavior**>`_.
+`feedback <https://github.com/OCA/calendar/issues/new?body=module:%20resource_booking%0Aversion:%2017.0%0A%0A**Steps%20to%20reproduce**%0A-%20...%0A%0A**Current%20behavior**%0A%0A**Expected%20behavior**>`_.
 
 Do not contact contributors directly about support or help with technical issues.
 
@@ -178,18 +191,19 @@ Credits
 =======
 
 Authors
-~~~~~~~
+-------
 
 * Tecnativa
 
 Contributors
-~~~~~~~~~~~~
+------------
 
-* Jairo Llopis <jairo.llopis@tecnativa.com> (https://www.tecnativa.com/)
-* Henrik Norlin (https://ows.cloud)
+-  Jairo Llopis <jairo.llopis@tecnativa.com>
+   (https://www.tecnativa.com/)
+-  Henrik Norlin (https://ows.cloud)
 
 Maintainers
-~~~~~~~~~~~
+-----------
 
 This module is maintained by the OCA.
 
@@ -212,6 +226,6 @@ Current `maintainers <https://odoo-community.org/page/maintainer-role>`__:
 
 |maintainer-pedrobaeza| |maintainer-ows-cloud| 
 
-This module is part of the `OCA/calendar <https://github.com/OCA/calendar/tree/16.0/resource_booking>`_ project on GitHub.
+This module is part of the `OCA/calendar <https://github.com/OCA/calendar/tree/17.0/resource_booking>`_ project on GitHub.
 
 You are welcome to contribute. To learn how please visit https://odoo-community.org/page/Contribute.
