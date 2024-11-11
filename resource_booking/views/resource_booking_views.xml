@@ -12,7 +12,7 @@
                 date_start="start"
                 date_stop="stop"
                 date_delay="duration"
-                quick_add="false"
+                quick_create="false"
                 color="combination_id"
             >
                 <field name="name" invisible="True" />
@@ -52,7 +52,7 @@
                         type="action"
                         context="{'default_partner_ids': partner_ids, 'default_note': requester_advice}"
                         help="Invite requesting partner to portal."
-                        states="pending"
+                        invisible="state!='pending'"
                     />
                     <button
                         name="%(portal.portal_share_action)d"
@@ -60,7 +60,7 @@
                         type="action"
                         context="{'default_partner_ids': partner_ids, 'default_note': requester_advice}"
                         help="Invite requesting partner to portal."
-                        states="scheduled,confirmed"
+                        invisible="state not in ('scheduled','confirmed')"
                     />
                     <button
                         name="action_schedule"
@@ -68,14 +68,14 @@
                         string="Schedule"
                         type="object"
                         help="Open a calendar to schedule a meeting for this booking request."
-                        attrs="{'invisible': ['|', ('is_modifiable', '=', False), ('state', '!=', 'pending')]}"
+                        invisible="not is_modifiable or state != 'pending'"
                     />
                     <button
                         name="action_confirm"
                         string="Confirm"
                         type="object"
                         help="Confirm that the requesting partner and yourself will attend the scheduled meeting."
-                        attrs="{'invisible': ['|', ('is_modifiable', '=', False), ('state', '!=', 'scheduled')]}"
+                        invisible="not is_modifiable or state != 'scheduled'"
                         context="{'confirm_own_attendance': True}"
                     />
                     <button
@@ -84,14 +84,14 @@
                         type="object"
                         help="Unschedule this booking."
                         confirm="This will remove the associated meeting to unschedule the booking. Are you sure?"
-                        attrs="{'invisible': ['|', ('is_modifiable', '=', False), ('meeting_id', '=', False)]}"
+                        invisible="not is_modifiable or not meeting_id"
                     />
                     <button
                         name="action_cancel"
                         string="Cancel"
                         type="object"
                         help="Unschedule this booking and archive it."
-                        attrs="{'invisible': ['|', '|', ('is_modifiable', '=', False), ('state', '=', 'canceled'), ('meeting_id', '!=', False)]}"
+                        invisible="not is_modifiable or state == 'canceled' or not meeting_id"
                     />
                     <button
                         name="action_cancel"
@@ -99,14 +99,14 @@
                         type="object"
                         help="Unschedule this booking and archive it."
                         confirm="This will remove the associated meeting to unschedule the booking. Are you sure?"
-                        attrs="{'invisible': ['|', '|', ('is_modifiable', '=', False), ('state', '=', 'canceled'), ('meeting_id', '=', False)]}"
+                        invisible="not is_modifiable or state == 'canceled' or not meeting_id"
                     />
                     <button
                         name="toggle_active"
                         string="Set pending"
                         type="object"
                         help="Set to pending"
-                        attrs="{'invisible': ['|', ('is_modifiable', '=', False), ('state', '!=', 'canceled')]}"
+                        invisible="not is_modifiable or state != 'canceled'"
                     />
                     <field name="state" widget="statusbar" />
                 </header>
@@ -116,7 +116,7 @@
                         name="web_ribbon"
                         title="Archived"
                         bg_color="bg-danger"
-                        attrs="{'invisible': [('active', '=', True)]}"
+                        invisible="active"
                     />
                     <div class="oe_button_box" name="button_box">
                         <button
@@ -142,18 +142,19 @@
                                 <field name="combination_auto_assign" />
                                 <label
                                     for="combination_auto_assign"
-                                    attrs="{'invisible': [('combination_auto_assign', '=', False)]}"
+                                    invisible="not combination_auto_assign"
                                     string="Auto-assigned:"
                                 />
                                 <label
                                     for="combination_auto_assign"
-                                    attrs="{'invisible': [('combination_auto_assign', '=', True)]}"
+                                    invisible="combination_auto_assign"
                                     string="Manually assigned:"
                                 />
                                 <field
                                     name="combination_id"
                                     class="oe_inline"
-                                    attrs="{'required': [('combination_auto_assign', '=', False)], 'readonly': [('combination_auto_assign', '=', True)]}"
+                                    required="not combination_auto_assign and state in ('scheduled','confirmed')"
+                                    readonly="combination_auto_assign"
                                 />
                             </div>
                             <field name="categ_ids" widget="many2many_tags" />
@@ -167,7 +168,7 @@
                                 colspan="2"
                                 role="alert"
                                 class="alert alert-warning"
-                                attrs="{'invisible': [('is_overdue', '=', False)]}"
+                                invisible="not is_overdue"
                             >
                                 This booking exceeded its modifications deadline.
                             </div>

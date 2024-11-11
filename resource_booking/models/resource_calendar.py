@@ -6,7 +6,7 @@ from pytz import UTC
 
 from odoo import api, fields, models
 
-from odoo.addons.resource.models.resource import Intervals
+from odoo.addons.resource.models.utils import Intervals
 
 
 class Busy(Exception):
@@ -100,10 +100,12 @@ class ResourceCalendar(models.Model):
         return Intervals(intervals)
 
     def _leave_intervals_batch(
-        self, start_dt, end_dt, resources=None, domain=None, tz=None
+        self, start_dt, end_dt, resources=None, domain=None, tz=None, any_calendar=False
     ):
         """Count busy meetings as leaves if required by context."""
-        result = super()._leave_intervals_batch(start_dt, end_dt, resources, domain, tz)
+        result = super()._leave_intervals_batch(
+            start_dt, end_dt, resources, domain, tz, any_calendar
+        )
         if self.env.context.get("analyzing_booking"):
             for resource_id in result:
                 # TODO Make this work in batch too

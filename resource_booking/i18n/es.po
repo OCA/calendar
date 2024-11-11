@@ -1383,22 +1383,3 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:resource_booking.message_combination_assigned
 msgid "because you belong to the chosen resource combination:"
 msgstr "porque pertenece a la combinación de recursos elegida:"
-
-#~ msgid ""
-#~ "Choose how to auto-assign resource combinations. It has no effect if "
-#~ "assiged manually."
-#~ msgstr ""
-#~ "Escoja cómo autoasignar combinaciones de recursos. No tendrá efecto si se "
-#~ "asigna manualmente."
-
-#~ msgid "Number of messages which requires an action"
-#~ msgstr "Número de mensajes que requieren una acción"
-
-#~ msgid "Number of unread messages"
-#~ msgstr "Número de mensajes no leídos"
-
-#~ msgid "Unread Messages"
-#~ msgstr "Mensajes por leer"
-
-#~ msgid "Unread Messages Counter"
-#~ msgstr "Contador de mensajes sin leer"

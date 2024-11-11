@@ -12,8 +12,9 @@ from pytz import utc
 from odoo import fields
 from odoo.exceptions import ValidationError
 from odoo.tests.common import Form, TransactionCase, new_test_user, users
+from odoo.tools import mute_logger
 
-from odoo.addons.resource.models.resource import Intervals
+from odoo.addons.resource.models.utils import Intervals
 from odoo.addons.resource_booking.models.resource_booking import (
     _availability_is_fitting,
 )
@@ -34,6 +35,7 @@ class BackendCaseBase(TransactionCase):
 @freeze_time("2021-02-26 09:00:00", tick=True)  # Last Friday of February
 class BackendCaseMisc(BackendCaseBase):
     @users("plain")
+    @mute_logger("odoo.models.unlink")
     def test_plain_user_calendar_event(self):
         """Check that a simple user is able to handle manual calendar events."""
         event = self.env["calendar.event"].create(
@@ -333,6 +335,7 @@ class BackendCaseMisc(BackendCaseBase):
         self.assertTrue(booking.stop)
         self.assertTrue(booking.combination_id)
 
+    @mute_logger("odoo.models.unlink")
     def test_state(self):
         # I create a pending booking
         booking = self.env["resource.booking"].create(
@@ -472,8 +475,7 @@ class BackendCaseMisc(BackendCaseBase):
         ce_f.start = datetime(2021, 2, 22, 8)
         ce_f.duration = 1
         ce_f.recurrency = True
-        ce_f.interval = 1
-        ce_f.rrule_type = "weekly"
+        ce_f.rrule_type_ui = "weekly"
         ce_f.end_type = "count"
         ce_f.count = 2
         ce_f.save()
@@ -490,6 +492,7 @@ class BackendCaseMisc(BackendCaseBase):
         rb_f.start = datetime(2021, 3, 1, 9)
         self.assertTrue(rb_f.combination_id)
 
+    @mute_logger("odoo.models.unlink")
     def test_change_calendar_after_bookings_exist(self):
         """Calendar changes can be done only if they introduce no conflicts."""
         rbc_mon = self.rbcs[0]
@@ -574,6 +577,7 @@ class BackendCaseMisc(BackendCaseBase):
             },
         )
 
+    @mute_logger("odoo.models.unlink")
     def test_location(self):
         """Location across records works as expected."""
         rbt2 = self.rbt.copy({"location": "Office 2"})
@@ -619,6 +623,7 @@ class BackendCaseMisc(BackendCaseBase):
         self.assertFalse(rb.meeting_id)
         self.assertEqual(rb.location, "Office 3")
 
+    @mute_logger("odoo.models.unlink")
     def test_videocall_location(self):
         """Videocall location across records works as expected.
         We need to set dummy urls to prevent the _set_videocall_location() method
@@ -780,7 +785,7 @@ class BackendCaseMisc(BackendCaseBase):
         # Requester and combination must be suggested
         self.assertEqual(
             rb._message_get_suggested_recipients(),
-            {rb.id: [(rb.partner_ids.id, "some customer", None, "Attendees")]},
+            {rb.id: [(rb.partner_ids.id, "some customer", None, "Attendees", {})]},
         )
 
     def test_creating_rbt_has_tags(self):
@@ -951,6 +956,7 @@ class TestMailActivity(TransactionCase):
         booking_form.description = "Booking Description"
         return booking_form.save()
 
+    @mute_logger("odoo.models.unlink")
     def test_action_open_resource_booking_full_process(self):
         action = self.mail_activity.action_open_resource_booking()
         self.assertEqual(action["res_id"], 0)
@@ -976,6 +982,7 @@ class TestMailActivity(TransactionCase):
         self.assertNotEqual(messages, [])
         self.assertNotEqual(activities, [])
 
+    @mute_logger("odoo.models.unlink")
     def test_action_done_without_feedback(self):
         booking = self._create_booking_from_mail_activity(self.mail_activity)
         messages, activities = self.mail_activity._action_done()
@@ -1021,6 +1028,7 @@ class TestMailActivity(TransactionCase):
         booking.start = "2021-03-02 08:00:00"
         self.assertEqual(mail_activity.date_deadline, booking.start.date())
 
+    @mute_logger("odoo.models.unlink")
     def test_unlink_resource_booking_activity(self):
         booking = self._create_booking_from_mail_activity(self.mail_activity)
         booking.action_cancel()
@@ -1029,6 +1037,7 @@ class TestMailActivity(TransactionCase):
         )
         self.assertFalse(self.mail_activity.calendar_event_id)
 
+    @mute_logger("odoo.models.unlink")
     def test_resource_booking_schedule_unschedule(self):
         booking = self._create_booking_from_mail_activity(self.mail_activity)
         res = booking.action_schedule()

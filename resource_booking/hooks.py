@@ -1,10 +1,8 @@
 # Copyright 2024 Tecnativa - Carolina Fernandez
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
-from odoo import SUPERUSER_ID, api
 
 
-def uninstall_hook(cr, registry):
-    env = api.Environment(cr, SUPERUSER_ID, {})
+def uninstall_hook(env, registry):
     # Remove new activity type resource booking and all activities associated'
     activiy_resource_booking = env.ref(
         "resource_booking.mail_activity_data_resource_booking", raise_if_not_found=False

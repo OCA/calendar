@@ -11,7 +11,7 @@ from dateutil.relativedelta import relativedelta
 from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
 
-from odoo.addons.resource.models.resource import Intervals
+from odoo.addons.resource.models.utils import Intervals
 
 
 def _merge_intervals(intervals):
@@ -144,7 +144,6 @@ class ResourceBooking(models.Model):
         domain="[('type_rel_ids.type_id', 'in', [type_id])]",
         index=True,
         readonly=False,
-        states={"scheduled": [("required", True)], "confirmed": [("required", True)]},
         store=True,
         tracking=True,
     )
@@ -235,7 +234,8 @@ class ResourceBooking(models.Model):
         readonly=False,
         store=True,
         tracking=True,
-        help="Amount of time that the resources will be booked and unavailable for others.",
+        help="Amount of time that the resources will be booked and unavailable "
+        "for others.",
     )
     stop = fields.Datetime(
         compute="_compute_stop",
@@ -257,7 +257,7 @@ class ResourceBooking(models.Model):
     )
 
     @api.model
-    def _mail_get_partner_fields(self):
+    def _mail_get_partner_fields(self, introspect_fields=False):
         """Avoid the error if a message is written from portal.
         Define as author partner_id record from field."""
         return ["partner_id"]
@@ -329,10 +329,20 @@ class ResourceBooking(models.Model):
             overdue.is_modifiable = False
 
     @api.depends("name", "partner_ids", "type_id", "meeting_id")
-    @api.depends_context("uid", "using_portal")
+    @api.depends_context("using_portal")
     def _compute_display_name(self):
-        """Overridden just for dependencies; see `name_get()` for implementation."""
-        return super()._compute_display_name()
+        res = super()._compute_display_name()
+        for item in self:
+            if self.env.context.get("using_portal"):
+                # ID optionally suffixed with custom name for portal users
+                template = _("# %(id)d - %(name)s") if item.name else _("# %(id)d")
+                item.display_name = template % {"id": item.id, "name": item.name}
+            elif not item.name and item.id:
+                # Automatic name for backend users
+                item.display_name = self._get_name_formatted(
+                    item.partner_ids[0], item.type_id, item.meeting_id
+                )
+        return res
 
     @api.depends("meeting_id.location", "type_id")
     def _compute_location(self):
@@ -683,24 +693,6 @@ class ResourceBooking(models.Model):
         self.booking_activity_ids.unlink()
         return super().unlink()
 
-    def name_get(self):
-        """Autogenerate booking name if none is provided."""
-        old = super().name_get()
-        new = []
-        for id_, name in old:
-            record = self.browse(id_)
-            if self.env.context.get("using_portal"):
-                # ID optionally suffixed with custom name for portal users
-                template = _("# %(id)d - %(name)s") if record.name else _("# %(id)d")
-                name = template % {"id": id_, "name": name}
-            elif not record.name:
-                # Automatic name for backend users
-                name = self._get_name_formatted(
-                    record.partner_ids[0], record.type_id, record.meeting_id
-                )
-            new.append((id_, name))
-        return new
-
     def _message_auto_subscribe_followers(self, updated_values, default_subtype_ids):
         """Auto-subscribe and notify resource partners."""
         result = super()._message_auto_subscribe_followers(
@@ -772,22 +764,20 @@ class ResourceBooking(models.Model):
         if self.env.context.get("confirm_own_attendance"):
             confirm_always |= self.env.user.partner_id
         # Avoid wasted state recomputes
-        with self.env.norecompute():
-            for booking in self:
-                if not booking.meeting_id:
-                    continue
-                # Make sure requesters and user resources are meeting attendees
-                booking.meeting_id.partner_ids |= booking.partner_ids | booking.mapped(
-                    "combination_id.resource_ids.user_id.partner_id"
-                )
-                # Find meeting attendees that should be confirmed
-                partners_to_confirm = confirm_always | booking.partner_ids
-                for attendee in booking.meeting_id.attendee_ids:
-                    if attendee.partner_id & partners_to_confirm:
-                        # attendee.state='accepted'
-                        attendees_to_confirm |= attendee
-            attendees_to_confirm.write({"state": "accepted"})
-        self.env.flush_all()  # booking.meeting_id.partner_ids and attendees_to_confirm
+        for booking in self:
+            if not booking.meeting_id:
+                continue
+            # Make sure requesters and user resources are meeting attendees
+            booking.meeting_id.partner_ids |= booking.partner_ids | booking.mapped(
+                "combination_id.resource_ids.user_id.partner_id"
+            )
+            # Find meeting attendees that should be confirmed
+            partners_to_confirm = confirm_always | booking.partner_ids
+            for attendee in booking.meeting_id.attendee_ids:
+                if attendee.partner_id & partners_to_confirm:
+                    # attendee.state='accepted'
+                    attendees_to_confirm |= attendee
+        attendees_to_confirm.write({"state": "accepted"})
 
     def action_unschedule(self):
         """Remove associated meetings."""

@@ -307,7 +307,7 @@
                         </td>
                         <td class="text-center">
                             <span
-                                class="badge badge-pill badge-info"
+                                class="badge badge-secondary"
                                 t-field="booking.state"
                             />
                         </td>
@@ -331,7 +331,7 @@
                 <small class="text-right">State:</small>
                 <span
                     t-field="booking_sudo.state"
-                    class="badge badge-pill badge-info"
+                    class="badge badge-secondary"
                     title="Current state of this booking"
                 />
             </div>

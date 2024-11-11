@@ -46,7 +46,7 @@ class CalendarEvent(models.Model):
         before = [(one.start, one.stop) for one in self]
         result = super().write(vals)
         rescheduled = self
-        for (old_start, old_stop), new in zip(before, self):
+        for (old_start, old_stop), new in zip(before, self, strict=True):
             if old_start == new.start and old_stop == new.stop:
                 rescheduled -= new
         rescheduled._validate_booking_modifications()

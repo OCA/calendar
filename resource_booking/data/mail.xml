@@ -10,9 +10,9 @@
             <br />
             You have been assigned to the
             <t t-out="model_description or 'document'" />
-            <t t-out="object.name_get()[0][1]" />
+            <t t-out="object.display_name" />
             because you belong to the chosen resource combination:
-            <t t-out="object.combination_id.name_get()[0][1]" />.
+            <t t-out="object.combination_id.display_name" />.
         </p>
         <p style="margin-top: 24px; margin-bottom: 16px;">
             <a
