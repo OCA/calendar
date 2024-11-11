@@ -109,7 +109,7 @@ def create_test_data(obj):
                 "tz": "UTC",
                 "user_id": user.id,
             }
-            for (user, cal) in zip(obj.users, obj.r_calendars)
+            for (user, cal) in zip(obj.users, obj.r_calendars, strict=True)
         ]
     )
     # Create one RBC for each of those calendars, which includes the
@@ -117,7 +117,7 @@ def create_test_data(obj):
     obj.rbcs = obj.env["resource.booking.combination"].create(
         [
             {"resource_ids": [(6, 0, [user.id, material.id])]}
-            for (user, material) in zip(obj.r_users, obj.r_materials)
+            for (user, material) in zip(obj.r_users, obj.r_materials, strict=True)
         ]
     )
     # Create one RBT that includes all RBCs as available combinations

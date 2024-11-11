@@ -1376,29 +1376,3 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:resource_booking.message_combination_assigned
 msgid "because you belong to the chosen resource combination:"
 msgstr ""
-
-#~ msgid ""
-#~ "Choose how to auto-assign resource combinations. It has no effect if "
-#~ "assiged manually."
-#~ msgstr ""
-#~ "Choisissez comment attribuer automatiquement les combinaisons de "
-#~ "ressources. Il n'a aucun effet s'il est affecté manuellement."
-
-#~ msgid ""
-#~ "Interval offered to start each resource booking. Also used as booking "
-#~ "default duration."
-#~ msgstr ""
-#~ "Intervalle offert pour démarrer chaque réservation de ressource. "
-#~ "Également utilisé comme durée de réservation par défaut."
-
-#~ msgid "Number of messages which requires an action"
-#~ msgstr "Nombre de messages nécessitant une action"
-
-#~ msgid "Number of unread messages"
-#~ msgstr "Nombre de messages non lus"
-
-#~ msgid "Unread Messages"
-#~ msgstr "Messages non lus"
-
-#~ msgid "Unread Messages Counter"
-#~ msgstr "Compteur de messages non lus"

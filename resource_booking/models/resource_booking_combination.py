@@ -3,7 +3,7 @@
 
 from odoo import _, api, fields, models
 
-from odoo.addons.resource.models.resource import Intervals
+from odoo.addons.resource.models.utils import Intervals
 
 
 class ResourceBookingCombination(models.Model):
@@ -87,7 +87,8 @@ class ResourceBookingCombination(models.Model):
                 if not combination_intervals:
                     break  # Can't restrict more
                 calendar = combination.forced_calendar_id or res.calendar_id
-                # combination_intervals &= calendar._work_intervals(start_dt, end_dt, res)
+                # combination_intervals &= calendar._work_intervals(start_dt,
+                # end_dt, res)
                 combination_intervals &= calendar._work_intervals_batch(
                     start_dt, end_dt, res
                 )[res.id]

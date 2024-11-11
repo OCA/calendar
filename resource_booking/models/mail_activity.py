@@ -44,13 +44,13 @@ class MailActivity(models.Model):
 
     def _action_done(self, feedback=False, attachment_ids=False):
         bookings = self.mapped("booking_id")
-        messages, activities = super(MailActivity, self)._action_done(
+        messages, activities = super()._action_done(
             feedback=feedback, attachment_ids=attachment_ids
         )
         if feedback:
             for booking in bookings:
                 description = booking.description
-                description = "%s<br />%s" % (
+                description = "{}<br />{}".format(
                     description if not tools.is_html_empty(description) else "",
                     _("Feedback: %(feedback)s", feedback=tools.plaintext2html(feedback))
                     if feedback
