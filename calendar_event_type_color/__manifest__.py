@@ -4,7 +4,7 @@
 {
     "name": "Calendar Event Type Color",
     "summary": "Colorize calendar view depending on event type color",
-    "version": "16.0.1.0.0",
+    "version": "17.0.1.0.0",
     "author": "Camptocamp, Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/calendar",
     "maintainers": ["yankinmax"],
