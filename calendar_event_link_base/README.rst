@@ -17,18 +17,19 @@ Calendar Event Link Base
     :target: http://www.gnu.org/licenses/agpl-3.0-standalone.html
     :alt: License: AGPL-3
 .. |badge3| image:: https://img.shields.io/badge/github-OCA%2Fcalendar-lightgray.png?logo=github
-    :target: https://github.com/OCA/calendar/tree/16.0/calendar_event_link_base
+    :target: https://github.com/OCA/calendar/tree/18.0/calendar_event_link_base
     :alt: OCA/calendar
 .. |badge4| image:: https://img.shields.io/badge/weblate-Translate%20me-F47D42.png
-    :target: https://translation.odoo-community.org/projects/calendar-16-0/calendar-16-0-calendar_event_link_base
+    :target: https://translation.odoo-community.org/projects/calendar-18-0/calendar-18-0-calendar_event_link_base
     :alt: Translate me on Weblate
 .. |badge5| image:: https://img.shields.io/badge/runboat-Try%20me-875A7B.png
-    :target: https://runboat.odoo-community.org/builds?repo=OCA/calendar&target_branch=16.0
+    :target: https://runboat.odoo-community.org/builds?repo=OCA/calendar&target_branch=18.0
     :alt: Try me on Runboat
 
 |badge1| |badge2| |badge3| |badge4| |badge5|
 
-This module add an abstract model that provide an action to link any model to calendar events.
+This module add an abstract model that provide an action to link any
+model to calendar events.
 
 **Table of contents**
 
@@ -38,26 +39,26 @@ This module add an abstract model that provide an action to link any model to ca
 Usage
 =====
 
-* Inherit the `calendar.event.link.mixin` to the model you want to extend
+- Inherit the calendar.event.link.mixin to the model you want to extend
 
-.. code-block:: python
+.. code:: python
 
-    class YourModel(models.Model):
-        _name = 'your.model'
-        _inherit = ['your.model', 'calendar.event.link.mixin']
+   class YourModel(models.Model):
+       _name = 'your.model'
+       _inherit = ['your.model', 'calendar.event.link.mixin']
 
-* Inherit the form view of your model and add this button to the `button_box` `div`
+- Inherit the form view of your model and add this button to the
+  button_box div
 
-.. code-block:: xml
+.. code:: xml
 
-    <button class="oe_stat_button" type="object" name="action_show_events" icon="fa-calendar">
-        <div class="o_stat_info">
-            <field name="event_count" class="o_stat_value"/>
-            <span class="o_stat_text" attrs="{'invisible': [('event_count', '&lt;', 2)]}">Meetings</span>
-            <span class="o_stat_text" attrs="{'invisible': [('event_count', '&gt;', 1)]}">Meeting</span>
-        </div>
-    </button>
-
+   <button class="oe_stat_button" type="object" name="action_show_events" icon="fa-calendar">
+       <div class="o_stat_info">
+           <field name="event_count" class="o_stat_value"/>
+           <span class="o_stat_text" attrs="{'invisible': [('event_count', '&lt;', 2)]}">Meetings</span>
+           <span class="o_stat_text" attrs="{'invisible': [('event_count', '&gt;', 1)]}">Meeting</span>
+       </div>
+   </button>
 
 Bug Tracker
 ===========
@@ -65,7 +66,7 @@ Bug Tracker
 Bugs are tracked on `GitHub Issues <https://github.com/OCA/calendar/issues>`_.
 In case of trouble, please check there if your issue has already been reported.
 If you spotted it first, help us to smash it by providing a detailed and welcomed
-`feedback <https://github.com/OCA/calendar/issues/new?body=module:%20calendar_event_link_base%0Aversion:%2016.0%0A%0A**Steps%20to%20reproduce**%0A-%20...%0A%0A**Current%20behavior**%0A%0A**Expected%20behavior**>`_.
+`feedback <https://github.com/OCA/calendar/issues/new?body=module:%20calendar_event_link_base%0Aversion:%2018.0%0A%0A**Steps%20to%20reproduce**%0A-%20...%0A%0A**Current%20behavior**%0A%0A**Expected%20behavior**>`_.
 
 Do not contact contributors directly about support or help with technical issues.
 
@@ -73,17 +74,17 @@ Credits
 =======
 
 Authors
-~~~~~~~
+-------
 
 * ACSONE SA/NV
 
 Contributors
-~~~~~~~~~~~~
+------------
 
-* Souheil Bejaoui <souheil.bejaoui@acsone.eu>
+- Souheil Bejaoui <souheil.bejaoui@acsone.eu>
 
 Maintainers
-~~~~~~~~~~~
+-----------
 
 This module is maintained by the OCA.
 
@@ -95,6 +96,6 @@ OCA, or the Odoo Community Association, is a nonprofit organization whose
 mission is to support the collaborative development of Odoo features and
 promote its widespread use.
 
-This module is part of the `OCA/calendar <https://github.com/OCA/calendar/tree/16.0/calendar_event_link_base>`_ project on GitHub.
+This module is part of the `OCA/calendar <https://github.com/OCA/calendar/tree/18.0/calendar_event_link_base>`_ project on GitHub.
 
 You are welcome to contribute. To learn how please visit https://odoo-community.org/page/Contribute.
