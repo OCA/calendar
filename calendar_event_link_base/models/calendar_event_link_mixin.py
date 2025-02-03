@@ -5,7 +5,6 @@ from odoo import _, fields, models
 
 
 class CalendarEventLinkMixin(models.AbstractModel):
-
     _name = "calendar.event.link.mixin"
     _description = "Calendar Event Link Mixin"
 
