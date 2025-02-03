@@ -68,6 +68,10 @@ Contributors
      - Iván Todorovich <ivan.todorovich@camptocamp.com>
      - Maksym Yankin <maksym.yankin@camptocamp.com>
 
+- `Heliconia Solutions Pvt. Ltd. <https://www.heliconia.io>`__
+
+  - Bhavesh Heliconia
+
 Other credits
 -------------
 
