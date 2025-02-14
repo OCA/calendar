@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-01-31 14:06+0000\n"
+"PO-Revision-Date: 2025-02-14 15:06+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -782,12 +782,12 @@ msgstr "Valori predefiniti incontro"
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking_type__alarm_ids
 msgid "Meetings will be created with these reminders by default."
-msgstr "Le riunioni verranno create in modo predefinito con questo promemoria."
+msgstr "Gli incontri verranno creati in modo predefinito con questo promemoria."
 
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking_type__categ_ids
 msgid "Meetings will be created with these tags by default."
-msgstr "Le riunioni verranno create in modo predefinito con queste etichette."
+msgstr "Gli incontri verranno creati in modo predefinito con queste etichette."
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__message_has_error
