@@ -2,7 +2,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 
-def uninstall_hook(env, registry):
+def uninstall_hook(env):
     # Remove new activity type resource booking and all activities associated'
     activiy_resource_booking = env.ref(
         "resource_booking.mail_activity_data_resource_booking", raise_if_not_found=False
