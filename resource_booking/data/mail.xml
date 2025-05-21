@@ -2,7 +2,6 @@
 <!-- Copyright 2021 Tecnativa - Jairo Llopis
      License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
 <data>
-
     <!-- Inspired in message_user_assigned -->
     <template id="message_combination_assigned">
         <p style="margin: 0px;">
@@ -24,5 +23,4 @@
             </a>
         </p>
     </template>
-
 </data>
