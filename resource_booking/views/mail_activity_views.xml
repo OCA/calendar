@@ -31,8 +31,8 @@
                 >activity_category in ['resource_booking','meeting']</attribute>
             </xpath>
             <xpath expr="//button[@name='action_close_dialog']" position="before">
-                  <field name="booking_id" invisible="1" />
-                  <button
+                <field name="booking_id" invisible="1" />
+                <button
                     string="Open Resource Booking"
                     invisible="activity_category!='resource_booking'"
                     name="action_open_resource_booking"

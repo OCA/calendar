@@ -25,9 +25,9 @@
             <div class="alert alert-danger" t-if="not slots">
                 No free slots found this month.
                 <a
-                    t-att-href="booking.get_portal_url(suffix='/schedule/%d/%d' % (start_next.year, start_next.month))"
-                    class="alert-link"
-                >
+                t-att-href="booking.get_portal_url(suffix='/schedule/%d/%d' % (start_next.year, start_next.month))"
+                class="alert-link"
+            >
                     Try next month
                     <i class="fa fa-chevron-right" />
                 </a>
@@ -137,8 +137,8 @@
                             <td
                                 colspan="7"
                             > All times are displayed using this timezone: <strong
-                                    t-field="booking.type_id.resource_calendar_id.tz"
-                                />
+                                t-field="booking.type_id.resource_calendar_id.tz"
+                            />
                             </td>
                         </tr>
                     </tfoot>
@@ -188,18 +188,18 @@
                                         <li>
                                             Start:
                                             <strong
-                                                t-out="slot.strftime(date_format)"
-                                            />
+                                            t-out="slot.strftime(date_format)"
+                                        />
                                             <strong
-                                                t-out="slot.strftime(time_format)"
-                                            />
+                                            t-out="slot.strftime(time_format)"
+                                        />
                                         </li>
                                         <li>
                                             Duration:
                                             <strong
-                                                t-field="booking.duration"
-                                                t-options='{"widget": "float_time"}'
-                                            />
+                                            t-field="booking.duration"
+                                            t-options='{"widget": "float_time"}'
+                                        />
                                         </li>
                                     </ul>
                                     <p>Are you sure?</p>
@@ -504,9 +504,9 @@
                             <p>
                                 If you cancel this booking:
                                 <ul>
-                                    <li>It will disappear from your bookings list.</li>
-                                    <li>It will be unscheduled.</li>
-                                </ul>
+                                <li>It will disappear from your bookings list.</li>
+                                <li>It will be unscheduled.</li>
+                            </ul>
                                 Please confirm this is really what you want.
                             </p>
                         </main>
@@ -561,7 +561,9 @@
                 class="close"
                 data-bs-dismiss="alert"
                 aria-label="Close"
-            > &#215;</button>
+            >
+                &#215;
+            </button>
         </div>
     </template>
     <template id="resource_booking_portal_schedule" name="Resource Booking Scheduling">
