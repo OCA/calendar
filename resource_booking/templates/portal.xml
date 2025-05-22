@@ -42,9 +42,9 @@
                             </td>
                         </tr>
                     </thead>
-                    <thead class="thead-dark">
+                    <thead class="table-dark">
                         <tr>
-                            <th class="text-left">
+                            <th class="text-start">
                                 <a
                                     t-if="start > now"
                                     t-att-href="booking.get_portal_url(suffix='/schedule/%d/%d' % (start_previous.year, start_previous.month))"
@@ -59,7 +59,7 @@
                                 colspan="5"
                                 t-out="start.strftime('%B %Y')"
                             />
-                            <th class="text-right">
+                            <th class="text-end">
                                 <a
                                     t-att-href="booking.get_portal_url(suffix='/schedule/%d/%d' % (start_next.year, start_next.month))"
                                     class="btn btn-secondary"
@@ -281,20 +281,22 @@
                 <t t-set="title">Bookings</t>
             </t>
             <t t-if="not bookings">
-                <p>There are currently no bookings for your account.</p>
+                <p
+                    class="alert alert-warning"
+                >There are currently no bookings for your account.</p>
             </t>
             <t t-if="bookings" t-call="portal.portal_table">
                 <thead>
                     <tr class="active">
-                        <th>Booking ref.</th>
-                        <th>Type</th>
-                        <th>Resources</th>
-                        <th class="text-center">State</th>
-                        <th class="text-right">Date</th>
+                        <th name="booking_ref">Booking ref.</th>
+                        <th name="booking_type">Type</th>
+                        <th name="booking_resource">Resources</th>
+                        <th name="booking_state" class="text-center">State</th>
+                        <th name="booking_date" class="text-end">Date</th>
                     </tr>
                 </thead>
-                <t t-foreach="bookings" t-as="booking">
-                    <tr>
+                <tbody>
+                    <tr t-foreach="bookings" t-as="booking">
                         <td>
                             <a
                                 t-att-href="booking.get_portal_url()"
@@ -311,31 +313,33 @@
                         </td>
                         <td class="text-center">
                             <span
-                                class="badge badge-secondary"
+                                t-attf-class="badge rounded-pill #{'text-bg-success' if booking.state == 'confirmed' else 'text-bg-info'}"
                                 t-field="booking.state"
                             />
                         </td>
-                        <td class="text-right">
+                        <td class="text-end">
                             <span t-field="booking.start" />
                         </td>
                     </tr>
-                </t>
+                </tbody>
             </t>
         </t>
     </template>
     <template id="resource_booking_portal_header" name="Resource Booking Header">
-        <div class="row no-gutters">
-            <div class="col-md">
-                <h5 class="mb-1 mb-md-0">
-                    Booking
-                    <span t-field="booking_sudo.display_name" />
-                </h5>
+        <div class="row justify-content-between mb-3">
+            <div class="col-12 col-md-9">
+                <div class="d-flex gap-2">
+                    <h3 class="my-0">
+                        Booking
+                        <span t-field="booking_sudo.display_name" />
+                    </h3>
+                </div>
             </div>
-            <div class="col-md text-md-right">
-                <small class="text-right">State:</small>
+            <div class="col-auto">
+                <small class="text-end">Stage:</small>
                 <span
+                    t-attf-class="badge rounded-pill #{'text-bg-success' if booking_sudo.state == 'confirmed' else 'text-bg-info'}"
                     t-field="booking_sudo.state"
-                    class="badge badge-secondary"
                     title="Current state of this booking"
                 />
             </div>
@@ -352,12 +356,12 @@
                 </t>
             </t>
             <!-- Form -->
-            <t t-call="portal.portal_record_layout">
-                <t t-set="card_header">
-                    <t t-call="resource_booking.resource_booking_portal_header" />
-                </t>
-                <t t-set="card_body">
-                    <div class="row">
+            <div id="booking_content" class="o_portal_content col-12">
+                <div id="card">
+                    <div id="card_header" data-anchor="true">
+                        <t t-call="resource_booking.resource_booking_portal_header" />
+                    </div>
+                    <div id="card_body" class="row">
                         <div class="col-md">
                             <div class="mb-1">
                                 <strong>Type:</strong>
@@ -428,8 +432,8 @@
                             </div>
                         </div>
                     </div>
-                </t>
-            </t>
+                </div>
+            </div>
             <!-- Actions -->
             <div class="row justify-content-center text-center d-print-none mt8">
                 <t t-if="booking_sudo.state == 'pending'">
@@ -482,7 +486,7 @@
                 </t>
             </div>
             <div role="dialog" class="modal fade" id="modal_cancel">
-                <div class="modal-dialog">
+                <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <input
                             type="hidden"
@@ -490,15 +494,13 @@
                             t-att-value="request.csrf_token()"
                         />
                         <header class="modal-header">
-                            <h4 class="modal-title">Confirm</h4>
+                            <h4 class="modal-title text-break flex-grow-1">Confirm</h4>
                             <button
                                 type="button"
-                                class="close"
+                                class="btn-close"
                                 data-bs-dismiss="modal"
                                 aria-label="Close"
-                            >
-                                <i class="fa fa-times" />
-                            </button>
+                            />
                         </header>
                         <main class="modal-body">
                             <p>
@@ -510,7 +512,9 @@
                                 Please confirm this is really what you want.
                             </p>
                         </main>
-                        <footer class="modal-footer">
+                        <footer
+                            class="modal-footer justify-content-around justify-content-md-end flex-wrap gap-1 w-100"
+                        >
                             <a
                                 t-att-href="booking_sudo.get_portal_url(suffix='/cancel')"
                                 class="btn btn-danger"
@@ -528,8 +532,9 @@
                 </div>
             </div>
             <!-- Discuss -->
-            <div class="mt32">
-                <h4>Message and communication history</h4>
+            <hr />
+            <div id="booking_chat" class="mt32" data-anchor="true">
+                <h3>Message and communication history</h3>
                 <t t-call="portal.message_thread">
                     <t t-set="object" t-value="booking_sudo" />
                     <t t-set="token" t-value="booking_sudo.access_token" />
@@ -568,7 +573,7 @@
     </template>
     <template id="resource_booking_portal_schedule" name="Resource Booking Scheduling">
         <t t-call="portal.portal_layout">
-            <t t-set="o_portal_fullwidth_alert" groups="project.group_project_user">
+            <t t-set="o_portal_fullwidth_alert" groups="resource_booking.group_user">
                 <t t-call="portal.portal_back_in_edit_mode">
                     <t
                         t-set="backend_url"
@@ -581,21 +586,22 @@
                 <t t-call="resource_booking.alert_availability_lost" />
             </t>
             <!-- Scheduling form -->
-            <t t-call="portal.portal_record_layout">
-                <t t-set="classes" t-value="'resource_booking_portal_schedule'" />
-                <t t-set="card_header">
-                    <t t-call="resource_booking.resource_booking_portal_header" />
-                </t>
-                <t t-set="card_body">
-                    <div class="row">
-                        <div class="col">
-                            <t t-call="resource_booking.scheduling_calendar">
-                                <t t-set="booking" t-value="booking_sudo" />
-                            </t>
+            <div id="booking_content" class="o_portal_content col-12">
+                <div id="card">
+                    <div id="card_header" data-anchor="true">
+                        <t t-call="resource_booking.resource_booking_portal_header" />
+                    </div>
+                    <div id="card_body" class="row">
+                        <div class="row">
+                            <div class="col">
+                                <t t-call="resource_booking.scheduling_calendar">
+                                    <t t-set="booking" t-value="booking_sudo" />
+                                </t>
+                            </div>
                         </div>
                     </div>
-                </t>
-            </t>
+                </div>
+            </div>
         </t>
     </template>
 </data>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2025 Tecnativa - Carlos Lopez
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="resource_booking_type_customer" model="resource.booking.type">
+        <field name="name">Customer meeting</field>
+    </record>
+    <record
+        id="resource_booking_type_combination_1"
+        model="resource.booking.type.combination.rel"
+    >
+        <field name="combination_id" ref="resource_booking_combination_admin_demo" />
+        <field name="type_id" ref="resource_booking_type_customer" />
+    </record>
+</odoo>

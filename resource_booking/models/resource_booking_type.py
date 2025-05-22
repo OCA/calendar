@@ -3,7 +3,7 @@
 
 from random import random
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 
 
 class ResourceBookingType(models.Model):
@@ -106,12 +106,13 @@ class ResourceBookingType(models.Model):
 
     @api.depends("booking_ids")
     def _compute_booking_count(self):
-        data = self.env["resource.booking"].read_group(
-            [("type_id", "in", self.ids)], ["type_id"], ["type_id"]
+        booking_data = dict(
+            self.env["resource.booking"]._read_group(
+                [("type_id", "in", self.ids)], ["type_id"], ["__count"]
+            )
         )
-        mapping = {x["type_id"][0]: x["type_id_count"] for x in data}
-        for one in self:
-            one.booking_count = mapping.get(one.id, 0)
+        for booking_type in self:
+            booking_type.booking_count = booking_data.get(booking_type, 0)
 
     @api.constrains("booking_ids", "resource_calendar_id", "combination_rel_ids")
     def _check_bookings_scheduling(self):
@@ -147,8 +148,8 @@ class ResourceBookingType(models.Model):
                 ),
             ),
             "domain": [("type_id", "=", self.id)],
-            "name": _("Bookings"),
+            "name": self.env._("Bookings"),
             "res_model": "resource.booking",
             "type": "ir.actions.act_window",
-            "view_mode": "calendar,tree,form",
+            "view_mode": "calendar,list,form",
         }

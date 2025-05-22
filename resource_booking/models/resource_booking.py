@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 
 from dateutil.relativedelta import relativedelta
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
 from odoo.addons.resource.models.utils import Intervals
@@ -44,65 +44,6 @@ def _availability_is_fitting(available_intervals, start_dt, stop_dt):
     for item in available_intervals._items:
         available_start, available_stop = item[0], item[1]
         if start_dt >= available_start and stop_dt <= available_stop:
-            return True
-    return False
-
-
-def _availability_is_fitting_legacy(available_intervals, start_dt, end_dt):
-    """I keep the old method, since part of it may be needed in the new method."""
-    # Test whether the stretch between start_dt and end_dt is an uninterrupted
-    # stretch of time as determined by `available_intervals`.
-    #
-    # `available_intervals` is typically created by `_get_intervals()`, which in
-    # turn uses `calendar._work_intervals()`. It appears to be default upstream
-    # behaviour of `_work_intervals()` to create a (start_dt, end_dt, record)
-    # tuple for every day, where end_dt is at 23:59, and the next tuple's
-    # start_dt is at 00:00.
-    #
-    # Changing this upstream behaviour of `_work_intervals()` to return a
-    # _single_ tuple for any multi-day uninterrupted stretch of time would
-    # probably be preferable, but (1.) the code in `_work_intervals()` is
-    # unbelievably arcane, and (2.) changing this behaviour is extremely likely
-    # to cause bugs elsewhere. So instead, we account for the upstream behaviour
-    # here.
-    start_date = start_dt.date()
-    end_date = end_dt.date()
-    # Booking is uninterrupted on the same calendar day.
-    if (
-        len(available_intervals) == 1
-        and available_intervals._items[0][0] <= start_dt
-        and available_intervals._items[0][1] >= end_dt
-    ):
-        return True
-    # Booking spans more than one calendar day, e.g. from 23:00 to 1:00
-    # the next day.
-    elif available_intervals and start_date != end_date:
-        tally_date = start_date
-        for item in available_intervals:
-            item0_date = item[0].date()
-            item1_date = item[1].date()
-            # FIXME: Really weird workaround for when available_intervals has
-            # nonsensical items in it where item1_date is before item0_date.
-            # Just ignore those items and pretend they don't exist; all the
-            # other items appear to make sense.
-            if item1_date < item0_date:
-                continue
-            # Intervals that aren't on the running tally date break the streak.
-            # This check is for malformed data in `available_intervals` where a
-            # day is skipped.
-            if item0_date != tally_date or item1_date != tally_date:
-                break
-            # Intervals that aren't on the end date should end at 23:59 (and any
-            # number of seconds).
-            if item1_date != end_date and (item[1].hour != 23 or item[1].minute != 59):
-                break
-            # Intervals that aren't on the start date should start at 00:00 (and
-            # any number of seconds).
-            if item0_date != start_date and (item[0].hour != 0 or item[0].minute != 0):
-                break
-            # The next interval should be on the next day.
-            tally_date += timedelta(days=1)
-        else:
             return True
     return False
 
@@ -335,8 +276,8 @@ class ResourceBooking(models.Model):
         for item in self:
             if self.env.context.get("using_portal"):
                 # ID optionally suffixed with custom name for portal users
-                template = _("# %(id)d - %(name)s") if item.name else _("# %(id)d")
-                item.display_name = template % {"id": item.id, "name": item.name}
+                template = f"# {item.id} - {item.name}" if item.name else f"# {item.id}"
+                item.display_name = template
             elif not item.name and item.id:
                 # Automatic name for backend users
                 item.display_name = self._get_name_formatted(
@@ -500,11 +441,11 @@ class ResourceBooking(models.Model):
         missing_rbc = has_meeting - has_rbc
         if missing_rbc:
             raise ValidationError(
-                _(
+                self.env._(
                     "Cannot schedule these bookings because no resources "
-                    "are selected for them:\n\n- %s"
+                    "are selected for them:\n\n- %s",
+                    "\n- ".join(missing_rbc.mapped("display_name")),
                 )
-                % ("\n- ".join(missing_rbc.mapped("display_name")))
             )
         # Ensure all bookings fit in their type and resources calendars
         unfitting_bookings = has_meeting
@@ -523,12 +464,12 @@ class ResourceBooking(models.Model):
         # Explain which bookings failed validation
         if unfitting_bookings:
             raise ValidationError(
-                _(
+                self.env._(
                     "Cannot schedule these bookings because they do not fit "
                     "in their type or resources calendars, or because "
-                    "all resources are busy:\n\n- %s"
+                    "all resources are busy:\n\n- %s",
+                    "\n- ".join(unfitting_bookings.mapped("display_name")),
                 )
-                % "\n- ".join(unfitting_bookings.mapped("display_name"))
             )
 
     def _get_calendar_context(self, year=None, month=None, now=None):
@@ -570,11 +511,10 @@ class ResourceBooking(models.Model):
     @api.model
     def _get_name_formatted(self, partner, type_, meeting=None):
         """Produce a beautifully formatted name."""
-        values = {"partner": partner.display_name, "type": type_.display_name}
+        name = f"{partner.display_name} - {type_.display_name}"
         if meeting:
-            values["time"] = meeting.display_time
-            return _("%(partner)s - %(type)s - %(time)s") % values
-        return _("%(partner)s - %(type)s") % values
+            name += f" - {meeting.display_time}"
+        return name
 
     def _get_best_combination(self):
         """Pick best combination based on current booking state."""
@@ -596,9 +536,11 @@ class ResourceBooking(models.Model):
         if self.env.context.get("using_portal"):
             hours = (self.stop - self.start).total_seconds() / 3600
             raise ValidationError(
-                _("No resource combinations available on %s")
-                % self.env["calendar.event"]._get_display_time(
-                    self.start, self.stop, hours, False
+                self.env._(
+                    "No resource combinations available on %s",
+                    self.env["calendar.event"]._get_display_time(
+                        self.start, self.stop, hours, False
+                    ),
                 )
             )
 
@@ -750,11 +692,11 @@ class ResourceBooking(models.Model):
                 default_resource_booking_ids=[(6, 0, self.ids)],
                 default_name=self.name or "",
             ),
-            "name": _("Schedule booking"),
+            "name": self.env._("Schedule booking"),
             "res_model": "calendar.event",
             "target": "self",
             "type": "ir.actions.act_window",
-            "view_mode": "calendar,tree,form",
+            "view_mode": "calendar,list,form",
         }
 
     def action_confirm(self):

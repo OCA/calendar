@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2025 Tecnativa - Carlos Lopez
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record
+        id="resource_booking_combination_admin_demo"
+        model="resource.booking.combination"
+    >
+        <field
+            name="resource_ids"
+            eval="[Command.set([ref('resource_user_admin'), ref('resource_user_demo')])]"
+        />
+    </record>
+</odoo>

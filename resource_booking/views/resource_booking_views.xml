@@ -24,10 +24,10 @@
         </field>
     </record>
     <record id="resource_booking_view_tree" model="ir.ui.view">
-        <field name="name">Resource booking tree</field>
+        <field name="name">Resource booking list</field>
         <field name="model">resource.booking</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name" />
                 <field name="partner_ids" widget="many2many_tags" optional="hide" />
                 <field name="type_id" />
@@ -35,7 +35,7 @@
                 <field name="state" />
                 <field name="start" />
                 <field name="stop" />
-            </tree>
+            </list>
         </field>
     </record>
     <record id="resource_booking_view_form" model="ir.ui.view">
@@ -91,7 +91,7 @@
                         string="Cancel"
                         type="object"
                         help="Unschedule this booking and archive it."
-                        invisible="not is_modifiable or state == 'canceled' or not meeting_id"
+                        invisible="not is_modifiable or state == 'canceled' or meeting_id"
                     />
                     <button
                         name="action_cancel"
@@ -185,15 +185,7 @@
                         <field name="description" colspan="4" />
                     </group>
                 </sheet>
-                <div class="oe_chatter">
-                    <field
-                        name="message_follower_ids"
-                        widget="mail_followers"
-                        groups="base.group_user"
-                    />
-                    <field name="activity_ids" widget="mail_activity" />
-                    <field name="message_ids" widget="mail_thread" />
-                </div>
+                <chatter />
             </form>
         </field>
     </record>
@@ -252,7 +244,7 @@
     <record id="resource_booking_action" model="ir.actions.act_window">
         <field name="name">Bookings</field>
         <field name="res_model">resource.booking</field>
-        <field name="view_mode">calendar,tree,form</field>
+        <field name="view_mode">calendar,list,form</field>
         <field name="domain">[]</field>
         <field name="context">{'search_default_is_mine': 1}</field>
         <field name="help" type="html">

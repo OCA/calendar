@@ -62,35 +62,27 @@
                         >
                             <field name="combination_assignment" />
                             <field name="combination_rel_ids">
-                                <tree editable="bottom">
+                                <list editable="bottom">
                                     <field name="sequence" widget="handle" />
                                     <field name="combination_id" />
-                                </tree>
+                                </list>
                             </field>
                         </group>
                     </group>
                 </sheet>
-                <div class="oe_chatter">
-                    <field
-                        name="message_follower_ids"
-                        widget="mail_followers"
-                        groups="base.group_user"
-                    />
-                    <field name="activity_ids" widget="mail_activity" />
-                    <field name="message_ids" widget="mail_thread" />
-                </div>
+                <chatter />
             </form>
         </field>
     </record>
     <record id="resource_booking_type_view_tree" model="ir.ui.view">
-        <field name="name">Resource booking type tree</field>
+        <field name="name">Resource booking type list</field>
         <field name="model">resource.booking.type</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name" />
                 <field name="resource_calendar_id" />
                 <field name="duration" widget="float_time" />
-            </tree>
+            </list>
         </field>
     </record>
     <record id="resource_booking_type_view_search" model="ir.ui.view">
@@ -115,7 +107,7 @@
     <record id="resource_booking_type_action" model="ir.actions.act_window">
         <field name="name">Types</field>
         <field name="res_model">resource.booking.type</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="domain">[]</field>
         <field name="context">{}</field>
         <field name="help" type="html">

@@ -1,5 +1,6 @@
 # Copyright 2021 Tecnativa - Jairo Llopis
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
+from odoo import Command
 
 
 def create_test_data(obj):
@@ -13,9 +14,7 @@ def create_test_data(obj):
     # Tuesdays, and another one on Mondays and Tuesdays; in that order.
     # Also create an all-day calendar for Saturday and Sunday.
     attendances = [
-        (
-            0,
-            0,
+        Command.create(
             {
                 "name": "Mondays",
                 "dayofweek": "0",
@@ -24,9 +23,7 @@ def create_test_data(obj):
                 "day_period": "morning",
             },
         ),
-        (
-            0,
-            0,
+        Command.create(
             {
                 "name": "Tuesdays",
                 "dayofweek": "1",
@@ -35,9 +32,7 @@ def create_test_data(obj):
                 "day_period": "morning",
             },
         ),
-        (
-            0,
-            0,
+        Command.create(
             {
                 "name": "Fridays",
                 "dayofweek": "4",
@@ -46,9 +41,7 @@ def create_test_data(obj):
                 "day_period": "morning",
             },
         ),
-        (
-            0,
-            0,
+        Command.create(
             {
                 "name": "Saturdays",
                 "dayofweek": "5",
@@ -57,9 +50,7 @@ def create_test_data(obj):
                 "day_period": "morning",
             },
         ),
-        (
-            0,
-            0,
+        Command.create(
             {
                 "name": "Sunday",
                 "dayofweek": "6",
@@ -81,7 +72,7 @@ def create_test_data(obj):
     obj.r_materials = obj.env["resource.resource"].create(
         [
             {
-                "name": "Material resource for %s" % cal.name,
+                "name": f"Material resource for {cal.name}",
                 "calendar_id": cal.id,
                 "resource_type": "material",
                 "tz": "UTC",
@@ -104,7 +95,7 @@ def create_test_data(obj):
         [
             {
                 "calendar_id": cal.id,
-                "name": "User %s" % user.name,
+                "name": f"User {user.name}",
                 "resource_type": "user",
                 "tz": "UTC",
                 "user_id": user.id,
@@ -116,7 +107,7 @@ def create_test_data(obj):
     # corresponding material and human resources simultaneously; same order
     obj.rbcs = obj.env["resource.booking.combination"].create(
         [
-            {"resource_ids": [(6, 0, [user.id, material.id])]}
+            {"resource_ids": [Command.set([user.id, material.id])]}
             for (user, material) in zip(obj.r_users, obj.r_materials, strict=True)
         ]
     )
@@ -125,7 +116,7 @@ def create_test_data(obj):
         {
             "name": "Test resource booking type",
             "combination_rel_ids": [
-                (0, 0, {"sequence": num, "combination_id": rbc.id})
+                Command.create({"sequence": num, "combination_id": rbc.id})
                 for num, rbc in enumerate(obj.rbcs)
             ],
             "resource_calendar_id": obj.r_calendars[2].id,

@@ -9,11 +9,13 @@ from dateutil.relativedelta import relativedelta
 from freezegun import freeze_time
 from pytz import utc
 
-from odoo import fields
+from odoo import Command, fields
 from odoo.exceptions import ValidationError
-from odoo.tests.common import Form, TransactionCase, new_test_user, users
+from odoo.tests import Form
+from odoo.tests.common import TransactionCase, new_test_user, users
 from odoo.tools import mute_logger
 
+from odoo.addons.base.tests.common import BaseCommon
 from odoo.addons.resource.models.utils import Intervals
 from odoo.addons.resource_booking.models.resource_booking import (
     _availability_is_fitting,
@@ -433,7 +435,7 @@ class BackendCaseMisc(BackendCaseBase):
                 "start": datetime(2021, 3, 1, 8),
                 "stop": datetime(2021, 3, 1, 10, 30),
                 "name": "some meeting",
-                "partner_ids": [(6, 0, self.users.partner_id.ids)],
+                "partner_ids": [Command.set(self.users.partner_id.ids)],
             }
         )
         # Check it's not bookable
@@ -783,9 +785,16 @@ class BackendCaseMisc(BackendCaseBase):
             rb.message_partner_ids, rb_user.partner_id | self.users[:2].partner_id
         )
         # Requester and combination must be suggested
+        recipients_info = rb._message_get_suggested_recipients()
+        self.assertEqual(len(recipients_info), 1)
         self.assertEqual(
-            rb._message_get_suggested_recipients(),
-            {rb.id: [(rb.partner_ids.id, "some customer", None, "Attendees", {})]},
+            recipients_info[0],
+            {
+                "lang": None,
+                "partner_id": rb.partner_ids.id,
+                "name": "some customer",
+                "reason": "Attendees",
+            },
         )
 
     def test_creating_rbt_has_tags(self):
@@ -925,7 +934,7 @@ class BackendCaseMisc(BackendCaseBase):
         )
 
 
-class TestMailActivity(TransactionCase):
+class TestMailActivity(BaseCommon):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -966,7 +975,7 @@ class TestMailActivity(TransactionCase):
         self.assertEqual(action["context"]["default_name"], "Test Summary")
         self.assertEqual(
             ctx["default_booking_activity_ids"],
-            [(6, 0, [self.mail_activity.id])],
+            [Command.set([self.mail_activity.id])],
         )
         booking = self._create_booking_from_mail_activity(self.mail_activity)
         self.assertTrue(self.mail_activity.calendar_event_id)
@@ -1006,9 +1015,7 @@ class TestMailActivity(TransactionCase):
                 "type_id": self.rbt.id,
                 "duration": 1,
                 "booking_activity_ids": [
-                    (
-                        0,
-                        0,
+                    Command.create(
                         {
                             "activity_type_id": self.activity_type.id,
                             "summary": "Test Summary",
