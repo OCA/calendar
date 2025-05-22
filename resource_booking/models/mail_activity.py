@@ -1,7 +1,7 @@
 # Copyright 2024 Tecnativa - Carolina Fernandez
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
-from odoo import _, fields, models, tools
+from odoo import fields, models, tools
 from odoo.tools import is_html_empty
 
 
@@ -52,7 +52,10 @@ class MailActivity(models.Model):
                 description = booking.description
                 description = "{}<br />{}".format(
                     description if not tools.is_html_empty(description) else "",
-                    _("Feedback: %(feedback)s", feedback=tools.plaintext2html(feedback))
+                    self.env._(
+                        "Feedback: %(feedback)s",
+                        feedback=tools.plaintext2html(feedback),
+                    )
                     if feedback
                     else "",
                 )

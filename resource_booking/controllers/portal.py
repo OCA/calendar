@@ -8,7 +8,7 @@ from dateutil.parser import isoparse
 
 from odoo.exceptions import AccessError, MissingError, ValidationError
 from odoo.http import request, route
-from odoo.tests.common import Form
+from odoo.tests import Form
 
 from odoo.addons.portal.controllers import portal
 

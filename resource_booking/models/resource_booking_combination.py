@@ -1,7 +1,7 @@
 # Copyright 2021 Tecnativa - Jairo Llopis
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 
 from odoo.addons.resource.models.utils import Intervals
 
@@ -42,12 +42,13 @@ class ResourceBookingCombination(models.Model):
 
     @api.depends("booking_ids")
     def _compute_booking_count(self):
-        data = self.env["resource.booking"].read_group(
-            [("combination_id", "in", self.ids)], ["combination_id"], ["combination_id"]
+        booking_data = dict(
+            self.env["resource.booking"]._read_group(
+                [("combination_id", "in", self.ids)], ["combination_id"], ["__count"]
+            )
         )
-        mapping = {x["combination_id"][0]: x["combination_id_count"] for x in data}
-        for one in self:
-            one.booking_count = mapping.get(one.id, 0)
+        for combination in self:
+            combination.booking_count = booking_data.get(combination, 0)
 
     @api.depends("resource_ids.name", "forced_calendar_id.name")
     def _compute_name(self):
@@ -57,18 +58,21 @@ class ResourceBookingCombination(models.Model):
                 "calendar": one.forced_calendar_id.name,
             }
             if one.forced_calendar_id:
-                one.name = _("%(resources)s (using calendar %(calendar)s)") % data
+                one.name = self.env._(
+                    "%(resources)s (using calendar %(calendar)s)", **data
+                )
             else:
-                one.name = _("%(resources)s") % data
+                one.name = self.env._("%(resources)s", **data)
 
     @api.depends("type_rel_ids")
     def _compute_type_count(self):
-        data = self.env["resource.booking.type.combination.rel"].read_group(
-            [("combination_id", "in", self.ids)], ["combination_id"], ["combination_id"]
+        booking_data = dict(
+            self.env["resource.booking.type.combination.rel"]._read_group(
+                [("combination_id", "in", self.ids)], ["combination_id"], ["__count"]
+            )
         )
-        mapping = {x["combination_id"][0]: x["combination_id_count"] for x in data}
-        for one in self:
-            one.type_count = mapping.get(one.id, 0)
+        for combination in self:
+            combination.type_count = booking_data.get(combination, 0)
 
     @api.constrains("booking_ids", "forced_calendar_id", "resource_ids")
     def _check_bookings_scheduling(self):
@@ -98,10 +102,10 @@ class ResourceBookingCombination(models.Model):
     def action_open_bookings(self):
         return {
             "domain": [("combination_id", "in", self.ids)],
-            "name": _("Bookings"),
+            "name": self.env._("Bookings"),
             "res_model": "resource.booking",
             "type": "ir.actions.act_window",
-            "view_mode": "calendar,tree,form",
+            "view_mode": "calendar,list,form",
             "context": {"default_combination_id": self.id},
         }
 
@@ -109,8 +113,8 @@ class ResourceBookingCombination(models.Model):
         return {
             "context": self.env.context,
             "domain": [("combination_rel_ids.combination_id", "in", self.ids)],
-            "name": _("Booking types"),
+            "name": self.env._("Booking types"),
             "res_model": "resource.booking.type",
             "type": "ir.actions.act_window",
-            "view_mode": "tree,form",
+            "view_mode": "list,form",
         }

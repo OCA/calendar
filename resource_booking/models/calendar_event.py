@@ -2,7 +2,7 @@
 # Copyright 2022 Tecnativa - Pedro M. Baeza
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
 
@@ -29,11 +29,11 @@ class CalendarEvent(models.Model):
         frozen = bookings - modifiable
         if frozen:
             raise ValidationError(
-                _(
+                self.env._(
                     "You are not allowed to alter these bookings because "
-                    "they exceeded their modification deadlines:\n\n- %s"
+                    "they exceeded their modification deadlines:\n\n- %s",
+                    "\n- ".join(frozen.mapped("display_name")),
                 )
-                % "\n- ".join(frozen.mapped("display_name"))
             )
 
     def unlink(self):

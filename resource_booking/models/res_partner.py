@@ -17,8 +17,13 @@ class ResPartner(models.Model):
     )
 
     def _compute_resource_booking_count(self):
+        booking_count_by_partner = dict(
+            self.env["resource.booking"]._read_group(
+                [("partner_ids", "in", self.ids)], ["partner_ids"], ["__count"]
+            )
+        )
         for p in self:
-            p.resource_booking_count = len(p.resource_booking_ids)
+            p.resource_booking_count = booking_count_by_partner.get(p, 0)
 
     def action_view_resource_booking(self):
         self.ensure_one()
@@ -27,5 +32,6 @@ class ResPartner(models.Model):
         )
         action["context"] = {
             "default_partner_ids": self.ids,
+            "search_default_partner_ids": self.display_name,
         }
         return action
