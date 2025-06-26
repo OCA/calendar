@@ -551,6 +551,12 @@
         <div
             class="alert alert-danger alert-dismissible rounded-0 fade show d-print-none css_editable_mode_hidden"
         >
+            <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close"
+            />
             <div class="container">
                 <div t-ignore="true" class="text-center">
                     <strong>The chosen schedule is no longer available.</strong>
@@ -561,14 +567,6 @@
                     </t>
                 </div>
             </div>
-            <button
-                type="button"
-                class="close"
-                data-bs-dismiss="alert"
-                aria-label="Close"
-            >
-                &#215;
-            </button>
         </div>
     </template>
     <template id="resource_booking_portal_schedule" name="Resource Booking Scheduling">
