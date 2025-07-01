@@ -8,7 +8,6 @@ from dateutil.parser import isoparse
 
 from odoo.exceptions import AccessError, MissingError, ValidationError
 from odoo.http import request, route
-from odoo.tests import Form
 
 from odoo.addons.portal.controllers import portal
 
@@ -131,8 +130,7 @@ class CustomerPortal(portal.CustomerPortal):
         when_tz_aware = isoparse(when)
         when_naive = datetime.utcfromtimestamp(when_tz_aware.timestamp())
         try:
-            with Form(booking_sudo) as booking_form:
-                booking_form.start = when_naive
+            booking_sudo.start = when_naive
         except ValidationError as error:
             url = booking_sudo.get_portal_url(
                 suffix=f"/schedule/{when_tz_aware:%Y/%m}",
