@@ -3,6 +3,7 @@
 
 from odoo import api, fields, models
 
+from odoo.addons.hr_work_entry_contract.models.hr_work_intervals import WorkIntervals
 from odoo.addons.resource.models.utils import Intervals
 
 
@@ -80,7 +81,7 @@ class ResourceBookingCombination(models.Model):
         bookings = self.mapped("booking_ids")
         return bookings._check_scheduling()
 
-    def _get_intervals(self, start_dt, end_dt):
+    def _get_intervals(self, start_dt, end_dt, tz):
         """Get available intervals for this booking combination."""
         base = Intervals([(start_dt, end_dt, self)])
         result = Intervals([])
@@ -93,9 +94,19 @@ class ResourceBookingCombination(models.Model):
                 calendar = combination.forced_calendar_id or res.calendar_id
                 # combination_intervals &= calendar._work_intervals(start_dt,
                 # end_dt, res)
-                combination_intervals &= calendar._work_intervals_batch(
+                combination_intervals_in_tz = calendar._work_intervals_batch(
                     start_dt, end_dt, res
                 )[res.id]
+                # Convert to the specified time zone if needed
+                # to display the intervals correctly in the same time zone.
+                if calendar.tz != tz.zone:
+                    new_intervals = []
+                    for interval in combination_intervals_in_tz:
+                        start = interval[0].astimezone(tz)
+                        end = interval[1].astimezone(tz)
+                        new_intervals.append((start, end, interval[2]))
+                    combination_intervals_in_tz = WorkIntervals(new_intervals)
+                combination_intervals &= combination_intervals_in_tz
             result |= combination_intervals
         return result
 
