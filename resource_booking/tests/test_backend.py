@@ -934,6 +934,50 @@ class BackendCaseMisc(BackendCaseBase):
             )
         )
 
+    def test_resource_two_timezone(self):
+        """
+        Test that resource booking works correctly with two different time zones.
+        - The resource calendar is set to the America/Guayaquil time zone
+            and starts at 06:00.
+        - The booking type has a calendar in the Europe/Madrid time zone
+            and starts at 09:00.
+        The slots should be returned in the same time zone as the booking type.
+        The first slot should start at 06:00 in America/Guayaquil,
+        which corresponds to 12:00 in Europe/Madrid.
+        """
+        calendar_friday = self.r_calendars[3]
+        rbc_friday = self.rbcs[3]
+        rbc_friday.resource_ids.write({"tz": "America/Guayaquil"})
+        calendar_friday.write({"tz": "America/Guayaquil"})
+        calendar_friday.attendance_ids.write({"hour_from": 6, "hour_to": 15})
+        calendar_meeting = calendar_friday.copy(
+            {"name": "Calendar Meeting", "tz": "Europe/Madrid"}
+        )
+        calendar_meeting.attendance_ids.write({"hour_from": 9, "hour_to": 14})
+        self.rbt.write(
+            {
+                "resource_calendar_id": calendar_meeting.id,
+                "modifications_deadline": 2,
+            }
+        )
+        resource_booking = self.env["resource.booking"].create(
+            {
+                "partner_ids": [(4, self.partner.id)],
+                "duration": 2,
+                "type_id": self.rbt.id,
+                "combination_id": rbc_friday.id,
+                "combination_auto_assign": False,
+            }
+        )
+        response = resource_booking._get_calendar_context()
+        for slots in response["slots"].values():
+            # The first slot should start at 06:00 in America/Guayaquil.
+            # In Europe/Madrid, it should be 12:00.
+            self.assertEqual(slots[0].strftime("%H:%M:%S"), "12:00:00")
+            # Check that all slots are in the expected time zone.
+            for slot in slots:
+                self.assertEqual(slot.tzinfo.zone, "Europe/Madrid")
+
 
 class TestMailActivity(BaseCommon):
     @classmethod
