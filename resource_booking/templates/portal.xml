@@ -2,7 +2,7 @@
 <!-- Copyright 2021 Tecnativa - Jairo Llopis
      Copyright 2023 Tecnativa - Carolina Fernandez
      License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
-<data>
+<odoo>
     <!--
     This template needs these context variables:
 
@@ -602,4 +602,4 @@
             </div>
         </t>
     </template>
-</data>
+</odoo>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!-- Copyright 2021 Tecnativa - Jairo Llopis
      License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
-<data>
+<odoo>
     <!-- User menus -->
     <menuitem
         id="resource_booking_main_menu"
@@ -56,4 +56,4 @@
         action="resource.action_resource_calendar_leave_tree"
         sequence="300"
     />
-</data>
+</odoo>

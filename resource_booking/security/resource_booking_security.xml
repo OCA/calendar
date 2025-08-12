@@ -2,7 +2,7 @@
 <!-- Copyright 2021 Tecnativa - Jairo Llopis
      Copyright 2023 Tecnativa - Carolina Fernandez
      License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
-<data>
+<odoo>
     <record id="category_resource_booking" model="ir.module.category">
         <field name="name">Resource Booking</field>
     </record>
@@ -65,4 +65,4 @@
             <field name="domain_force">[(1, '=', 1)]</field>
         </record>
     </data>
-</data>
+</odoo>
