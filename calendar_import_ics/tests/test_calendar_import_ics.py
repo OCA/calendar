@@ -24,10 +24,15 @@ class TestImportIcs(TransactionCase):
     def test_import_ics(self):
         events_before_imp = self.event_model.search([])
         filename = "test_calendar.ics"
+        vals_len = {"name": "len", "email": "len@lambdao.dev"}
+        partner_len = self.env["res.partner"].create(vals_len)
+        vals_fanny = {"name": "fanny", "email": "fanny@lambdao.dev"}
+        partner_fanny = self.env["res.partner"].create(vals_fanny)
         wiz = self.import_wiz.create(
             {
                 "import_ics_file": self._get_test_file(filename),
                 "import_ics_filename": filename,
+                "additional_partner_emails": [(6, 0, [partner_fanny.id])],
             }
         )
         wiz.button_import()
@@ -42,6 +47,15 @@ class TestImportIcs(TransactionCase):
         self.assertEqual(event_1.start, start_date)
         self.assertEqual(event_1.stop, end_date)
         self.assertEqual(event_1.name, name)
+
+        uid_2 = "4b1a0cb2081f6b3243bfdf191c985fe86237344c"
+        event_2 = self.event_model.search([("event_identifier", "=", uid_2)])
+        event_partners = event_2.attendee_ids.partner_id
+        # we added fanny as partners to look for in the attendees
+        self.assertIn(partner_fanny, event_partners)
+        # we didn't add len, so its partner hasn't been added as attendee
+        self.assertNotIn(partner_len, event_partners)
+
         filename = "test_calendar_2.ics"
         wiz = self.import_wiz.create(
             {
@@ -68,8 +82,11 @@ class TestImportIcs(TransactionCase):
             }
         )
         wiz.button_import()
+        # event_1 has not been imported, and has been deleted as it had no other partner
         event_1 = self.event_model.search([("event_identifier", "=", uid)])
         self.assertFalse(event_1)
+        # event_2 has not been deleted, since we imported fanny as other attendee on it
+        self.assertTrue(event_2)
         wiz = self.import_wiz.create(
             {
                 "import_ics_file": self._get_test_file(filename),

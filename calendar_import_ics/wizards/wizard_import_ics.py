@@ -30,6 +30,15 @@ class CalendarImportIcs(models.TransientModel):
         "that are not in this import will be deleted",
         default=True,
     )
+    additional_partner_emails = fields.Many2many(
+        "res.partner",
+        help="Partners to be searched for as attendee emails",
+    )
+    no_mail_to_attendees = fields.Boolean(
+        string="No mail to attendees?",
+        help="If checked, the attendees will not receive a mail",
+        default=False,
+    )
 
     def button_import(self):
         imported_events = []
@@ -44,13 +53,24 @@ class CalendarImportIcs(models.TransientModel):
         file_str = file_decoded.decode("utf-8")
         lines = file_str.split("\n")
         ics_event = {}
+        emails_to_partner = {p.email: p.id for p in self.additional_partner_emails}
+        # raise if there are multiple partners with the same email?
+        processor = self
+        if self.no_mail_to_attendees:
+            processor = self.with_context(no_mail_to_attendees=True)
         for line in lines:
             if line.startswith(("DTSTART", "DTEND")) and "TZID=" in line:
                 line = self.convert_date_to_z(line)
             if line.startswith("BEGIN:VEVENT"):
                 ics_event = {}
             elif line.startswith("END:VEVENT"):
-                self._process_event(ics_event, imported_events)
+                processor._process_event(ics_event, imported_events)
+            elif line.startswith("ATTENDEE:MAILTO:"):
+                email = line.split(":MAILTO:")[1].strip()
+                if "partner_ids" not in ics_event:
+                    ics_event["partner_ids"] = []
+                if email in emails_to_partner:
+                    ics_event["partner_ids"].append(emails_to_partner[email])
             else:
                 if ":" in line:
                     key, value = line.strip().split(":", 1)
@@ -82,16 +102,20 @@ class CalendarImportIcs(models.TransientModel):
             date_str += "Z"
         return datetime.strptime(date_str, "%Y%m%dT%H%M%SZ")
 
+    def _get_partner_vals(self, ics_event):
+        partner_ids = ics_event.get("partner_ids", [])
+        if self.partner_id.id not in partner_ids:
+            partner_ids.append(self.partner_id.id)
+        return [(4, pid) for pid in partner_ids]
+
     def _update_event(self, event, ics_event, event_start_date, event_end_date):
-        vals = {}
+        vals = {"partner_ids": self._get_partner_vals(ics_event)}
         if event.start != event_start_date:
             vals["start"] = event_start_date
         if event.stop != event_end_date:
             vals["stop"] = event_end_date
         if event.name != ics_event["SUMMARY"]:
             vals["name"] = ics_event["SUMMARY"]
-        if self.partner_id not in event.partner_ids:
-            vals["partner_ids"] = [(4, self.partner_id.id, 0)]
         event.write(vals)
 
     def _create_event(self, ics_event, event_start_date, event_end_date):
@@ -101,7 +125,7 @@ class CalendarImportIcs(models.TransientModel):
                 "stop": event_end_date,
                 "name": ics_event["SUMMARY"],
                 "event_identifier": ics_event["UID"],
-                "partner_ids": [(4, self.partner_id.id)],
+                "partner_ids": self._get_partner_vals(ics_event),
             }
         )
 
@@ -121,6 +145,8 @@ class CalendarImportIcs(models.TransientModel):
         non_imported_events = self.env["calendar.event"].search(domain)
         for non_imported_event in non_imported_events:
             non_imported_event.write({"partner_ids": [(3, self.partner_id.id)]})
+        # TODO: this should be an option?
+        #  If we imported another partner on it, we shouldn't skip the unlink
         if not non_imported_events.partner_ids:
             non_imported_events.unlink()
 

@@ -11,6 +11,8 @@
                     <field name="do_remove_old_event" />
                     <field name="import_ics_file" filename="import_ics_filename" />
                     <field name="import_ics_filename" invisible="1" />
+                    <field name="additional_partner_emails" widget="many2many_tags" />
+                    <field name="no_mail_to_attendees" widget="boolean_toggle" />
                 </group>
                 <footer>
                     <button
