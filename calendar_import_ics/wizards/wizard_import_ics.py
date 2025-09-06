@@ -78,6 +78,8 @@ class CalendarImportIcs(models.TransientModel):
                     self._create_event(ics_event, event_start_date, event_end_date)
 
     def _parse_date(self, date_str):
+        if not date_str.endswith("Z"):
+            date_str += "Z"
         return datetime.strptime(date_str, "%Y%m%dT%H%M%SZ")
 
     def _update_event(self, event, ics_event, event_start_date, event_end_date):
