@@ -1,7 +1,3 @@
-.. image:: https://odoo-community.org/readme-banner-image
-   :target: https://odoo-community.org/get-involved?utm_source=readme
-   :alt: Odoo Community Association
-
 =====================
 Calendar - Import ics
 =====================
@@ -17,7 +13,7 @@ Calendar - Import ics
 .. |badge1| image:: https://img.shields.io/badge/maturity-Beta-yellow.png
     :target: https://odoo-community.org/page/development-status
     :alt: Beta
-.. |badge2| image:: https://img.shields.io/badge/license-AGPL--3-blue.png
+.. |badge2| image:: https://img.shields.io/badge/licence-AGPL--3-blue.png
     :target: http://www.gnu.org/licenses/agpl-3.0-standalone.html
     :alt: License: AGPL-3
 .. |badge3| image:: https://img.shields.io/badge/github-OCA%2Fcalendar-lightgray.png?logo=github
@@ -48,7 +44,9 @@ odoo calendar, importing events and the following attributes:
 Usage
 =====
 
-To use this module, follow these steps:
+To use this module, your user should be part of the 'Calendar Import
+Ics' group. You need to be in debug mode to add this group to your user.
+Then, follow these steps:
 
 1. Navigate to the Calendar App.
 2. Go to Configuration.

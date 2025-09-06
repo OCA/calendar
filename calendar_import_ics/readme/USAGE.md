@@ -1,4 +1,7 @@
-To use this module, follow these steps:
+
+To use this module, your user should be part of the 'Calendar Import Ics' group.
+You need to be in debug mode to add this group to your user.
+Then, follow these steps:
 
 1.  Navigate to the Calendar App.
 2.  Go to Configuration.
