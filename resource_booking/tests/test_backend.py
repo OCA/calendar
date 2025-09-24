@@ -787,8 +787,11 @@ class BackendCaseMisc(BackendCaseBase):
         # Requester and combination must be suggested
         recipients_info = rb._message_get_suggested_recipients()
         self.assertEqual(len(recipients_info), 1)
+        recipient_info = recipients_info[0]
+        if "display_name" in recipient_info:
+            recipient_info["name"] = recipient_info.pop("display_name")
         self.assertEqual(
-            recipients_info[0],
+            recipient_info,
             {
                 "lang": None,
                 "partner_id": rb.partner_ids.id,
