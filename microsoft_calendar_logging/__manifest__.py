@@ -13,4 +13,7 @@
     "depends": [
         "microsoft_calendar",
     ],
+    "data": [
+        "views/calendar_event_views.xml",
+    ],
 }
