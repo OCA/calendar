@@ -1,0 +1,605 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2021 Tecnativa - Jairo Llopis
+     Copyright 2023 Tecnativa - Carolina Fernandez
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<data>
+    <!--
+    This template needs these context variables:
+
+    - access_token: to allow public access to the record
+    - booking: the booking record
+    - calendar: a Calendar object, already configured with the correct first weekday
+    - now: tz-aware datetime object indicating current time
+    - res_lang: res.lang record for current context l10n
+    - slots: available slots, as returned from [resource.booking]._get_available_slots()
+    - start: datetime when we start displaying the calendar
+    - weekday_names: dict of mappings between weekday numbers and names, where MON=1
+     -->
+    <template id="scheduling_calendar" name="Resource Booking Calendar">
+        <t t-set="confirm_url" t-value="booking.get_portal_url(suffix='/confirm')" />
+        <t t-set="date_format" t-value="res_lang.date_format" />
+        <t t-set="time_format" t-value="res_lang.time_format.replace(':%S', '')" />
+        <t t-set="start_next" t-value="start + relativedelta(months=1)" />
+        <t t-set="start_previous" t-value="start - relativedelta(months=1)" />
+        <div class="o_booking_calendar">
+            <div class="alert alert-danger" t-if="not slots">
+                No free slots found this month.
+                <a
+                t-att-href="booking.get_portal_url(suffix='/schedule/%d/%d' % (start_next.year, start_next.month))"
+                class="alert-link"
+            >
+                    Try next month
+                    <i class="fa fa-chevron-right" />
+                </a>
+            </div>
+            <!-- Monthly calendar -->
+            <div class="table-responsive-md">
+                <table class="table text-center">
+                    <thead t-if="booking.requester_advice">
+                        <tr>
+                            <td colspan="7">
+                                <div t-field="booking.requester_advice" />
+                            </td>
+                        </tr>
+                    </thead>
+                    <thead class="table-dark">
+                        <tr>
+                            <th class="text-start">
+                                <a
+                                    t-if="start > now"
+                                    t-att-href="booking.get_portal_url(suffix='/schedule/%d/%d' % (start_previous.year, start_previous.month))"
+                                    class="btn btn-secondary"
+                                    title="Previous month"
+                                >
+                                    <i class="fa fa-chevron-left" />
+                                </a>
+                            </th>
+                            <th
+                                class="align-middle"
+                                colspan="5"
+                                t-out="start.strftime('%B %Y')"
+                            />
+                            <th class="text-end">
+                                <a
+                                    t-att-href="booking.get_portal_url(suffix='/schedule/%d/%d' % (start_next.year, start_next.month))"
+                                    class="btn btn-secondary"
+                                    title="Next month"
+                                >
+                                    <i class="fa fa-chevron-right" />
+                                </a>
+                            </th>
+                        </tr>
+                    </thead>
+                    <thead>
+                        <tr>
+                            <t t-foreach="calendar.iterweekdays()" t-as="weekday">
+                                <th
+                                    t-att-title="weekday_names[str(weekday + 1)]"
+                                    t-out="weekday_names[str(weekday + 1)][:3]"
+                                />
+                            </t>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t
+                            t-foreach="calendar.monthdatescalendar(start.year, start.month)"
+                            t-as="week"
+                        >
+                            <tr>
+                                <t t-foreach="week" t-as="day">
+                                    <td
+                                        t-att-class="day.month != start.month and 'text-muted'"
+                                    >
+                                        <t
+                                            t-if="day.month == start.month and slots.get(day)"
+                                        >
+                                            <!-- Day dropdown -->
+                                            <div class="dropdown">
+                                                <button
+                                                    class="btn btn-primary dropdown-toggle"
+                                                    type="button"
+                                                    data-bs-toggle="dropdown"
+                                                    aria-haspopup="true"
+                                                    aria-expanded="false"
+                                                    t-out="day.day"
+                                                    t-attf-id="dropdown-trigger-#{day.isoformat()}"
+                                                />
+                                                <div
+                                                    class="dropdown-menu slots-dropdown"
+                                                    t-attf-aria-labelledby="dropdown-trigger-#{day.isoformat()}"
+                                                >
+                                                    <t
+                                                        t-foreach="slots[day]"
+                                                        t-as="slot"
+                                                    >
+                                                        <!-- Hour item to open confirmation -->
+                                                        <button
+                                                            class="dropdown-item"
+                                                            type="button"
+                                                            data-bs-toggle="modal"
+                                                            t-attf-data-bs-target="#modal-confirm-#{int(slot.timestamp())}"
+                                                            t-out="slot.strftime(time_format)"
+                                                        />
+                                                    </t>
+                                                </div>
+                                            </div>
+                                        </t>
+                                        <t t-else="">
+                                            <t t-out="day.day" />
+                                        </t>
+                                    </td>
+                                </t>
+                            </tr>
+                        </t>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td
+                                colspan="7"
+                            > All times are displayed using this timezone: <strong
+                                t-field="booking.type_id.resource_calendar_id.tz"
+                            />
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <!-- Hour confirmation modals -->
+            <t
+                t-foreach="calendar.monthdatescalendar(start.year, start.month)"
+                t-as="week"
+            >
+                <t t-foreach="week" t-as="day">
+                    <form
+                        t-foreach="slots.get(day, [])"
+                        t-as="slot"
+                        method="post"
+                        t-att-action="confirm_url"
+                        t-attf-id="modal-confirm-#{int(slot.timestamp())}"
+                        t-attf-aria-labelledby="modal-title-#{int(slot.timestamp())}"
+                        class="modal fade"
+                    >
+                        <input
+                            type="hidden"
+                            name="csrf_token"
+                            t-att-value="request.csrf_token()"
+                        />
+                        <input
+                            type="hidden"
+                            name="access_token"
+                            t-att-value="access_token"
+                        />
+                        <input
+                            type="hidden"
+                            name="when"
+                            t-att-value="slot.isoformat()"
+                        />
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div
+                                    t-attf-id="modal-title-#{int(slot.timestamp())}"
+                                    class="modal-header"
+                                >
+                                    <h5>Confirm booking</h5>
+                                </div>
+                                <div class="modal-body">
+                                    <p>You are about to confirm this booking:</p>
+                                    <ul>
+                                        <li>
+                                            Start:
+                                            <strong
+                                            t-out="slot.strftime(date_format)"
+                                        />
+                                            <strong
+                                            t-out="slot.strftime(time_format)"
+                                        />
+                                        </li>
+                                        <li>
+                                            Duration:
+                                            <strong
+                                            t-field="booking.duration"
+                                            t-options='{"widget": "float_time"}'
+                                        />
+                                        </li>
+                                    </ul>
+                                    <p>Are you sure?</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button
+                                        type="button"
+                                        class="btn btn-secondary"
+                                        data-bs-dismiss="modal"
+                                    >Cancel</button>
+                                    <button
+                                        type="submit"
+                                        class="btn btn-primary"
+                                    >Confirm booking</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </t>
+            </t>
+        </div>
+    </template>
+    <!-- Portal templates -->
+    <template id="portal_breadcrumbs" inherit_id="portal.portal_breadcrumbs">
+        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+            <li
+                t-if="page_name == 'booking' or booking_sudo"
+                t-attf-class="breadcrumb-item #{'active ' if not booking_sudo else ''}"
+            >
+                <a
+                    t-if="booking_sudo"
+                    t-attf-href="/my/bookings?{{ keep_query() }}"
+                >Bookings</a>
+                <t t-else="">Bookings</t>
+            </li>
+            <t t-if="booking_sudo">
+                <li
+                    t-attf-class="breadcrumb-item #{'active ' if page_name == 'booking' else ''}"
+                >
+                    <t t-if="page_name == 'booking_schedule'">
+                        <a
+                            t-att-href="booking_sudo.get_portal_url()"
+                            t-out="booking_sudo.display_name"
+                        />
+                    </t>
+                    <t t-else="">
+                        <t t-out="booking_sudo.name" />
+                    </t>
+                </li>
+                <li
+                    class="breadcrumb-item active"
+                    t-if="page_name == 'booking_schedule'"
+                >Schedule</li>
+            </t>
+        </xpath>
+    </template>
+    <template
+        id="portal_my_home"
+        inherit_id="portal.portal_my_home"
+        customize_show="True"
+        priority="30"
+    >
+        <div id="portal_common_category" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t
+                    t-set="icon"
+                    t-value="'/resource_booking/static/src/img/portal_icon.svg'"
+                />
+                <t t-set="title">Bookings</t>
+                <t t-set="url" t-value="'/my/bookings'" />
+                <t t-set="placeholder_count" t-value="'booking_count'" />
+            </t>
+        </div>
+    </template>
+    <template id="portal_my_bookings" name="My Bookings">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True" />
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Bookings</t>
+            </t>
+            <t t-if="not bookings">
+                <p
+                    class="alert alert-warning"
+                >There are currently no bookings for your account.</p>
+            </t>
+            <t t-if="bookings" t-call="portal.portal_table">
+                <thead>
+                    <tr class="active">
+                        <th name="booking_ref">Booking ref.</th>
+                        <th name="booking_type">Type</th>
+                        <th name="booking_resource">Resources</th>
+                        <th name="booking_state" class="text-center">State</th>
+                        <th name="booking_date" class="text-end">Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr t-foreach="bookings" t-as="booking">
+                        <td>
+                            <a
+                                t-att-href="booking.get_portal_url()"
+                                t-attf-class="tr_resource_booking_link"
+                            >
+                                <span t-field="booking.display_name" />
+                            </a>
+                        </td>
+                        <td>
+                            <span t-field="booking.type_id" />
+                        </td>
+                        <td>
+                            <span t-field="booking.combination_id" />
+                        </td>
+                        <td class="text-center">
+                            <span
+                                t-attf-class="badge rounded-pill #{'text-bg-success' if booking.state == 'confirmed' else 'text-bg-info'}"
+                                t-field="booking.state"
+                            />
+                        </td>
+                        <td class="text-end">
+                            <span t-field="booking.start" />
+                        </td>
+                    </tr>
+                </tbody>
+            </t>
+        </t>
+    </template>
+    <template id="resource_booking_portal_header" name="Resource Booking Header">
+        <div class="row justify-content-between mb-3">
+            <div class="col-12 col-md-9">
+                <div class="d-flex gap-2">
+                    <h3 class="my-0">
+                        Booking
+                        <span t-field="booking_sudo.display_name" />
+                    </h3>
+                </div>
+            </div>
+            <div class="col-auto">
+                <small class="text-end">Stage:</small>
+                <span
+                    t-attf-class="badge rounded-pill #{'text-bg-success' if booking_sudo.state == 'confirmed' else 'text-bg-info'}"
+                    t-field="booking_sudo.state"
+                    title="Current state of this booking"
+                />
+            </div>
+        </div>
+    </template>
+    <template id="resource_booking_portal_form" name="Booking portal form">
+        <t t-call="portal.portal_layout">
+            <t t-set="o_portal_fullwidth_alert" groups="resource_booking.group_user">
+                <t t-call="portal.portal_back_in_edit_mode">
+                    <t
+                        t-set="backend_url"
+                        t-value="'/web#return_label=Website&amp;model=resource.booking&amp;id=%d&amp;view_type=form' % (booking_sudo.id)"
+                    />
+                </t>
+            </t>
+            <!-- Form -->
+            <div id="booking_content" class="o_portal_content col-12">
+                <div id="card">
+                    <div id="card_header" data-anchor="true">
+                        <t t-call="resource_booking.resource_booking_portal_header" />
+                    </div>
+                    <div id="card_body" class="row">
+                        <div class="col-md">
+                            <div class="mb-1">
+                                <strong>Type:</strong>
+                                <span t-field="booking_sudo.type_id.name" />
+                            </div>
+                            <div class="mb-1">
+                                <strong>Requested by:</strong>
+                                <ul>
+                                    <t
+                                        t-foreach="booking_sudo.partner_ids"
+                                        t-as="partner"
+                                    >
+                                        <li>
+                                            <span t-field="partner.display_name" />
+                                        </li>
+                                    </t>
+                                </ul>
+                            </div>
+                            <div class="mb-1">
+                                <strong>Booked resources:</strong>
+                                <ul>
+                                    <t
+                                        t-foreach="booking_sudo.combination_id.resource_ids"
+                                        t-as="resource"
+                                    >
+                                        <li>
+                                            <span t-field="resource.name" />
+                                        </li>
+                                    </t>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <div class="mb-1">
+                                <strong>Location:</strong>
+                                <span t-field="booking_sudo.location" />
+                            </div>
+                            <div class="mb-1">
+                                <strong>Meeting URL:</strong>
+                                <a
+                                    t-att-href="booking_sudo.videocall_location"
+                                    target="_blank"
+                                >
+                                    <t t-out="booking_sudo.videocall_location or ''" />
+                                </a>
+                            </div>
+                            <div class="mb-1">
+                                <strong>Dates:</strong>
+                                <span t-field="booking_sudo.meeting_id.display_time" />
+                            </div>
+                            <div class="mb-1">
+                                <strong>Duration:</strong>
+                                <span
+                                    t-field="booking_sudo.duration"
+                                    t-options='{"widget": "float_time"}'
+                                />
+                            </div>
+                            <div t-if="booking_sudo.requester_advice" class="mb-1">
+                                <strong>Advice:</strong>
+                                <span t-field="booking_sudo.requester_advice" />
+                            </div>
+                            <div
+                                t-if="booking_sudo.is_overdue"
+                                role="alert"
+                                class="mb-1 alert alert-warning"
+                            >
+                                This booking exceeded its modifications deadline.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Actions -->
+            <div class="row justify-content-center text-center d-print-none mt8">
+                <t t-if="booking_sudo.state == 'pending'">
+                    <div class="col-sm-auto mt8">
+                        <a
+                            role="button"
+                            class="btn btn-primary"
+                            t-att-href="booking_sudo.get_portal_url(suffix='/schedule')"
+                        >
+                            <i class="fa fa-calendar" />
+                            Schedule
+                        </a>
+                    </div>
+                </t>
+                <t
+                    t-if="booking_sudo.is_modifiable and booking_sudo.state in {'scheduled', 'accepted'}"
+                >
+                    <div class="col-sm-auto mt8">
+                        <a
+                            role="button"
+                            class="btn btn-secondary"
+                            t-att-href="booking_sudo.get_portal_url(suffix='/schedule')"
+                        >
+                            <i class="fa fa-calendar" />
+                            Reschedule
+                        </a>
+                    </div>
+                </t>
+                <div class="col-sm-auto mt8">
+                    <a role="button" class="btn btn-secondary" href="#discussion">
+                        <i class="fa fa-comment" />
+                        Feedback
+                    </a>
+                </div>
+                <t
+                    t-if="booking_sudo.is_modifiable and booking_sudo.state != 'canceled'"
+                >
+                    <div class="col-sm-auto mt8">
+                        <a
+                            role="button"
+                            class="btn btn-danger"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modal_cancel"
+                            href="#"
+                        >
+                            <i class="fa fa-times" />
+                            Cancel
+                        </a>
+                    </div>
+                </t>
+            </div>
+            <div role="dialog" class="modal fade" id="modal_cancel">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <input
+                            type="hidden"
+                            name="csrf_token"
+                            t-att-value="request.csrf_token()"
+                        />
+                        <header class="modal-header">
+                            <h4 class="modal-title text-break flex-grow-1">Confirm</h4>
+                            <button
+                                type="button"
+                                class="btn-close"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"
+                            />
+                        </header>
+                        <main class="modal-body">
+                            <p>
+                                If you cancel this booking:
+                                <ul>
+                                <li>It will disappear from your bookings list.</li>
+                                <li>It will be unscheduled.</li>
+                            </ul>
+                                Please confirm this is really what you want.
+                            </p>
+                        </main>
+                        <footer
+                            class="modal-footer justify-content-around justify-content-md-end flex-wrap gap-1 w-100"
+                        >
+                            <a
+                                t-att-href="booking_sudo.get_portal_url(suffix='/cancel')"
+                                class="btn btn-danger"
+                            >
+                                <i class="fa fa-times" />
+                                Cancel this booking
+                            </a>
+                            <button
+                                type="button"
+                                class="btn btn-primary"
+                                data-bs-dismiss="modal"
+                            >Go back</button>
+                        </footer>
+                    </div>
+                </div>
+            </div>
+            <!-- Discuss -->
+            <hr />
+            <div id="booking_chat" class="mt32" data-anchor="true">
+                <h3>Message and communication history</h3>
+                <t t-call="portal.message_thread">
+                    <t t-set="object" t-value="booking_sudo" />
+                    <t t-set="token" t-value="booking_sudo.access_token" />
+                    <t t-set="pid" t-value="pid" />
+                    <t t-set="hash" t-value="hash" />
+                </t>
+            </div>
+        </t>
+    </template>
+    <template
+        id="alert_availability_lost"
+        name="Alert Resource Booking Availability was Lost"
+    >
+        <div
+            class="alert alert-danger alert-dismissible rounded-0 fade show d-print-none css_editable_mode_hidden"
+        >
+            <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close"
+            />
+            <div class="container">
+                <div t-ignore="true" class="text-center">
+                    <strong>The chosen schedule is no longer available.</strong>
+                    <t t-if="error">
+                        <br />
+                        Error details:
+                        <span t-out="error" />
+                    </t>
+                </div>
+            </div>
+        </div>
+    </template>
+    <template id="resource_booking_portal_schedule" name="Resource Booking Scheduling">
+        <t t-call="portal.portal_layout">
+            <t t-set="o_portal_fullwidth_alert" groups="resource_booking.group_user">
+                <t t-call="portal.portal_back_in_edit_mode">
+                    <t
+                        t-set="backend_url"
+                        t-value="'/web#return_label=Website&amp;model=resource.booking&amp;id=%d&amp;view_type=form' % (booking_sudo.id)"
+                    />
+                </t>
+            </t>
+            <!-- Error alert -->
+            <t t-if="error">
+                <t t-call="resource_booking.alert_availability_lost" />
+            </t>
+            <!-- Scheduling form -->
+            <div id="booking_content" class="o_portal_content col-12">
+                <div id="card">
+                    <div id="card_header" data-anchor="true">
+                        <t t-call="resource_booking.resource_booking_portal_header" />
+                    </div>
+                    <div id="card_body" class="row">
+                        <div class="row">
+                            <div class="col">
+                                <t t-call="resource_booking.scheduling_calendar">
+                                    <t t-set="booking" t-value="booking_sudo" />
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</data>
