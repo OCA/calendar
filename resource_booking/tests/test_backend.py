@@ -793,6 +793,7 @@ class BackendCaseMisc(BackendCaseBase):
                 "lang": None,
                 "partner_id": rb.partner_ids.id,
                 "name": "some customer",
+                "display_name": "some customer",
                 "reason": "Attendees",
             },
         )
