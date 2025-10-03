@@ -12,8 +12,10 @@ class ResourceResource(models.Model):
     @api.constrains("calendar_id", "resource_type", "tz", "user_id")
     def _check_bookings_scheduling(self):
         """Scheduled bookings must have no conflicts."""
-        bookings = self.env["resource.booking"].search(
-            [("combination_id.resource_ids", "in", self.ids)]
+        bookings = (
+            self.env["resource.booking"]
+            .sudo()
+            .search([("combination_id.resource_ids", "in", self.ids)])
         )
         return bookings._check_scheduling()
 
