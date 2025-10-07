@@ -1,0 +1,1 @@
+odoo-addon-web_calendar_slot_duration @ git+https://github.com/OCA/web.git@refs/pull/3306/head#subdirectory=web_calendar_slot_duration
