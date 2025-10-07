@@ -1,0 +1,89 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* calendar_export_ics
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: 2025-07-28 10:25+0000\n"
+"Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
+"Language-Team: none\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.10.4\n"
+
+#. module: calendar_export_ics
+#: model:ir.model,name:calendar_export_ics.model_calendar_export_ics
+#: model:res.groups,name:calendar_export_ics.group_calendar_export
+msgid "Calendar Export Ics"
+msgstr "Esporta calendario ICS"
+
+#. module: calendar_export_ics
+#: model:ir.model.fields,field_description:calendar_export_ics.field_calendar_export_ics__create_uid
+msgid "Created by"
+msgstr "Creato da"
+
+#. module: calendar_export_ics
+#: model:ir.model.fields,field_description:calendar_export_ics.field_calendar_export_ics__create_date
+msgid "Created on"
+msgstr "Creato il"
+
+#. module: calendar_export_ics
+#: model:ir.model.fields,field_description:calendar_export_ics.field_calendar_export_ics__display_name
+msgid "Display Name"
+msgstr "Nome visualizzato"
+
+#. module: calendar_export_ics
+#: model_terms:ir.ui.view,arch_db:calendar_export_ics.calendar_export_ics_form
+msgid "Done"
+msgstr "Eseguito"
+
+#. module: calendar_export_ics
+#: model:ir.model.fields,field_description:calendar_export_ics.field_calendar_export_ics__export_end_date
+msgid "End Export Date"
+msgstr "Data fine esportazione"
+
+#. module: calendar_export_ics
+#: model:ir.model.fields,field_description:calendar_export_ics.field_calendar_export_ics__export_ics_filename
+msgid "Export Ics Filename"
+msgstr "Nome file ICS esportazione"
+
+#. module: calendar_export_ics
+#: model:ir.actions.act_window,name:calendar_export_ics.action_export_ics_wizard
+#: model:ir.ui.menu,name:calendar_export_ics.menu_calendar_export_ics
+msgid "Export to Ics File"
+msgstr "Esporta in file ICS"
+
+#. module: calendar_export_ics
+#: model_terms:ir.ui.view,arch_db:calendar_export_ics.calendar_export_ics_form
+msgid "Generate ICS File"
+msgstr "Genera file ICS"
+
+#. module: calendar_export_ics
+#: model:ir.model.fields,field_description:calendar_export_ics.field_calendar_export_ics__id
+msgid "ID"
+msgstr "ID"
+
+#. module: calendar_export_ics
+#: model:ir.model.fields,field_description:calendar_export_ics.field_calendar_export_ics__export_ics_file
+msgid "Ics Exported File"
+msgstr "File ICS esportato"
+
+#. module: calendar_export_ics
+#: model:ir.model.fields,field_description:calendar_export_ics.field_calendar_export_ics__write_uid
+msgid "Last Updated by"
+msgstr "Ultimo aggiornamento di"
+
+#. module: calendar_export_ics
+#: model:ir.model.fields,field_description:calendar_export_ics.field_calendar_export_ics__write_date
+msgid "Last Updated on"
+msgstr "Ultimo aggiornamento il"
+
+#. module: calendar_export_ics
+#: model:ir.model.fields,field_description:calendar_export_ics.field_calendar_export_ics__partner_id
+msgid "Partner"
+msgstr "Partner"

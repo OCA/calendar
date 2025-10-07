@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="calendar_export_ics_form" model="ir.ui.view">
+        <field name="name">calendar.export.ics.form</field>
+        <field name="model">calendar.export.ics</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="export_end_date" invisible="export_ics_file" />
+                    <field
+                        name="partner_id"
+                        groups="base.group_erp_manager"
+                        invisible="export_ics_file"
+                    />
+                    <field
+                        name="export_ics_file"
+                        filename="export_ics_filename"
+                        widget="binary"
+                        readonly="1"
+                        force_save="1"
+                        invisible="not export_ics_file"
+                    />
+                    <field name="export_ics_filename" invisible="1" />
+                </group>
+                <footer>
+                    <button
+                        name="button_export"
+                        type="object"
+                        class="oe_highlight"
+                        string="Generate ICS File"
+                        invisible="export_ics_file"
+                    />
+                    <button special="cancel" string="Done" class="oe_link" />
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_export_ics_wizard" model="ir.actions.act_window">
+        <field name="name">Export to Ics File</field>
+        <field name="res_model">calendar.export.ics</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+    <menuitem
+        id="menu_calendar_export_ics"
+        parent="calendar.calendar_menu_config"
+        action="action_export_ics_wizard"
+        sequence="1"
+    />
+</odoo>
