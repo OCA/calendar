@@ -769,19 +769,12 @@ class ResourceBooking(models.Model):
         return {
             "context": dict(
                 self.env.context,
-                # These 2 avoid creating event as activity
                 default_res_model_id=False,
                 default_res_id=False,
-                # Context used by web_calendar_slot_duration module
-                # Use the booking type's slot duration for calendar snapping
                 calendar_slot_duration=DurationParser.value_to_html(
                     self.type_id.slot_duration,
-                    {
-                        "unit": "hour",
-                        "digital": True,
-                    },
+                    {"unit": "hour", "digital": True},
                 ),
-                # For best UX, set default event duration to the booking duration
                 default_duration=self.duration,
                 default_resource_booking_ids=[(6, 0, self.ids)],
                 default_name=self.name or "",
