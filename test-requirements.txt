@@ -1,0 +1,7 @@
+cssselect
+odoo==19.0.*
+
+# Temporary dependency until web_calendar_slot_duration has a 19.0 release on OCA wheels/PyPI.
+# See: https://github.com/OCA/maintainer-tools/wiki/Use-temporary-reference(s)-to-another-pull-request(s)
+# Depends on PR: https://github.com/OCA/web/pull/3306
+odoo-addon-web_calendar_slot_duration @ git+https://github.com/OCA/web.git@refs/pull/3306/head#subdirectory=web_calendar_slot_duration
