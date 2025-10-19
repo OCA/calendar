@@ -42,8 +42,7 @@ class ResourceCalendarPublicHoliday(models.Model):
         ):
             raise ValidationError(
                 self.env._(
-                    "You can't create duplicate public holiday per year and/or"
-                    " country"
+                    "You can't create duplicate public holiday per year and/or country"
                 )
             )
         return True
