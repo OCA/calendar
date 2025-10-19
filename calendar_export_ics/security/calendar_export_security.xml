@@ -2,6 +2,8 @@
 <odoo>
     <record id="group_calendar_export" model="res.groups">
         <field name="name">Calendar Export Ics</field>
-        <field name="category_id" ref="base.module_category_hidden" />
+        <!-- Odoo 19: res.groups no longer has 'category_id'.
+             Group categories are modeled via res.groups.privilege -> ir.module.category.
+             Classification is optional; drop category link for minimal migration. -->
     </record>
 </odoo>
