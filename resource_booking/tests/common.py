@@ -84,9 +84,9 @@ def create_test_data(obj):
     obj.users = obj.env["res.users"].create(
         [
             {
-                "email": "user_%d@example.com" % num,
-                "login": "user_%d" % num,
-                "name": "User %d" % num,
+                "email": f"user_{num}@example.com",
+                "login": f"user_{num}",
+                "name": f"User {num}",
             }
             for num, _ in enumerate(obj.r_calendars)
         ]

@@ -410,7 +410,7 @@
                             </div>
                             <div class="mb-1">
                                 <strong>Dates:</strong>
-                                <span t-field="booking_sudo.meeting_id.display_time" />
+                                <span t-out="booking_sudo._get_portal_display_time()" />
                             </div>
                             <div class="mb-1">
                                 <strong>Duration:</strong>

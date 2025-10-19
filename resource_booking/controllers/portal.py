@@ -2,7 +2,7 @@
 # Copyright 2022 Tecnativa - Pedro M. Baeza
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 from dateutil.parser import isoparse
 
@@ -128,7 +128,10 @@ class CustomerPortal(portal.CustomerPortal):
         """Confirm a booking in a given datetime."""
         booking_sudo = self._get_booking_sudo(booking_id, access_token)
         when_tz_aware = isoparse(when)
-        when_naive = datetime.utcfromtimestamp(when_tz_aware.timestamp())
+        # Build a naive UTC datetime without using deprecated utcfromtimestamp
+        when_naive = datetime.fromtimestamp(
+            when_tz_aware.timestamp(), tz=timezone.utc
+        ).replace(tzinfo=None)
         try:
             booking_sudo.start = when_naive
         except ValidationError as error:

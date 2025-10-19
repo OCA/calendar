@@ -8,18 +8,16 @@
     </record>
     <record id="group_user" model="res.groups">
         <field name="name">User</field>
-        <field name="category_id" ref="category_resource_booking" />
         <field name="comment">Users allowed to book resources</field>
     </record>
     <record id="group_manager" model="res.groups">
         <field name="name">Manager</field>
-        <field name="category_id" ref="category_resource_booking" />
         <field name="implied_ids" eval="[(4, ref('group_user'))]" />
         <field
             name="comment"
         >Users allowed to manage resource booking configurations.</field>
         <field
-            name="users"
+            name="user_ids"
             eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"
         />
     </record>

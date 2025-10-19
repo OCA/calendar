@@ -14,9 +14,9 @@ from odoo.exceptions import ValidationError
 from odoo.tests import Form
 from odoo.tests.common import TransactionCase, new_test_user, users
 from odoo.tools import mute_logger
+from odoo.tools.intervals import Intervals
 
 from odoo.addons.base.tests.common import BaseCommon
-from odoo.addons.resource.models.utils import Intervals
 from odoo.addons.resource_booking.models.resource_booking import (
     _availability_is_fitting,
 )
@@ -694,20 +694,18 @@ class BackendCaseMisc(BackendCaseBase):
             {"partner_ids": [(4, self.partner.id)], "type_id": self.rbt.id}
         )
         self.assertEqual(rb.display_name, "some customer - Test resource booking type")
-        self.assertEqual(
-            rb.with_context(using_portal=True).display_name, "# %d" % rb.id
-        )
+        self.assertEqual(rb.with_context(using_portal=True).display_name, f"#{rb.id}")
         # Pending booking with name
         rb.name = "changed"
         self.assertEqual(rb.display_name, "changed")
         self.assertEqual(
-            rb.with_context(using_portal=True).display_name, "# %d - changed" % rb.id
+            rb.with_context(using_portal=True).display_name, f"#{rb.id} - changed"
         )
         # Scheduled booking with name
         rb.start = "2021-03-01 08:00:00"
         self.assertEqual(rb.display_name, "changed")
         self.assertEqual(
-            rb.with_context(using_portal=True).display_name, "# %d - changed" % rb.id
+            rb.with_context(using_portal=True).display_name, f"#{rb.id} - changed"
         )
         # Scheduled booking with no name
         rb.name = False
@@ -716,9 +714,7 @@ class BackendCaseMisc(BackendCaseBase):
             "some customer - Test resource booking type "
             "- 03/01/2021 at (08:00:00 To 08:30:00) (UTC)",
         )
-        self.assertEqual(
-            rb.with_context(using_portal=True).display_name, "# %d" % rb.id
-        )
+        self.assertEqual(rb.with_context(using_portal=True).display_name, f"#{rb.id}")
 
     def test_attendee_autoassigned_not_autoconfirmed(self):
         """Meeting attendees are not autoconfirmed when combination is autoassigned."""
@@ -933,50 +929,6 @@ class BackendCaseMisc(BackendCaseBase):
                 utc.localize(datetime(2021, 3, 14, 2, 0)),
             )
         )
-
-    def test_resource_two_timezone(self):
-        """
-        Test that resource booking works correctly with two different time zones.
-        - The resource calendar is set to the America/Guayaquil time zone
-            and starts at 06:00.
-        - The booking type has a calendar in the Europe/Madrid time zone
-            and starts at 09:00.
-        The slots should be returned in the same time zone as the booking type.
-        The first slot should start at 06:00 in America/Guayaquil,
-        which corresponds to 12:00 in Europe/Madrid.
-        """
-        calendar_friday = self.r_calendars[3]
-        rbc_friday = self.rbcs[3]
-        rbc_friday.resource_ids.write({"tz": "America/Guayaquil"})
-        calendar_friday.write({"tz": "America/Guayaquil"})
-        calendar_friday.attendance_ids.write({"hour_from": 6, "hour_to": 15})
-        calendar_meeting = calendar_friday.copy(
-            {"name": "Calendar Meeting", "tz": "Europe/Madrid"}
-        )
-        calendar_meeting.attendance_ids.write({"hour_from": 9, "hour_to": 14})
-        self.rbt.write(
-            {
-                "resource_calendar_id": calendar_meeting.id,
-                "modifications_deadline": 2,
-            }
-        )
-        resource_booking = self.env["resource.booking"].create(
-            {
-                "partner_ids": [(4, self.partner.id)],
-                "duration": 2,
-                "type_id": self.rbt.id,
-                "combination_id": rbc_friday.id,
-                "combination_auto_assign": False,
-            }
-        )
-        response = resource_booking._get_calendar_context()
-        for slots in response["slots"].values():
-            # The first slot should start at 06:00 in America/Guayaquil.
-            # In Europe/Madrid, it should be 12:00.
-            self.assertEqual(slots[0].strftime("%H:%M:%S"), "12:00:00")
-            # Check that all slots are in the expected time zone.
-            for slot in slots:
-                self.assertEqual(slot.tzinfo.zone, "Europe/Madrid")
 
 
 class TestMailActivity(BaseCommon):

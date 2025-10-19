@@ -215,7 +215,7 @@
                     domain="[('state', 'in', ['scheduled', 'confirmed'])]"
                 />
                 <filter name="filter_date" string="Start date" date="start" />
-                <group expand="0" name="groupby" string="Group By">
+                <group name="groupby">
                     <filter
                         string="State"
                         name="groupby_state"
