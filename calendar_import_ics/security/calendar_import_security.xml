@@ -2,6 +2,6 @@
 <odoo>
     <record id="group_calendar_import" model="res.groups">
         <field name="name">Calendar Import Ics</field>
-        <field name="category_id" ref="base.module_category_hidden" />
+        <!-- Odoo 19: res.groups no longer has 'category_id'. Drop classification. -->
     </record>
 </odoo>

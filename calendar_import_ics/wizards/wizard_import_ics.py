@@ -7,7 +7,7 @@ from datetime import datetime
 import pytz
 from dateutil import parser
 
-from odoo import _, fields, models
+from odoo import fields, models
 from odoo.exceptions import ValidationError
 
 
@@ -37,7 +37,7 @@ class CalendarImportIcs(models.TransientModel):
         assert self.import_ics_file
         extension = self.import_ics_filename.split(".")[1]
         if extension != "ics":
-            raise ValidationError(_("Only ics files are supported"))
+            raise ValidationError(self.env._("Only ics files are supported"))
         if self.env.user and not self.partner_id:
             self.partner_id = self.env.user.partner_id.id
         file_decoded = base64.b64decode(self.import_ics_file)
