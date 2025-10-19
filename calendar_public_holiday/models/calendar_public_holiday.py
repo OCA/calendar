@@ -75,7 +75,6 @@ class ResourceCalendarPublicHoliday(models.Model):
         return states_filter
 
     @api.model
-    @api.returns("calendar.public.holiday.line")
     def get_holidays_list(self, year=None, start_dt=None, end_dt=None, partner_id=None):
         """Returns recordset of calendar.public.holiday.line
         for the specified year and employee

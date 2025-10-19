@@ -69,15 +69,17 @@ class CalendarHolidaysPublicLine(models.Model):
                 if self.state_ids & holiday.state_ids:
                     raise ValidationError(
                         self.env._(
-                            "You can't create duplicate public holiday per date"
-                            f" {self.date} and one of the country states."
+                            "You can't create duplicate public holiday per date %s "
+                            "and one of the country states.",
+                            self.date,
                         )
                     )
         domain = self._get_domain_check_date_state_one()
         if self.search_count(domain) > 1:
             raise ValidationError(
                 self.env._(
-                    f"You can't create duplicate public holiday per date {self.date}."
+                    "You can't create duplicate public holiday per date %s.",
+                    self.date,
                 )
             )
         return True
