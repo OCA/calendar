@@ -420,6 +420,11 @@ class ResourceBooking(models.Model):
                         meeting = meeting.with_context(from_ui=True)
                     meeting.write(meeting_vals)
                 else:
+                    # Force the tz just in the creation
+                    # as it cannot be changed on write
+                    event_tz = one.type_id.resource_calendar_id.tz or False
+                    if event_tz:
+                        meeting_vals["event_tz"] = event_tz
                     to_create.append(meeting_vals)
             else:
                 to_delete |= one.meeting_id
