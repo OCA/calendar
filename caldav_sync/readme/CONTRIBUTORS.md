@@ -1,0 +1,4 @@
+- [Bemade Inc.](https://www.bemade.org)
+  - Marc Durepos \<marc@bemade.org\>
+- [JumpTo](https://www.jumpto.ch)
+  - Sabrine Mbarek \<sabrine.mbarek22@gmail.com\>

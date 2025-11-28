@@ -1,0 +1,14 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Odoo//CalDAV Client//EN
+BEGIN:VEVENT
+UID:external-organizer-test-123
+DTSTART:20250207T143000Z
+DTEND:20250207T153000Z
+DTSTAMP:20250207T143000Z
+ATTENDEE;PARTSTAT=ACCEPTED;CN=Test User:mailto:test@example.com
+ATTENDEE;PARTSTAT=ACCEPTED;CN=Mister External:mailto:mister.external@otherdomain.com
+SUMMARY:Meeting with External Organizer
+DESCRIPTION:This is a test event with an external organizer
+END:VEVENT
+END:VCALENDAR
