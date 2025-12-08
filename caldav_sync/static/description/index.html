@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CalDAV Synchronization</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #000000; /* Black background */
+            color: #b48a1d; /* Gold color */
+        }
+        .container {
+            margin-top: 20px;
+        }
+        h1, h2 {
+            color: #b48a1d; /* Gold color */
+        }
+        p, ul, ol {
+            color: #ffffff; /* White color for better readability on black background */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">CalDAV Synchronization</h1>
+        <img src="images/main_screenshot.png" class="img-fluid my-4" alt="Main Screenshot">
+        <p><strong>Author:</strong> Bemade Inc. (Marc Durepos)</p>
+        <p><strong>Website:</strong> <a href="https://www.bemade.org" class="text-warning">www.bemade.org</a></p>
+        <p><strong>License:</strong> GNU Lesser General Public License (LGPL-3)</p>
+        <h2>Overview</h2>
+        <p>The CalDAV Synchronization module for Odoo allows users to synchronize their calendar events with CalDAV servers. This enables seamless integration of Odoo calendar with external applications like Apple Calendar or Thunderbird.</p>
+        <h2>Warning</h2>
+        <p>This module is in early development stages and should not be considered stable.
+        Please test it on an unimportant calendar before using it with your important data.
+        We are working hard to make improvements based on user feedback, so please reach
+        out if you run into any issues or need a specific feature.</p>
+        <h2>Features</h2>
+        <ul>
+            <li>Synchronize Odoo calendar events with CalDAV servers.</li>
+            <li>Create, update, and delete events in Odoo and reflect changes on the CalDAV server.</li>
+            <li>Poll CalDAV server for changes and update Odoo calendar accordingly.</li>
+        </ul>
+        <h2>Configuration</h2>
+        <ol>
+            <li>Install the module in Odoo.</li>
+            <li>Go to the User settings in Odoo.</li>
+            <li>
+                Enter the CalDAV calendar URL, username, and password on the user settings.
+                In some cases, the calendar URL to use is not evident. For Apple iCloud
+                calendars, for example, we recommend starting with the base server url
+                at https://caldav.icloud.com/ and then selecting a specific calendar url
+                from the error given in the server logs.
+            </li>
+        </ol>
+        <p><strong>Note: </strong>Some calendar service providers such as
+            Apple iCloud require app-specific passwords to be set so that
+            the calendar API can bypass 2-factor authentication. Please look
+        into setting up app-specific passwords for your cloud calendar
+            provider if you're faced with authentication errors.</p>
+        <h2>Usage</h2>
+        <ol>
+            <li>Create a calendar event in Odoo and it will be synchronized with the CalDAV calendar.</li>
+            <li>Update the event in Odoo and the changes will reflect on the CalDAV server.</li>
+            <li>Delete the event in Odoo and it will be removed from the CalDAV server.</li>
+            <li>Changes made to the calendar on the CalDAV server will be polled and updated in Odoo.</li>
+        </ol>
+        <h2>Technical Details</h2>
+        <p>The module extends the <code>calendar.event</code> model to add CalDAV synchronization functionality. It uses the <code>icalendar</code> library to format events and the <code>caldav</code> library to interact with CalDAV servers. Polling for changes on the CalDAV server can be triggered manually by triggering the scheduled action in Odoo.</p>
+        <h2>Support</h2>
+        <p>If you have any issues with the module or feature requests, please reach out
+            to us by creating an issue on our Gitlab at
+            <a href="https://git.bemade.org/bemade/bemade-addons">
+                https://git.bemade.org/bemade/bemade-addons
+            </a>
+            or by submitting a request on our website at
+            <a href="https://www.bemade.org">
+                https://www.bemade.org</a>
+            </a>
+        </p>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,2 @@
+- [Bemade Inc.](https://www.bemade.org):
+  - Marc Durepos \<marc@bemade.org\>
