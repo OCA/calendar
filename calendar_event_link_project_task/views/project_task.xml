@@ -2,7 +2,6 @@
 <!-- Copyright 2019 ACSONE SA/NV
      License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
 <odoo>
-
     <record model="ir.ui.view" id="project_task_form_view">
         <field name="model">project.task</field>
         <field name="inherit_id" ref="project.view_task_form2" />
@@ -29,5 +28,4 @@
             </xpath>
         </field>
     </record>
-
 </odoo>

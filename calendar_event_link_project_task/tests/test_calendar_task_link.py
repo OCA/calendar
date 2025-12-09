@@ -6,7 +6,7 @@ from odoo.tests.common import TransactionCase
 
 class TestCalendarTaskLink(TransactionCase):
     def setUp(self):
-        super(TestCalendarTaskLink, self).setUp()
+        super().setUp()
         self.task = self.env["project.task"].search([], limit=1)
 
     def test_calendar_task_link(self):
