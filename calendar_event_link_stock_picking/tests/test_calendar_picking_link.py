@@ -7,7 +7,7 @@ from odoo.tests.common import TransactionCase
 
 class TestCalendarPickingLink(TransactionCase):
     def setUp(self):
-        super(TestCalendarPickingLink, self).setUp()
+        super().setUp()
         self.picking = self.env["stock.picking"].search([], limit=1)
 
     def test_calendar_picking_link(self):
