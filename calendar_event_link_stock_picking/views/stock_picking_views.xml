@@ -15,11 +15,11 @@
                         <field name="event_count" class="o_stat_value" />
                         <span
                             class="o_stat_text"
-                            attrs="{'invisible': [('event_count', '&lt;', 2)]}"
+                            invisible="event_count &lt; 2"
                         >Meetings</span>
                         <span
                             class="o_stat_text"
-                            attrs="{'invisible': [('event_count', '&gt;', 1)]}"
+                            invisible="event_count &gt; 1"
                         >Meeting</span>
                     </div>
                 </button>
