@@ -1,6 +1,7 @@
 # Copyright 2025 Therp BV <https://therp.nl>.
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html).
 import logging
+import pprint
 
 from odoo import api, fields, models
 
@@ -62,10 +63,27 @@ class MicrosoftCalendarSync(models.AbstractModel):
         """Mark time record last updated on microsoft from Odoo."""
         # Actual update on microsoft will run after commit.
         super().write({"datetime_updated_on_microsoft": fields.Datetime.now()})
+        for this in self:
+            _logger.info(
+                "Updating event on microsoft for %(model)s, (%(id)s, %(name)s)",
+                {"model": this._name, "id": this.id, "name": this.name},
+            )
+            _logger.debug(
+                "Updating event with values: %(values)s",
+                {"values": pprint.pformat(values)},
+            )
         return super()._microsoft_patch(user_id, event_id, values, timeout=timeout)
 
     def _microsoft_insert(self, values, timeout=TIMEOUT):
         """Mark time record created on microsoft from Odoo."""
         # Actual insert on microsoft will run after commit.
         super().write({"datetime_created_on_microsoft": fields.Datetime.now()})
+        for this in self:
+            _logger.info(
+                "Inserting event on microsoft for %(model)s, (%(id)s, %(name)s)",
+                {"model": this._name, "id": this.id, "name": this.name},
+            )
+            _logger.debug(
+                "Inserting with values: %(values)s", {"values": pprint.pformat(values)}
+            )
         return super()._microsoft_insert(values, timeout=timeout)
