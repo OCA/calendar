@@ -1,0 +1,28 @@
+<odoo>
+
+    <record id="rule_calendar_shared_ics_manager_all" model="ir.rule">
+        <field name="name">calendar.shared.ics: managers see all</field>
+        <field name="model_id" ref="model_calendar_shared_ics" />
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field
+            name="groups"
+            eval="[(4, ref('calendar_shared_ics.group_calendar_shared_ics_manager'))]"
+        />
+        <field name="perm_read" eval="1" />
+        <field name="perm_write" eval="1" />
+        <field name="perm_create" eval="1" />
+        <field name="perm_unlink" eval="1" />
+    </record>
+
+    <record id="rule_calendar_shared_ics_user_own" model="ir.rule">
+        <field name="name">calendar.shared.ics: users can read own feed</field>
+        <field name="model_id" ref="model_calendar_shared_ics" />
+        <field name="domain_force">[('partner_id', '=', user.partner_id.id)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]" />
+        <field name="perm_read" eval="1" />
+        <field name="perm_write" eval="0" />
+        <field name="perm_create" eval="0" />
+        <field name="perm_unlink" eval="0" />
+    </record>
+
+</odoo>

@@ -1,0 +1,73 @@
+<odoo>
+    <record id="view_calendar_shared_ics_tree" model="ir.ui.view">
+        <field name="name">calendar.shared.ics.tree</field>
+        <field name="model">calendar.shared.ics</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+                <field name="active" />
+                <field name="partner_id" />
+                <field name="apply_partner_filter" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_calendar_shared_ics_form" model="ir.ui.view">
+        <field name="name">calendar.shared.ics.form</field>
+        <field name="model">calendar.shared.ics</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="access_token" invisible="1" />
+                    <button
+                        name="action_open_share_wizard"
+                        type="object"
+                        string="Share"
+                        class="oe_highlight"
+                    />
+                    <button
+                        name="action_reset_access_token"
+                        type="object"
+                        string="Rotate access token"
+                        confirm="This will invalidate the existing subscription link. Continue?"
+                    />
+                </header>
+                <sheet>
+                    <group>
+                        <field name="name" />
+                        <field name="active" />
+                    </group>
+                    <group string="Feed scope">
+                        <field name="partner_id" />
+                        <field name="apply_partner_filter" />
+                        <field name="domain" />
+                    </group>
+                    <group string="Subscription link">
+                        <field name="share_webcal_url" readonly="1" widget="copy" />
+                        <field name="share_url" readonly="1" widget="copy" />
+                        <field name="access_url" readonly="1" widget="url" />
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" />
+                    <field name="activity_ids" />
+                    <field name="message_ids" />
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_calendar_shared_ics" model="ir.actions.act_window">
+        <field name="name">Shared ICS Calendars</field>
+        <field name="res_model">calendar.shared.ics</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem
+        id="menu_calendar_shared_ics_root"
+        name="Shared ICS"
+        parent="calendar.calendar_menu_config"
+        action="action_calendar_shared_ics"
+    />
+
+</odoo>
