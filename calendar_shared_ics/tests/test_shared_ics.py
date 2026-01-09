@@ -19,7 +19,7 @@ class TestCalendarSharedIcsFullNoHttp(TransactionCase):
         self.group_manager = self.env.ref(
             "calendar_shared_ics.group_calendar_shared_ics_manager"
         )
-        self.marker = f"[ICS_NOHTTP_{self.__class__.__name__}]"
+        self.marker = f"[ICS{self.__class__.__name__}]"
         # Partners
         self.partner_mgr = self.Partners.create({"name": f"{self.marker} Mgr Partner"})
         self.partner_u1 = self.Partners.create({"name": f"{self.marker} U1 Partner"})
@@ -52,7 +52,6 @@ class TestCalendarSharedIcsFullNoHttp(TransactionCase):
                 "groups_id": [Command.set([self.group_user.id])],
             }
         )
-
         # Feeds
         self.feed_u1 = self.Shared.sudo().create(
             {
@@ -70,8 +69,7 @@ class TestCalendarSharedIcsFullNoHttp(TransactionCase):
         )
         self.feed_u1.sudo()._portal_ensure_token()
         self.feed_u2.sudo()._portal_ensure_token()
-
-        # Events (real records to test domain/search)
+        # Events
         now = fields.Datetime.now()
         self.event_u1 = self.Event.sudo().create(
             {
@@ -99,9 +97,39 @@ class TestCalendarSharedIcsFullNoHttp(TransactionCase):
         feeds_u1 = self.Shared.with_user(self.user_u1).search([])
         self.assertIn(self.feed_u1, feeds_u1)
         self.assertNotIn(self.feed_u2, feeds_u1)
+
         self.Shared.with_user(self.user_u1).browse(self.feed_u1.id).read(["name"])
         with self.assertRaises(AccessError):
             self.Shared.with_user(self.user_u1).browse(self.feed_u2.id).read(["name"])
+
+    def test_check_access_token(self):
+        token = self.feed_u1.sudo().access_token
+        self.assertTrue(self.feed_u1.sudo()._check_access_token(token))
+        self.assertFalse(self.feed_u1.sudo()._check_access_token("WRONG"))
+        self.assertFalse(self.feed_u1.sudo()._check_access_token(False))
+
+    def test_get_share_url_points_to_landing(self):
+        # _get_share_url should return a relative URL to the public landing page
+        self.feed_u1.sudo()._portal_ensure_token()
+        token = self.feed_u1.sudo().access_token
+        url = self.feed_u1.sudo()._get_share_url()
+        self.assertIn(f"/calendar/shared/{self.feed_u1.id}/landing", url)
+        self.assertIn("access_token=", url)
+        self.assertIn(token, url)
+
+    def test_computed_subscription_urls(self):
+        # These should be absolute and contain /ics + access_token
+        self.feed_u1.sudo()._portal_ensure_token()
+        token = self.feed_u1.sudo().access_token
+        share_url = self.feed_u1.sudo().share_url
+        webcal_url = self.feed_u1.sudo().share_webcal_url
+        self.assertTrue(share_url)
+        self.assertTrue(webcal_url)
+        self.assertIn(f"/calendar/shared/{self.feed_u1.id}/ics", share_url)
+        self.assertIn(f"access_token={token}", share_url)
+        self.assertIn(f"/calendar/shared/{self.feed_u1.id}/ics", webcal_url)
+        self.assertIn(f"access_token={token}", webcal_url)
+        self.assertTrue(webcal_url.startswith("webcal://"))
 
     def test_domain_partner_filter(self):
         dom = self.feed_u1.sudo()._get_events_domain()
@@ -132,8 +160,6 @@ class TestCalendarSharedIcsFullNoHttp(TransactionCase):
             b"BEGIN:VCALENDAR\r\nBEGIN:VEVENT\r\nSUMMARY:%s\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
             % ((f"{self.marker} Event U1").encode("utf-8"))
         )
-
-        # Patch _get_ics_file on the recordset model class
         with patch.object(
             type(events), "_get_ics_file", return_value={self.event_u1.id: ics_u1}
         ):

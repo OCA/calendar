@@ -14,8 +14,10 @@
         "security/ir.model.access.csv",
         "security/ir_rule.xml",
         "views/calendar_shared_ics_views.xml",
+        "views/landing_page.xml",
     ],
     "installable": True,
     "application": False,
     "external_dependencies": {"python": ["vobject"]},
+    "maintainers": ["ntsirintanis"],
 }

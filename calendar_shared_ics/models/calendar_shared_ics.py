@@ -25,6 +25,26 @@ class CalendarSharedIcs(models.Model):
     share_webcal_url = fields.Char(compute="_compute_share_urls", readonly=True)
     share_url = fields.Char(compute="_compute_share_urls", readonly=True)
 
+    def _compute_access_url(self):
+        """Adjust to modufy access url"""
+        res = super()._compute_access_url()
+        base_url = self.get_base_url()
+        for cal in self:
+            cal.access_url = f"{base_url}/calendar/shared/{cal.id}/ics"
+        return res
+
+    @api.depends("access_token")
+    def _compute_share_urls(self):
+        """Compute actual share urls (https://, webcall:)"""
+        base_url = self.get_base_url()
+        for cal in self:
+            cal._portal_ensure_token()
+            ics_url = f"{base_url}/calendar/shared/{cal.id}/ics?access_token={cal.access_token}"
+            cal.share_url = ics_url
+            cal.share_webcal_url = ics_url.replace("https://", "webcal://").replace(
+                "http://", "webcal://"
+            )
+
     def action_reset_access_token(self):
         """Rotate token (invalidate old subscription URLs)."""
         for cal in self.sudo():
@@ -53,32 +73,9 @@ class CalendarSharedIcs(models.Model):
         }
 
     def _get_share_url(self, redirect=False, **kwargs):
-        """Direct user to their own calendar feed in backend"""
         self.ensure_one()
-        return f"/web#id={self.id}&model={self._name}&view_type=form"
-
-    def _compute_access_url(self):
-        """Generic access url"""
-        res = super()._compute_access_url()
-        base_url = self.env["ir.config_parameter"].sudo().get_param("web.base.url")
-        for cal in self:
-            cal.access_url = f"{base_url}/calendar/shared/{cal.id}/ics"
-        return res
-
-    @api.depends("access_url", "access_token")
-    def _compute_share_urls(self):
-        """Links for configuring mail clients"""
-        for cal in self:
-            cal._portal_ensure_token()
-            if not cal.access_url:
-                cal.share_url = False
-                cal.share_webcal_url = False
-                continue
-            url = f"{cal.access_url}?access_token={cal.access_token}"
-            cal.share_url = url
-            cal.share_webcal_url = url.replace("https://", "webcal://").replace(
-                "http://", "webcal://"
-            )
+        self._portal_ensure_token()
+        return f"/calendar/shared/{self.id}/landing?access_token={self.access_token}"
 
     def _check_access_token(self, token):
         self.ensure_one()
@@ -86,18 +83,13 @@ class CalendarSharedIcs(models.Model):
         return bool(token) and token == self.access_token
 
     def _get_events_domain(self):
-        """Compute the calendar.event domain for this shared feed.
-
-        Raises on invalid domain to allow fail-closed behavior at the controller layer.
-        """
+        """Compute the calendar.event domain for this shared feed."""
         self.ensure_one()
         domain = []
         if self.apply_partner_filter and self.partner_id:
             domain.append(("partner_ids", "in", [self.partner_id.id]))
         if self.domain:
             extra = safe_eval(self.domain.strip(), {"uid": self.env.uid})
-            if not isinstance(extra, (list, tuple)):
-                raise ValueError("Domain must be a list/tuple of terms")
             domain += list(extra)
         return domain
 

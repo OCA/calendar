@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <template id="shared_ics_landing_page" name="Shared ICS landing page">
+        <t t-call="web.layout">
+            <div class="container my-4" style="max-width: 900px;">
+                <h2 class="mb-2">
+                    <t t-esc="shared.name" />
+                </h2>
+                <p class="text-muted">
+                    This is a read-only calendar subscription. Use the links below to add it to Thunderbird or Outlook.
+                </p>
+                <div class="my-3">
+                    <a t-att-href="webcal_url" class="btn btn-primary">
+                        Subscribe (webcal)
+                    </a>
+                </div>
+                <div class="my-4">
+                    <h5 class="mb-2">Copy/paste (HTTPS)</h5>
+                    <input
+                        type="text"
+                        class="form-control"
+                        t-att-value="ics_url"
+                        readonly="readonly"
+                        onclick="this.select();"
+                    />
+                    <small class="text-muted">
+                        If the webcal button doesn’t work, copy this URL into your calendar client.
+                    </small>
+                </div>
+                <div class="my-4">
+                    <h5 class="mb-2">Alternative (webcal)</h5>
+                    <input
+                        type="text"
+                        class="form-control"
+                        t-att-value="webcal_url"
+                        readonly="readonly"
+                        onclick="this.select();"
+                    />
+                </div>
+                <hr class="my-4" />
+                <div class="my-3">
+                    <h5>Thunderbird</h5>
+                    <ol>
+                        <li>Calendar tab → <strong>New Calendar…</strong></li>
+                        <li><strong>On the Network</strong> → <strong
+                            >iCalendar (ICS)</strong></li>
+                        <li>Paste the HTTPS (or webcal) link above</li>
+                    </ol>
+                </div>
+
+                <div class="my-3">
+                    <h5>Outlook</h5>
+                    <p class="mb-1">
+                        Depending on Outlook version, use “Add calendar / Subscribe from web” and paste the HTTPS link.
+                    </p>
+                    <p class="text-muted mb-0">
+                        If Outlook refuses the webcal link, use the HTTPS link.
+                    </p>
+                </div>
+                <t t-if="backend_url">
+                    <hr class="my-4" />
+                    <p class="text-muted">
+                        If you have access to Odoo, you can open the feed record:
+                    </p>
+                    <a t-att-href="backend_url" class="btn btn-outline-secondary">
+                        Open in Odoo
+                    </a>
+                </t>
+            </div>
+        </t>
+    </template>
+</odoo>

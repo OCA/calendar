@@ -32,3 +32,34 @@ class CalendarSharedIcsController(Controller):
                 ("Cache-Control", "no-store"),
             ],
         )
+
+    @route(
+        ["/calendar/shared/<model('calendar.shared.ics'):shared>/landing"],
+        type="http",
+        auth="public",
+        csrf=False,
+        sitemap=False,
+    )
+    def calendar_shared_ics_landing(self, shared, **kwargs):
+        # Public landing page: user can copy/paste the https/webcal subscription URL.
+        # and also login in the backend, if internal
+        shared = shared.sudo()
+        if not shared.exists() or not shared.active:
+            return request.not_found()
+        if not shared._check_access_token(kwargs.get("access_token")):
+            return request.not_found()
+        shared._portal_ensure_token()
+        backend_url = "%s/web#id=%s&model=%s&view_type=form" % (
+            shared.get_base_url(),
+            shared.id,
+            shared._name,
+        )
+        return request.render(
+            "calendar_shared_ics.shared_ics_landing_page",
+            {
+                "shared": shared,
+                "ics_url": shared.share_url,
+                "webcal_url": shared.share_webcal_url,
+                "backend_url": backend_url,
+            },
+        )
