@@ -38,9 +38,27 @@
                         <field name="active" />
                     </group>
                     <group string="Feed scope">
+                        <field name="apply_user_filter" />
+                        <field
+                            name="include_internal_users"
+                            attrs="{'invisible': [('apply_user_filter', '=', False)]}"
+                        />
+                        <field
+                            name="include_portal_users"
+                            attrs="{'invisible': [('apply_user_filter', '=', False)]}"
+                        />
                         <field name="partner_id" />
                         <field name="apply_partner_filter" />
-                        <field name="domain" />
+                        <field name="only_recent_events" />
+                        <field
+                            name="recent_days"
+                            attrs="{'invisible': [('only_recent_events', '=', False)]}"
+                        />
+                        <field
+                            name="domain"
+                            widget="domain"
+                            options="{'model': 'calendar.event'}"
+                        />
                     </group>
                     <group string="Subscription link">
                         <field name="share_webcal_url" readonly="1" widget="copy" />

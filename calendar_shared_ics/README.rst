@@ -28,35 +28,52 @@ Shared ICS calendars (token-protected)
 
 |badge1| |badge2| |badge3| |badge4| |badge5|
 
+This module allows sharing an Odoo calendar as a read-only ICS feed that can be
+subscribed to in external calendar clients such as Outlook, Google Calendar,
+and Thunderbird.
 
-This module allows sharing an Odoo calendar as a **read-only ICS feed** that can be
-subscribed to in external calendar clients such as **Outlook**, **Google Calendar**,
-and **Thunderbird**.
+The calendar is exposed via a public URL protected by an access token and can be
+added as a network calendar (ICS / ``webcal://``). External calendar clients periodically
+refresh the feed, providing near-real-time visibility of Odoo events without any
+write-back capability.
 
-The calendar is exposed via a public URL protected by an **access token** and can be
-added as a network calendar (ICS / webcal).
+Odoo includes bidirectional calendar synchronisation with external providers such as
+Outlook and Google Calendar. In practice, however, this integration is not always
+sufficiently robust and can suffer from functional limitations, data inconsistencies,
+or bugs—especially in environments with complex recurrence rules, shared resources,
+or high event volumes.
 
-Odoo provides bidirectional calendar synchronisation with external providers such as
-Outlook and Google Calendar. However, in practice this integration is not always mature
-and can suffer from functional limitations or bugs, especially in complex setups.
-
-This module offers a **simple and robust alternative** for one-directional use cases:
+This module provides a simple, reliable, and intentionally one-directional
+alternative:
 
 * Events are exported from Odoo as a **read-only ICS calendar**
-* External calendar clients periodically refresh the feed
+* External clients periodically fetch the feed
 * No changes are ever written back into Odoo
+* Old events can be excluded by default to improve synchronisation performance
 
 Typical use cases include:
 
-* Sharing planning or resource bookings with employees
-* Giving customers or partners insight into scheduled events
-* Avoiding conflicts or data corruption caused by two-way sync
+* Sharing planning or resource bookings with internal employees
+* Providing customers or partners with insight into scheduled events
+* Publishing operational calendars without exposing the Odoo backend
+* Avoiding conflicts or data corruption caused by two-way synchronisation
 
-⚠ **Security note**  
-The calendar is protected by an access token embedded in the URL.
-Anyone who obtains this URL can view the calendar.
-Treat the link as a secret.
-R
+Each shared calendar feed can be configured individually, including:
+
+* Restricting events to a specific attendee (partner)
+* Applying additional custom event filters
+* Limiting exports to recent and future events only
+* Generating and rotating access tokens
+* Sharing the feed via the standard Odoo portal share wizard
+
+**Security notice**
+
+The calendar feed is protected solely by an **access token embedded in the URL**.
+Anyone in possession of this URL can view the calendar contents.
+
+The token grants **read-only access** and does **not** allow modification of data or
+configuration of the feed. Nevertheless, the URL should be treated as confidential and
+shared only with trusted recipients.
 
 **Table of contents**
 
@@ -66,30 +83,67 @@ R
 Usage
 =====
 
-1. **Create a shared calendar feed**
-   * Go to *Calendar → Configuration → Shared ICS*
-   * Create a new *Shared ICS calendar*
-   * Select the partner whose events should be exported
-   * Optionally define extra domain filters
 
-2. **Generate a share link**
-   * Click *Share*
-   * Use the standard Odoo sharing wizard
-   * An email will be sent containing a link to a landing page
+Only users with the *Shared ICS manager* role can create or modify
+shared calendar feeds.
 
-3. **Subscribe from an external calendar**
-   * Open the link from the email
-   * Copy the **webcal://** or **https://** URL
-   * Add it as a network / public calendar in your client
+#. Go to *Calendar → Configuration → Shared ICS*
+#. Create a new *Shared ICS calendar*
+#. Configure the feed:
+   
+   * Select the **partner** whose events should be exported
+   * Optionally restrict events further using **Additional Filtering**
+   * Optionally limit the feed to **recent and future events only**
+   * Adjust user-related filters to easily select internal or portal users
 
-   Examples:
-   * **Outlook**: *Add calendar → Subscribe from web*
-   * **Google Calendar**: *Settings → Add calendar → From URL*
-   * **Thunderbird**: *New Calendar → On the Network → iCalendar (ICS)*
+Each record represents one independent, read-only calendar feed.
 
-4. **Rotate access token (optional)**
-   * If the link is compromised, use *Rotate access token*
-   * Old subscription URLs will stop working immediately
+Regular users can only **view their own feed** (if any) but cannot
+create, modify, or delete shared calendars.
+
+Generate a share link
+
+#. Open the shared calendar feed record
+#. Click **Share**
+#. The standard Odoo *Share* wizard will open
+#. Select one or more recipients and send the email
+
+The email contains a link to a landing page where the recipient can
+copy the actual subscription URL.
+
+Subscribe from an external calendar
+
+#. Open the link from the email
+#. Copy either the **``webcal://``** or **``https://``** URL shown on the page
+#. Add it as a network / public calendar in your calendar client
+
+Examples:
+
+* **Outlook**
+  
+  *Add calendar → Subscribe from web*
+
+* **Google Calendar**
+  
+  *Settings → Add calendar → From URL*
+
+* **Thunderbird**
+  
+  *New Calendar → On the Network → iCalendar (ICS)*
+
+The external calendar will periodically refresh the feed.
+All events are **read-only** and cannot be modified from the external client.
+
+Rotate access token (optional)
+
+If a subscription URL is compromised:
+
+#. Open the shared calendar feed
+#. Click **Rotate access token**
+#. A new token is generated immediately
+
+All previously issued URLs stop working at once, while the new URL
+continues to function without further configuration.
 
 Known issues / Roadmap
 ======================
@@ -118,10 +172,6 @@ Authors
 
 Contributors
 ~~~~~~~~~~~~
-
-------------
-Contributors
-------------
 
 * Nikos Tsirintanis <ntsirintanis@therp.nl>
 

@@ -370,31 +370,47 @@ ul.auto-toc {
 !! source digest: sha256:490396883f2f27e9e987064ece49696f3e0dcc53e355b186debb2d5c642e61f3
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
 <p><a class="reference external image-reference" href="https://odoo-community.org/page/development-status"><img alt="Beta" src="https://img.shields.io/badge/maturity-Beta-yellow.png" /></a> <a class="reference external image-reference" href="http://www.gnu.org/licenses/agpl-3.0-standalone.html"><img alt="License: AGPL-3" src="https://img.shields.io/badge/licence-AGPL--3-blue.png" /></a> <a class="reference external image-reference" href="https://github.com/OCA/calendar/tree/16.0/calendar_shared_ics"><img alt="OCA/calendar" src="https://img.shields.io/badge/github-OCA%2Fcalendar-lightgray.png?logo=github" /></a> <a class="reference external image-reference" href="https://translation.odoo-community.org/projects/calendar-16-0/calendar-16-0-calendar_shared_ics"><img alt="Translate me on Weblate" src="https://img.shields.io/badge/weblate-Translate%20me-F47D42.png" /></a> <a class="reference external image-reference" href="https://runboat.odoo-community.org/builds?repo=OCA/calendar&amp;target_branch=16.0"><img alt="Try me on Runboat" src="https://img.shields.io/badge/runboat-Try%20me-875A7B.png" /></a></p>
-<p>This module allows sharing an Odoo calendar as a <strong>read-only ICS feed</strong> that can be
-subscribed to in external calendar clients such as <strong>Outlook</strong>, <strong>Google Calendar</strong>,
-and <strong>Thunderbird</strong>.</p>
-<p>The calendar is exposed via a public URL protected by an <strong>access token</strong> and can be
-added as a network calendar (ICS / webcal).</p>
-<p>Odoo provides bidirectional calendar synchronisation with external providers such as
-Outlook and Google Calendar. However, in practice this integration is not always mature
-and can suffer from functional limitations or bugs, especially in complex setups.</p>
-<p>This module offers a <strong>simple and robust alternative</strong> for one-directional use cases:</p>
+<p>This module allows sharing an Odoo calendar as a read-only ICS feed that can be
+subscribed to in external calendar clients such as Outlook, Google Calendar,
+and Thunderbird.</p>
+<p>The calendar is exposed via a public URL protected by an access token and can be
+added as a network calendar (ICS / <tt class="docutils literal"><span class="pre">webcal://</span></tt>). External calendar clients periodically
+refresh the feed, providing near-real-time visibility of Odoo events without any
+write-back capability.</p>
+<p>Odoo includes bidirectional calendar synchronisation with external providers such as
+Outlook and Google Calendar. In practice, however, this integration is not always
+sufficiently robust and can suffer from functional limitations, data inconsistencies,
+or bugs—especially in environments with complex recurrence rules, shared resources,
+or high event volumes.</p>
+<p>This module provides a simple, reliable, and intentionally one-directional
+alternative:</p>
 <ul class="simple">
 <li>Events are exported from Odoo as a <strong>read-only ICS calendar</strong></li>
-<li>External calendar clients periodically refresh the feed</li>
+<li>External clients periodically fetch the feed</li>
 <li>No changes are ever written back into Odoo</li>
+<li>Old events can be excluded by default to improve synchronisation performance</li>
 </ul>
 <p>Typical use cases include:</p>
 <ul class="simple">
-<li>Sharing planning or resource bookings with employees</li>
-<li>Giving customers or partners insight into scheduled events</li>
-<li>Avoiding conflicts or data corruption caused by two-way sync</li>
+<li>Sharing planning or resource bookings with internal employees</li>
+<li>Providing customers or partners with insight into scheduled events</li>
+<li>Publishing operational calendars without exposing the Odoo backend</li>
+<li>Avoiding conflicts or data corruption caused by two-way synchronisation</li>
 </ul>
-<p>⚠ <strong>Security note</strong>
-The calendar is protected by an access token embedded in the URL.
-Anyone who obtains this URL can view the calendar.
-Treat the link as a secret.
-R</p>
+<p>Each shared calendar feed can be configured individually, including:</p>
+<ul class="simple">
+<li>Restricting events to a specific attendee (partner)</li>
+<li>Applying additional custom event filters</li>
+<li>Limiting exports to recent and future events only</li>
+<li>Generating and rotating access tokens</li>
+<li>Sharing the feed via the standard Odoo portal share wizard</li>
+</ul>
+<p><strong>Security notice</strong></p>
+<p>The calendar feed is protected solely by an <strong>access token embedded in the URL</strong>.
+Anyone in possession of this URL can view the calendar contents.</p>
+<p>The token grants <strong>read-only access</strong> and does <strong>not</strong> allow modification of data or
+configuration of the feed. Nevertheless, the URL should be treated as confidential and
+shared only with trusted recipients.</p>
 <p><strong>Table of contents</strong></p>
 <div class="contents local topic" id="contents">
 <ul class="simple">
@@ -403,43 +419,68 @@ R</p>
 <li><a class="reference internal" href="#bug-tracker" id="toc-entry-3">Bug Tracker</a></li>
 <li><a class="reference internal" href="#credits" id="toc-entry-4">Credits</a><ul>
 <li><a class="reference internal" href="#authors" id="toc-entry-5">Authors</a></li>
-<li><a class="reference internal" href="#contributors" id="toc-entry-6">Contributors</a><ul>
-<li><a class="reference internal" href="#contributors-1" id="toc-entry-7">Contributors</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#maintainers" id="toc-entry-8">Maintainers</a></li>
+<li><a class="reference internal" href="#contributors" id="toc-entry-6">Contributors</a></li>
+<li><a class="reference internal" href="#maintainers" id="toc-entry-7">Maintainers</a></li>
 </ul>
 </li>
 </ul>
 </div>
 <div class="section" id="usage">
 <h1><a class="toc-backref" href="#toc-entry-1">Usage</a></h1>
-<ol class="arabic">
-<li><p class="first"><strong>Create a shared calendar feed</strong>
-* Go to <em>Calendar → Configuration → Shared ICS</em>
-* Create a new <em>Shared ICS calendar</em>
-* Select the partner whose events should be exported
-* Optionally define extra domain filters</p>
-</li>
-<li><p class="first"><strong>Generate a share link</strong>
-* Click <em>Share</em>
-* Use the standard Odoo sharing wizard
-* An email will be sent containing a link to a landing page</p>
-</li>
-<li><p class="first"><strong>Subscribe from an external calendar</strong>
-* Open the link from the email
-* Copy the <strong>webcal://</strong> or <strong>https://</strong> URL
-* Add it as a network / public calendar in your client</p>
-<p>Examples:
-* <strong>Outlook</strong>: <em>Add calendar → Subscribe from web</em>
-* <strong>Google Calendar</strong>: <em>Settings → Add calendar → From URL</em>
-* <strong>Thunderbird</strong>: <em>New Calendar → On the Network → iCalendar (ICS)</em></p>
-</li>
-<li><p class="first"><strong>Rotate access token (optional)</strong>
-* If the link is compromised, use <em>Rotate access token</em>
-* Old subscription URLs will stop working immediately</p>
+<p>Only users with the <em>Shared ICS manager</em> role can create or modify
+shared calendar feeds.</p>
+<ol class="arabic simple">
+<li>Go to <em>Calendar → Configuration → Shared ICS</em></li>
+<li>Create a new <em>Shared ICS calendar</em></li>
+<li>Configure the feed:<ul>
+<li>Select the <strong>partner</strong> whose events should be exported</li>
+<li>Optionally restrict events further using <strong>Additional Filtering</strong></li>
+<li>Optionally limit the feed to <strong>recent and future events only</strong></li>
+<li>Adjust user-related filters to easily select internal or portal users</li>
+</ul>
 </li>
 </ol>
+<p>Each record represents one independent, read-only calendar feed.</p>
+<p>Regular users can only <strong>view their own feed</strong> (if any) but cannot
+create, modify, or delete shared calendars.</p>
+<p>Generate a share link</p>
+<ol class="arabic simple">
+<li>Open the shared calendar feed record</li>
+<li>Click <strong>Share</strong></li>
+<li>The standard Odoo <em>Share</em> wizard will open</li>
+<li>Select one or more recipients and send the email</li>
+</ol>
+<p>The email contains a link to a landing page where the recipient can
+copy the actual subscription URL.</p>
+<p>Subscribe from an external calendar</p>
+<ol class="arabic simple">
+<li>Open the link from the email</li>
+<li>Copy either the <strong>``webcal://``</strong> or <strong>``https://``</strong> URL shown on the page</li>
+<li>Add it as a network / public calendar in your calendar client</li>
+</ol>
+<p>Examples:</p>
+<ul>
+<li><p class="first"><strong>Outlook</strong></p>
+<p><em>Add calendar → Subscribe from web</em></p>
+</li>
+<li><p class="first"><strong>Google Calendar</strong></p>
+<p><em>Settings → Add calendar → From URL</em></p>
+</li>
+<li><p class="first"><strong>Thunderbird</strong></p>
+<p><em>New Calendar → On the Network → iCalendar (ICS)</em></p>
+</li>
+</ul>
+<p>The external calendar will periodically refresh the feed.
+All events are <strong>read-only</strong> and cannot be modified from the external client.</p>
+<p>Rotate access token (optional)</p>
+<p>If a subscription URL is compromised:</p>
+<ol class="arabic simple">
+<li>Open the shared calendar feed</li>
+<li>Click <strong>Rotate access token</strong></li>
+<li>A new token is generated immediately</li>
+</ol>
+<p>All previously issued URLs stop working at once, while the new URL
+continues to function without further configuration.</p>
 </div>
 <div class="section" id="known-issues-roadmap">
 <h1><a class="toc-backref" href="#toc-entry-2">Known issues / Roadmap</a></h1>
@@ -467,15 +508,12 @@ If you spotted it first, help us to smash it by providing a detailed and welcome
 </div>
 <div class="section" id="contributors">
 <h2><a class="toc-backref" href="#toc-entry-6">Contributors</a></h2>
-<div class="section" id="contributors-1">
-<h3><a class="toc-backref" href="#toc-entry-7">Contributors</a></h3>
 <ul class="simple">
 <li>Nikos Tsirintanis &lt;<a class="reference external" href="mailto:ntsirintanis&#64;therp.nl">ntsirintanis&#64;therp.nl</a>&gt;</li>
 </ul>
 </div>
-</div>
 <div class="section" id="maintainers">
-<h2><a class="toc-backref" href="#toc-entry-8">Maintainers</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-7">Maintainers</a></h2>
 <p>This module is maintained by the OCA.</p>
 <a class="reference external image-reference" href="https://odoo-community.org">
 <img alt="Odoo Community Association" src="https://odoo-community.org/logo.png" />
