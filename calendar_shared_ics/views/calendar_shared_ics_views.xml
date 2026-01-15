@@ -47,7 +47,11 @@
                             name="include_portal_users"
                             attrs="{'invisible': [('apply_user_filter', '=', False)]}"
                         />
-                        <field name="partner_id" />
+                        <field name="allowed_partner_ids" invisible="1" />
+                        <field
+                            name="partner_id"
+                            domain="[('id', 'in', allowed_partner_ids)]"
+                        />
                         <field name="apply_partner_filter" />
                         <field name="only_recent_events" />
                         <field
@@ -61,8 +65,16 @@
                         />
                     </group>
                     <group string="Subscription link">
-                        <field name="share_webcal_url" readonly="1" widget="copy" />
-                        <field name="share_url" readonly="1" widget="copy" />
+                        <field
+                            name="share_webcal_url"
+                            readonly="1"
+                            widget="CopyClipboardChar"
+                        />
+                        <field
+                            name="share_url"
+                            readonly="1"
+                            widget="CopyClipboardChar"
+                        />
                         <field name="access_url" readonly="1" widget="url" />
                     </group>
                 </sheet>

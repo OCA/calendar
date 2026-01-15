@@ -49,6 +49,12 @@ class CalendarSharedIcs(models.Model):
         default=7,
         help="How many days back to include for recent events",
     )
+    allowed_partner_ids = fields.Many2many(
+        "res.partner",
+        compute="_compute_allowed_partner_ids",
+        compute_sudo=True,
+        help="Partners selectable in partner_id according to the user filter options.",
+    )
 
     def _compute_access_url(self):
         """Adjust to modify access url"""
@@ -72,27 +78,29 @@ class CalendarSharedIcs(models.Model):
                 "http://", "webcal://"
             )
 
-    @api.onchange("apply_user_filter", "include_internal_users", "include_portal_users")
-    def _onchange_partner_id_domain(self):
-        """Restrict partner_id selection to partners that are linked to users."""
-        if not self.apply_user_filter:
-            return {"domain": {"partner_id": []}}
-        if not self.include_internal_users and not self.include_portal_users:
-            return {"domain": {"partner_id": [("id", "=", 0)]}}
-        user_domain = []
-        if self.include_internal_users:
-            user_domain.append(("groups_id", "in", self.env.ref("base.group_user").id))
-        if self.include_portal_users:
-            user_domain.append(
-                ("groups_id", "in", self.env.ref("base.group_portal").id)
-            )
-        # if both at ticked, and an OR
-        if len(user_domain) == 1:
-            users = self.env["res.users"].search(user_domain)
-        else:
-            users = self.env["res.users"].search(["|"] + user_domain)
-        partner_ids = users.mapped("partner_id").ids
-        return {"domain": {"partner_id": [("id", "in", partner_ids)]}}
+    @api.depends("apply_user_filter", "include_internal_users", "include_portal_users")
+    def _compute_allowed_partner_ids(self):
+        Users = self.env["res.users"].sudo()
+        for cal in self:
+            if not cal.apply_user_filter:
+                cal.allowed_partner_ids = False
+                continue
+            # If neither is selected allow none.
+            if not cal.include_internal_users and not cal.include_portal_users:
+                cal.allowed_partner_ids = [(6, 0, [])]
+                continue
+            domain = []
+            parts = []
+            if cal.include_internal_users:
+                parts.append([("share", "=", False)])
+            if cal.include_portal_users:
+                parts.append([("share", "=", True)])
+            if len(parts) == 1:
+                domain = parts[0]
+            else:
+                domain = ["|"] + parts[0] + parts[1]
+            users = Users.search(domain)
+            cal.allowed_partner_ids = [(6, 0, users.mapped("partner_id").ids)]
 
     def action_reset_access_token(self):
         """Rotate token (invalidate old subscription URLs)."""
