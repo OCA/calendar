@@ -282,7 +282,7 @@ class ResourceBooking(models.Model):
             elif not item.name and item.id:
                 # Automatic name for backend users
                 item.display_name = self._get_name_formatted(
-                    item.partner_ids[0], item.type_id, item.meeting_id
+                    item.partner_ids[:1], item.type_id, item.meeting_id
                 )
         return res
 
@@ -383,7 +383,7 @@ class ResourceBooking(models.Model):
             location=self.location,
             videocall_location=self.videocall_location,
             name=self.name
-            or self._get_name_formatted(self.partner_ids[0], self.type_id),
+            or self._get_name_formatted(self.partner_ids[:1], self.type_id),
             partner_ids=[
                 (4, partner.id, 0) for partner in self.partner_ids | resource_partners
             ],
