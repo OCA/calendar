@@ -19,5 +19,7 @@ class ResConfigSettings(models.TransientModel):
         config_parameter=FILTER_ODOO_EVENTS,
         default="[]",
         help="Limit Odoo events synchronized to records satisfying domain."
-        " When no filter is set, all Odoo events will be synchronized.",
+        " When no filter is set, all Odoo events will be synchronized."
+        " When a filter is set, events NOT satisfying the domain, but"
+        " already synchronized, will be removed from Microsoft",
     )
