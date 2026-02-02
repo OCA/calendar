@@ -931,39 +931,24 @@ class TestCalDAVIntegration(TransactionCase, CaldavTestCommon):
             f"(recurrence {original_recurrence_id}) with future_events"
         )
 
-        # Mute expected warnings/errors (CalDAV server may reject complex updates)
-        caldav_logger = logging.getLogger("odoo.addons.caldav_sync")
-        caldav_error = None
-        with (
-            patch.object(caldav_logger, "warning"),
-            patch.object(caldav_logger, "debug"),
-            patch.object(caldav_logger, "error"),
-        ):
-            try:
-                middle_event.write(
-                    {
-                        "name": "Updated Future Meeting",
-                        "recurrence_update": "future_events",
-                    }
-                )
-                _logger.info("test_update_future_events: Write completed successfully")
-            except Exception as e:
-                caldav_error = e
-                _logger.info(
-                    f"test_update_future_events: CalDAV sync failed (expected): {e}"
-                )
+        middle_event.write(
+            {
+                "name": "Updated Future Meeting",
+                "recurrence_update": "future_events",
+            }
+        )
+        _logger.info("test_update_future_events: Write completed successfully")
 
         # Verify the recurrence was split - middle_event should now be a base event
         # of a new recurrence (or the write may have failed but no recursion occurred)
         middle_event.invalidate_recordset()
-        if not caldav_error:
-            # If no error, verify the update took effect
-            updated_event = self.env["calendar.event"].browse(middle_event_id)
-            if updated_event.exists():
-                _logger.info(
-                    f"test_update_future_events: Event {middle_event_id} still exists, "
-                    f"is_base_event={updated_event.is_base_event}"
-                )
+        # If no error, verify the update took effect
+        updated_event = self.env["calendar.event"].browse(middle_event_id)
+        if updated_event.exists():
+            _logger.info(
+                f"test_update_future_events: Event {middle_event_id} still exists, "
+                f"is_base_event={updated_event.is_base_event}"
+            )
 
     def test_break_recurrence_syncs_detached_events(self):
         """Test that breaking recurrence syncs detached events properly."""

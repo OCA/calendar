@@ -44,16 +44,16 @@ def _parse_rrule_string(rrule_str: str) -> dict[str, Any]:
     Takes a string like "RRULE:FREQ=WEEKLY;UNTIL=20221231T000000Z;BYDAY=MO"
     and returns a dictionary with proper types for vRecur.
     """
-    from icalendar import vDDDTypes, vFrequency, vWeekday
+    from icalendar import vFrequency, vWeekday
 
     def parse_value(key: str, value: str) -> Any:
         if key == "UNTIL":
-            # Convert to datetime and wrap in vDDDTypes
+            # Convert to datetime - vRecur expects raw datetime, not vDDDTypes
             if "T" in value:
                 dt = datetime.strptime(value, "%Y%m%dT%H%M%S")
             else:
                 dt = datetime.strptime(value, "%Y%m%d")
-            return vDDDTypes(dt)
+            return dt
         elif key in ("WKST", "BYDAY", "BYWEEKDAY"):
             # Convert to vWeekday
             return [vWeekday(day) for day in value.split(",")]
@@ -323,7 +323,6 @@ class CalendarEvent(models.Model):
         else:
             calendar.add_event(**ical_event_data)
 
-    @api.model
     def _update_ical_event_values(
         self, ical_event: icalendar.cal.Event, event_data: dict
     ):
@@ -413,12 +412,14 @@ class CalendarEvent(models.Model):
         just ensures the superclass behavior runs with the keep_caldav_ids=False
         context so new UIDs are generated.
         """
-        ctx = {"keep_caldav_ids": False}
-        return (
-            super()
-            .with_context(**ctx)
-            ._update_future_events(values, time_values, recurrence_values)
-        )
+        if self.env.context.get("keep_caldav_ids") is not False:
+            ctx = {"keep_caldav_ids": False}
+            return (
+                super()
+                .with_context(**ctx)
+                ._update_future_events(values, time_values, recurrence_values)
+            )
+        return super()._update_future_events(values, time_values, recurrence_values)
 
     def _break_recurrence(self, future=True):
         recurrence = self.recurrence_id
@@ -538,7 +539,8 @@ class CalendarEvent(models.Model):
         if self.recurrence_id:
             rrule = str(self.recurrence_id._get_rrule())
             rrule_dict = _parse_rrule_string(rrule)
-            event_data["rrule"] = vRecur(**rrule_dict)
+            if rrule_dict:
+                event_data["rrule"] = vRecur(**rrule_dict)
 
     def _add_event_attendees(self, event_data: dict) -> None:
         """Add the attendee information to the "organizer" and "attendee"
