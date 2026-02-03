@@ -1,0 +1,5 @@
+# generated from manifests external_dependencies
+caldav>=1.3.9,<=2.0.1
+icalendar
+markdown2
+markdownify
