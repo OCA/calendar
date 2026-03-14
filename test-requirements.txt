@@ -1,0 +1,2 @@
+odoo-addon-base_dav @ git+https://github.com/OCA/server-backend.git@refs/pull/435/head#subdirectory=base_dav
+odoo-addon-calendar_dav @ git+https://github.com/OCA/calendar.git@refs/pull/205/head#subdirectory=calendar_dav
