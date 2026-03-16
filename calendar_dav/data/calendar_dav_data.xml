@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+    <record id="dav_collection_calendar_event_personal" model="dav.collection">
+        <field name="name">Personal Calendar</field>
+        <field name="dav_type">calendar</field>
+        <field name="model_id" ref="calendar.model_calendar_event" />
+        <field name="field_uuid" ref="calendar_dav.field_calendar_event__uuid" />
+        <field
+            name="domain"
+        >["|", ("user_id", "in", [user.id]), ("partner_ids", "in", [user.partner_id.id])]</field>
+    </record>
+    <record id="dav_mapping_calendar_summary" model="dav.collection.field_mapping">
+        <field name="collection_id" ref="dav_collection_calendar_event_personal" />
+        <field name="name">summary</field>
+        <field name="mapping_type">simple</field>
+        <field name="field_id" ref="calendar.field_calendar_event__name" />
+    </record>
+    <record id="dav_mapping_calendar_dtstart" model="dav.collection.field_mapping">
+        <field name="collection_id" ref="dav_collection_calendar_event_personal" />
+        <field name="name">dtstart</field>
+        <field name="mapping_type">code</field>
+        <field name="field_id" ref="calendar.field_calendar_event__start" />
+        <!-- prettier-ignore-start -->
+        <field name="export_code"><![CDATA[
+if record.allday:
+    result = datetime.date(record.start_date.year, record.start_date.month, record.start_date.day)
+else:
+    result = datetime.datetime(record.start.year, record.start.month, record.start.day, record.start.hour, record.start.minute, record.start.second, tzinfo=tz.UTC)
+        ]]></field>
+        <field name="import_code"><![CDATA[
+if isinstance(item.value, datetime.datetime):
+    result = item.value.astimezone(tz.UTC).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+elif isinstance(item.value, datetime.date):
+    result = item.value.strftime(DEFAULT_SERVER_DATE_FORMAT)
+        ]]></field>
+        <!-- prettier-ignore-end -->
+    </record>
+    <record id="dav_mapping_calendar_dtend" model="dav.collection.field_mapping">
+        <field name="collection_id" ref="dav_collection_calendar_event_personal" />
+        <field name="name">dtend</field>
+        <field name="mapping_type">code</field>
+        <field name="field_id" ref="calendar.field_calendar_event__stop" />
+        <!-- prettier-ignore-start -->
+        <field name="export_code"><![CDATA[
+if record.allday:
+    result = datetime.date(record.stop_date.year, record.stop_date.month, record.stop_date.day)
+else:
+    result = datetime.datetime(record.stop.year, record.stop.month, record.stop.day, record.stop.hour, record.stop.minute, record.stop.second, tzinfo=tz.UTC)
+        ]]></field>
+        <field name="import_code"><![CDATA[
+if isinstance(item.value, datetime.datetime):
+    result = item.value.astimezone(tz.UTC).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+elif isinstance(item.value, datetime.date):
+    result = item.value.strftime(DEFAULT_SERVER_DATE_FORMAT)
+        ]]></field>
+        <!-- prettier-ignore-end -->
+    </record>
+    <record id="dav_mapping_calendar_description" model="dav.collection.field_mapping">
+        <field name="collection_id" ref="dav_collection_calendar_event_personal" />
+        <field name="name">description</field>
+        <field name="mapping_type">code</field>
+        <field name="field_id" ref="calendar.field_calendar_event__description" />
+        <field
+            name="export_code"
+        ><![CDATA[result = html2plaintext(record.description or "")]]></field>
+    </record>
+    <record id="dav_mapping_calendar_location" model="dav.collection.field_mapping">
+        <field name="collection_id" ref="dav_collection_calendar_event_personal" />
+        <field name="name">location</field>
+        <field name="mapping_type">simple</field>
+        <field name="field_id" ref="calendar.field_calendar_event__location" />
+    </record>
+    <record id="dav_mapping_calendar_class" model="dav.collection.field_mapping">
+        <field name="collection_id" ref="dav_collection_calendar_event_personal" />
+        <field name="name">class</field>
+        <field name="mapping_type">code</field>
+        <field name="field_id" ref="calendar.field_calendar_event__privacy" />
+        <field
+            name="export_code"
+        ><![CDATA[result = (record.privacy or "public").upper()]]></field>
+        <field
+            name="import_code"
+        ><![CDATA[result = (item.value or "PUBLIC").lower()]]></field>
+    </record>
+    <record id="dav_mapping_calendar_transp" model="dav.collection.field_mapping">
+        <field name="collection_id" ref="dav_collection_calendar_event_personal" />
+        <field name="name">transp</field>
+        <field name="mapping_type">code</field>
+        <field name="field_id" ref="calendar.field_calendar_event__show_as" />
+        <field
+            name="export_code"
+        ><![CDATA[result = "OPAQUE" if record.show_as == "busy" else "TRANSPARENT"]]></field>
+        <field
+            name="import_code"
+        ><![CDATA[result = "busy" if item.value == "OPAQUE" else "free"]]></field>
+    </record>
+    <record id="dav_mapping_calendar_organizer" model="dav.collection.field_mapping">
+        <field name="collection_id" ref="dav_collection_calendar_event_personal" />
+        <field name="name">organizer</field>
+        <field name="mapping_type">code</field>
+        <field name="field_id" ref="calendar.field_calendar_event__user_id" />
+        <field
+            name="export_code"
+        ><![CDATA[result = "mailto:" + (record.user_id.email or "") if record.user_id else None]]></field>
+    </record>
+    <record id="dav_mapping_calendar_attendee" model="dav.collection.field_mapping">
+        <field name="collection_id" ref="dav_collection_calendar_event_personal" />
+        <field name="name">attendee</field>
+        <field name="mapping_type">code</field>
+        <field name="field_id" ref="calendar.field_calendar_event__attendee_ids" />
+        <!-- prettier-ignore-start -->
+        <field name="export_code"><![CDATA[
+result = []
+for attendee in record.attendee_ids:
+    if not attendee.partner_id.email:
+        continue
+    partstat = {"needsAction": "NEEDS-ACTION", "accepted": "ACCEPTED", "declined": "DECLINED", "tentative": "TENTATIVE"}.get(attendee.state, "NEEDS-ACTION")
+    result.append({"value": "mailto:" + attendee.partner_id.email, "params": {"CN": attendee.partner_id.name or "", "PARTSTAT": partstat, "CUTYPE": "INDIVIDUAL", "ROLE": "REQ-PARTICIPANT"}})
+        ]]></field>
+        <!-- prettier-ignore-end -->
+    </record>
+    <record id="dav_mapping_calendar_valarm" model="dav.collection.field_mapping">
+        <field name="collection_id" ref="dav_collection_calendar_event_personal" />
+        <field name="name">valarm</field>
+        <field name="mapping_type">code</field>
+        <field name="field_id" ref="calendar.field_calendar_event__alarm_ids" />
+        <!-- prettier-ignore-start -->
+        <field name="export_code"><![CDATA[
+result = [{"value": {"action": "EMAIL" if a.alarm_type == "email" else "DISPLAY", "description": a.name or "Reminder", "trigger": datetime.timedelta(minutes=-a.duration_minutes)}} for a in record.alarm_ids]
+        ]]></field>
+        <!-- prettier-ignore-end -->
+    </record>
+    <record id="dav_mapping_calendar_rrule" model="dav.collection.field_mapping">
+        <field name="collection_id" ref="dav_collection_calendar_event_personal" />
+        <field name="name">rrule</field>
+        <field name="mapping_type">code</field>
+        <field name="field_id" ref="calendar.field_calendar_event__recurrence_id" />
+        <!-- prettier-ignore-start -->
+        <field name="export_code"><![CDATA[
+if record.recurrence_id and not record.follow_recurrence:
+    result = re.sub(r'DTSTART:[^\n]+\n?', '', record.recurrence_id.rrule or '').replace('RRULE:', '')
+        ]]></field>
+        <!-- prettier-ignore-end -->
+    </record>
+</odoo>
