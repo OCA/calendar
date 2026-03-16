@@ -4,7 +4,7 @@
 {
     "name": "Calendar dav",
     "summary": "Extension of the base_dav module to work better with the calendar",
-    "version": "18.0.1.0.0",
+    "version": "18.0.1.0.3",
     "category": "Calendar",
     "website": "https://github.com/OCA/calendar",
     "author": "initOS GmbH, Odoo Community Association (OCA)",
