@@ -8,7 +8,11 @@
         <field name="inherit_id" ref="calendar.view_calendar_event_form" />
         <field name="arch" type="xml">
             <form position="inside">
-                <field name="resource_booking_ids" invisible="1" />
+                <field
+                    name="resource_booking_ids"
+                    invisible="1"
+                    groups="resource_booking.group_user"
+                />
             </form>
         </field>
     </record>

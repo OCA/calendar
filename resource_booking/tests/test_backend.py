@@ -37,6 +37,19 @@ class BackendCaseBase(TransactionCase):
 @freeze_time("2021-02-26 09:00:00", tick=True)  # Last Friday of February
 class BackendCaseMisc(BackendCaseBase):
     @users("plain")
+    def test_plain_user_calendar_event_form(self):
+        event_form = Form(
+            self.env["calendar.event"].with_context(
+                default_partner_ids=self.env.user.partner_id.ids,
+                default_start="2023-01-01 00:00:00",
+                default_stop="2023-01-01 01:00:00",
+            )
+        )
+        event_form.name = "Test calendar event"
+        event = event_form.save()
+        self.assertEqual(event.name, "Test calendar event")
+
+    @users("plain")
     @mute_logger("odoo.models.unlink")
     def test_plain_user_calendar_event(self):
         """Check that a simple user is able to handle manual calendar events."""
