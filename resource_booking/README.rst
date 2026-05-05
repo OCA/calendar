@@ -1,7 +1,3 @@
-.. image:: https://odoo-community.org/readme-banner-image
-   :target: https://odoo-community.org/get-involved?utm_source=readme
-   :alt: Odoo Community Association
-
 ================
 Resource booking
 ================
@@ -17,7 +13,7 @@ Resource booking
 .. |badge1| image:: https://img.shields.io/badge/maturity-Production%2FStable-green.png
     :target: https://odoo-community.org/page/development-status
     :alt: Production/Stable
-.. |badge2| image:: https://img.shields.io/badge/license-AGPL--3-blue.png
+.. |badge2| image:: https://img.shields.io/badge/licence-AGPL--3-blue.png
     :target: http://www.gnu.org/licenses/agpl-3.0-standalone.html
     :alt: License: AGPL-3
 .. |badge3| image:: https://img.shields.io/badge/github-OCA%2Fcalendar-lightgray.png?logo=github
@@ -174,10 +170,13 @@ Known issues / Roadmap
 ======================
 
 - Allow combination auto-assignment based on least used combination.
+
 - Allow customer to choose combination.
+
 - Some error messages would be a bit more helpful if they specify the
   schedule impossibility reason, but that should be done without
   affecting performance.
+
 - Optimize ``_calendar_event_busy_intervals()`` to make it work in
   batch.
 
