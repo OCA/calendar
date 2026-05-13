@@ -375,10 +375,9 @@ class ResourceBooking(models.Model):
         resource_partners = self.combination_id.resource_ids.filtered(
             lambda res: res.resource_type == "user"
         ).mapped("user_id.partner_id")
-        return dict(
+        meeting_vals = dict(
             alarm_ids=[(6, 0, self.type_id.alarm_ids.ids)],
             categ_ids=[(6, 0, self.categ_ids.ids)],
-            description=self.type_id.requester_advice,
             duration=self.duration,
             location=self.location,
             videocall_location=self.videocall_location,
@@ -396,6 +395,9 @@ class ResourceBooking(models.Model):
             res_model_id=False,
             res_id=False,
         )
+        if self.type_id.requester_advice:
+            meeting_vals["description"] = self.type_id.requester_advice
+        return meeting_vals
 
     def _sync_meeting(self):
         """Lazy-create or destroy calendar.event."""
