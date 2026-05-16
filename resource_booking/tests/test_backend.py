@@ -592,6 +592,67 @@ class BackendCaseMisc(BackendCaseBase):
             },
         )
 
+    def test_booking_buffer_blocks_following_slots(self):
+        """A resource's booking_buffer blocks slots within the cooldown window."""
+        rbc = self.rbcs[0]  # Monday combination
+        # Apply a 1-hour cooldown to all resources in this combination
+        rbc.resource_ids.booking_buffer = 1.0
+        # Existing 30-minute booking ends at 09:00
+        self.env["resource.booking"].create(
+            {
+                "partner_ids": [(4, self.partner.id)],
+                "type_id": self.rbt.id,
+                "combination_id": rbc.id,
+                "combination_auto_assign": False,
+                "start": "2021-03-01 08:30:00",
+            }
+        )
+        # 09:30 is within the 1h buffer -> conflict
+        rb_f = Form(self.env["resource.booking"])
+        rb_f.partner_ids.add(self.partner)
+        rb_f.type_id = self.rbt
+        rb_f.combination_auto_assign = False
+        rb_f.combination_id = rbc
+        rb_f.start = datetime(2021, 3, 1, 9, 30)
+        with self.assertRaises(ValidationError):
+            rb_f.save()
+        # 10:00 (exactly buffer-end) is fine
+        rb_f.start = datetime(2021, 3, 1, 10)
+        rb_f.save()
+
+    def test_booking_buffer_zero_keeps_legacy_behavior(self):
+        """booking_buffer = 0 keeps the existing back-to-back slot behavior."""
+        rbc = self.rbcs[0]
+        self.assertTrue(all(r.booking_buffer == 0 for r in rbc.resource_ids))
+        self.env["resource.booking"].create(
+            {
+                "partner_ids": [(4, self.partner.id)],
+                "type_id": self.rbt.id,
+                "combination_id": rbc.id,
+                "combination_auto_assign": False,
+                "start": "2021-03-01 08:30:00",
+            }
+        )
+        # Back-to-back at 09:00 is allowed when there is no buffer
+        self.env["resource.booking"].create(
+            {
+                "partner_ids": [(4, self.partner.id)],
+                "type_id": self.rbt.id,
+                "combination_id": rbc.id,
+                "combination_auto_assign": False,
+                "start": "2021-03-01 09:00:00",
+            }
+        )
+
+    def test_booking_buffer_constraint(self):
+        """Negative booking_buffer is rejected by SQL constraint."""
+        from psycopg2 import IntegrityError
+
+        with self.assertRaises(IntegrityError), mute_logger("odoo.sql_db"):
+            with self.env.cr.savepoint():
+                self.rbcs[0].resource_ids[0].write({"booking_buffer": -1})
+                self.env.flush_all()
+
     @mute_logger("odoo.models.unlink")
     def test_location(self):
         """Location across records works as expected."""

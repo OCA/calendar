@@ -7,7 +7,7 @@ import calendar
 from datetime import datetime, timedelta
 
 from dateutil.relativedelta import relativedelta
-from pytz import timezone
+from pytz import timezone, utc
 
 from odoo import api, fields, models
 from odoo.exceptions import ValidationError
@@ -584,6 +584,48 @@ class ResourceBooking(models.Model):
                 test_start += slot_duration
         return result
 
+    def _get_buffered_booking_intervals(self, start_dt, end_dt, combinations):
+        """Return post-booking buffer intervals for resources in ``combinations``.
+
+        Each resource may declare a ``booking_buffer`` (hours of cooldown after
+        a scheduled booking ends). For every other booking that ends shortly
+        before ``end_dt`` and shares at least one buffered resource with the
+        candidate combinations, emit an interval covering the cooldown so it
+        is subtracted from the available intervals returned by ``_get_intervals``.
+        """
+        resources = combinations.resource_ids.filtered("booking_buffer")
+        if not resources:
+            return Intervals([])
+        max_buffer = max(resources.mapped("booking_buffer"))
+        max_buffer_delta = timedelta(hours=max_buffer)
+        booking_id = self.id or self._origin.id or -1
+        search_start = (
+            (start_dt - max_buffer_delta).astimezone(utc).replace(tzinfo=None)
+        )
+        search_end = end_dt.astimezone(utc).replace(tzinfo=None)
+        buffered = (
+            self.env["resource.booking"]
+            .sudo()
+            .search(
+                [
+                    ("id", "!=", booking_id),
+                    ("combination_id.resource_ids", "in", resources.ids),
+                    ("meeting_id", "!=", False),
+                    ("stop", ">", fields.Datetime.to_string(search_start)),
+                    ("stop", "<", fields.Datetime.to_string(search_end)),
+                ]
+            )
+        )
+        intervals = []
+        for booking in buffered:
+            shared = booking.combination_id.resource_ids & resources
+            buffer_hours = max(shared.mapped("booking_buffer"))
+            buffer_start = fields.Datetime.context_timestamp(self, booking.stop)
+            buffer_stop = buffer_start + timedelta(hours=buffer_hours)
+            if buffer_start < end_dt and buffer_stop > start_dt:
+                intervals.append((buffer_start, buffer_stop, booking))
+        return Intervals(intervals)
+
     def _get_intervals(self, start_dt, end_dt, combination=None):
         """Get available intervals for this booking,
         based on the calendar of the booking type
@@ -613,6 +655,10 @@ class ResourceBooking(models.Model):
         ).with_context(analyzing_booking=booking_id)
         tz = timezone(self.type_id.resource_calendar_id.tz)
         result &= combinations._get_intervals(start_dt, end_dt, tz)
+        # Subtract per-resource post-booking cooldown buffers
+        result -= booking._get_buffered_booking_intervals(
+            start_dt, end_dt, combinations
+        )
         return result
 
     def _sync_booking_activities_date(self):
