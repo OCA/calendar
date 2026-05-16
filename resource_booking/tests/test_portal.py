@@ -260,3 +260,47 @@ class PortalCase(HttpCase):
         portal_url = link.get("href")
         portal_page = self._url_xml(portal_url)
         self.assertTrue(portal_page.cssselect(".oe_login_form"))
+
+    def test_portal_home_no_resource_booking_access(self):
+        """Internal users without resource_booking permissions can still view /my.
+
+        Portal users have read access via the dedicated ACL, but a plain
+        internal user (e.g. someone added by another website-facing module)
+        has no row in ir.model.access.csv for resource.booking, so the
+        unguarded search_count in _prepare_home_portal_values used to raise
+        AccessError and break the entire portal home page.
+        """
+        plain = new_test_user(
+            self.env,
+            login="plain_internal",
+            password="plain_internal",
+            groups="base.group_user",
+        )
+        self.assertFalse(
+            self.env["resource.booking"].with_user(plain).has_access("read"),
+            "test precondition: plain internal user must lack booking read",
+        )
+        self.authenticate("plain_internal", "plain_internal")
+        response = self.url_open("/my", timeout=10)
+        self.assertEqual(response.status_code, 200)
+        # No traceback page; portal home rendered
+        self.assertNotIn("Traceback", response.text)
+        self.assertNotIn("AccessError", response.text)
+
+    def test_portal_my_bookings_no_access_renders_empty(self):
+        """An internal user without booking read access lands on an empty list."""
+        plain = new_test_user(
+            self.env,
+            login="plain_internal2",
+            password="plain_internal2",
+            groups="base.group_user",
+        )
+        self.assertFalse(
+            self.env["resource.booking"].with_user(plain).has_access("read"),
+            "test precondition: plain internal user must lack booking read",
+        )
+        self.authenticate("plain_internal2", "plain_internal2")
+        response = self.url_open("/my/bookings", timeout=10)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn("Traceback", response.text)
+        self.assertNotIn("AccessError", response.text)
