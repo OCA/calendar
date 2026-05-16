@@ -12,6 +12,11 @@ class ResourceBookingType(models.Model):
     _description = "Resource Booking Type"
     _sql_constraints = [
         ("duration_positive", "CHECK(duration > 0)", "Duration must be positive."),
+        (
+            "max_advance_booking_days_nonnegative",
+            "CHECK(max_advance_booking_days >= 0)",
+            "Maximum advance booking days must be zero or positive.",
+        ),
     ]
 
     active = fields.Boolean(default=True)
@@ -63,6 +68,17 @@ class ResourceBookingType(models.Model):
         required=True,
         default=0.5,  # 30 minutes
         help=("Interval offered to start each resource booking."),
+    )
+    max_advance_booking_days = fields.Integer(
+        default=0,
+        help=(
+            "Limit booking starts to within this many days from now. "
+            "Set to 0 to allow the full availability calendar range. "
+            "Portal visitors cannot confirm a start beyond the limit; "
+            "managers scheduling from the backend can. "
+            "A limit shorter than the modifications deadline leaves no "
+            "bookable window, so no slot is offered at all."
+        ),
     )
     location = fields.Char()
     videocall_location = fields.Char(string="Meeting URL")
