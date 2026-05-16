@@ -592,6 +592,46 @@ class BackendCaseMisc(BackendCaseBase):
             },
         )
 
+    def test_max_advance_booking_days_caps_slots(self):
+        """max_advance_booking_days caps suggested starts to N days from now."""
+        # Now is 2021-02-26 (frozen). Cap at 4 days -> last suggestable start
+        # is 2021-03-02.
+        self.rbt.max_advance_booking_days = 4
+        rb = self.env["resource.booking"].create(
+            {"partner_ids": [(4, self.partner.id)], "type_id": self.rbt.id}
+        )
+        slots = rb._get_available_slots(
+            utc.localize(datetime(2021, 2, 28)),
+            utc.localize(datetime(2021, 3, 31)),
+        )
+        all_starts = [s for day in slots.values() for s in day]
+        self.assertTrue(all_starts, "max_advance cap should not strand all slots")
+        # 2021-03-08 (Monday) is past the 4-day cap, so it must be excluded
+        self.assertNotIn(date(2021, 3, 8), slots)
+        # 2021-03-02 (Tuesday) is within the cap and the calendar (Mon/Tue)
+        self.assertIn(date(2021, 3, 2), slots)
+
+    def test_max_advance_booking_days_zero_keeps_full_range(self):
+        """A zero value (default) keeps the existing unbounded behavior."""
+        self.assertEqual(self.rbt.max_advance_booking_days, 0)
+        rb = self.env["resource.booking"].create(
+            {"partner_ids": [(4, self.partner.id)], "type_id": self.rbt.id}
+        )
+        slots = rb._get_available_slots(
+            utc.localize(datetime(2021, 2, 28)),
+            utc.localize(datetime(2021, 3, 31)),
+        )
+        self.assertIn(date(2021, 3, 8), slots)
+
+    def test_max_advance_booking_days_constraint(self):
+        """Negative max_advance_booking_days is rejected by SQL constraint."""
+        from psycopg2 import IntegrityError
+
+        with self.assertRaises(IntegrityError), mute_logger("odoo.sql_db"):
+            with self.env.cr.savepoint():
+                self.rbt.write({"max_advance_booking_days": -1})
+                self.env.flush_all()
+
     @mute_logger("odoo.models.unlink")
     def test_location(self):
         """Location across records works as expected."""
