@@ -507,6 +507,37 @@ class BackendCaseMisc(BackendCaseBase):
         rb_f.start = datetime(2021, 3, 1, 9)
         self.assertTrue(rb_f.combination_id)
 
+    def test_allday_event_blocks_booking_slot(self):
+        """All-day calendar events block booking slots that overlap their day.
+
+        Without all-day handling, the date-only event is invisible to the
+        scheduling search (which queries on start/stop datetimes), so the
+        booking is incorrectly accepted.
+        """
+        user = self.users[0]
+        self.env["calendar.event"].create(
+            {
+                "name": "PTO",
+                "allday": True,
+                "start_date": "2021-03-01",
+                "stop_date": "2021-03-01",
+                "user_id": user.id,
+                "partner_ids": [Command.set([user.partner_id.id])],
+            }
+        )
+        rb_f = Form(self.env["resource.booking"])
+        rb_f.partner_ids.add(self.partner)
+        rb_f.type_id = self.rbt
+        # Force the user-resource combination so the all-day event has to block it
+        rb_f.combination_auto_assign = False
+        rb_f.combination_id = self.rbcs[0]
+        rb_f.start = datetime(2021, 3, 1, 9)
+        with self.assertRaises(ValidationError):
+            rb_f.save()
+        # Following Monday is fine
+        rb_f.start = datetime(2021, 3, 8, 9)
+        rb_f.save()
+
     @mute_logger("odoo.models.unlink")
     def test_change_calendar_after_bookings_exist(self):
         """Calendar changes can be done only if they introduce no conflicts."""
