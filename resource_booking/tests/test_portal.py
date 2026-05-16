@@ -283,9 +283,14 @@ class PortalCase(HttpCase):
         self.authenticate("plain_internal", "plain_internal")
         response = self.url_open("/my", timeout=10)
         self.assertEqual(response.status_code, 200)
-        # No traceback page; portal home rendered
-        self.assertNotIn("Traceback", response.text)
-        self.assertNotIn("AccessError", response.text)
+        # Positive marker: the standard portal-home CSS hook is present, so
+        # the layout actually rendered rather than degrading to an error page.
+        tree = fromstring(response.text)
+        self.assertTrue(
+            tree.cssselect(".o_portal_my_home, .o_portal_wrap"),
+            "Portal home wrapper element should render even without "
+            "resource.booking read access",
+        )
 
     def test_portal_my_bookings_no_access_renders_empty(self):
         """An internal user without booking read access lands on an empty list."""
@@ -302,5 +307,10 @@ class PortalCase(HttpCase):
         self.authenticate("plain_internal2", "plain_internal2")
         response = self.url_open("/my/bookings", timeout=10)
         self.assertEqual(response.status_code, 200)
-        self.assertNotIn("Traceback", response.text)
-        self.assertNotIn("AccessError", response.text)
+        # Positive marker: the empty-state alert from the QWeb template
+        # confirms the bookings listing rendered with zero rows rather than
+        # falling through to an error page.
+        self.assertIn(
+            "There are currently no bookings for your account.",
+            response.text,
+        )
