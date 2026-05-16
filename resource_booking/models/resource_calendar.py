@@ -2,9 +2,12 @@
 # Copyright 2022 Tecnativa - Pedro M. Baeza
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
+from datetime import datetime, time, timedelta
+
 from pytz import UTC
 
 from odoo import api, fields, models
+from odoo.osv import expression
 
 from odoo.addons.resource.models.utils import Intervals
 
@@ -41,6 +44,9 @@ class ResourceCalendar(models.Model):
         """Get busy meeting intervals."""
         assert start_dt.tzinfo
         assert end_dt.tzinfo
+        interval_tz = start_dt.tzinfo
+        start_local_date = start_dt.date()
+        end_local_date = end_dt.date()
         start_dt, end_dt = (
             fields.Datetime.to_string(dt.astimezone(UTC)) for dt in (start_dt, end_dt)
         )
@@ -56,8 +62,19 @@ class ResourceCalendar(models.Model):
             return Intervals(intervals)
         # Simple domain to get all possibly conflicting events in a single
         # query; this reduces DB calls and helps the underlying recurring
-        # system (in calendar.event) to work smoothly
-        domain = [("start", "<=", end_dt), ("stop", ">=", start_dt)]
+        # system (in calendar.event) to work smoothly. All-day events are
+        # stored without start/stop timestamps in some flows, so OR in a
+        # date-based predicate to catch them too.
+        domain = expression.OR(
+            [
+                [("start", "<=", end_dt), ("stop", ">=", start_dt)],
+                [
+                    ("allday", "=", True),
+                    ("start_date", "<=", end_local_date),
+                    ("stop_date", ">=", start_local_date),
+                ],
+            ]
+        )
         # Anyway up to this version, is more performant to restrict as much as possible
         # the events to avoid recurrent events.
         # TODO: in v14 we should test which approach remains the most performant
@@ -89,15 +106,27 @@ class ResourceCalendar(models.Model):
                         ):
                             raise Busy
             except Busy:
-                # Add the matched event as a busy interval
+                # Add the matched event as a busy interval. All-day events
+                # have no start/stop timestamps in some flows, so derive the
+                # interval from start_date/stop_date in the analyzer's tz.
+                if event.allday and event.start_date and event.stop_date:
+                    event_start = interval_tz.localize(
+                        datetime.combine(event.start_date, time.min)
+                    )
+                    event_stop = interval_tz.localize(
+                        datetime.combine(event.stop_date + timedelta(days=1), time.min)
+                    )
+                else:
+                    event_start = fields.Datetime.context_timestamp(
+                        event, fields.Datetime.to_datetime(event.start)
+                    )
+                    event_stop = fields.Datetime.context_timestamp(
+                        event, fields.Datetime.to_datetime(event.stop)
+                    )
                 intervals.append(
                     (
-                        fields.Datetime.context_timestamp(
-                            event, fields.Datetime.to_datetime(event.start)
-                        ),
-                        fields.Datetime.context_timestamp(
-                            event, fields.Datetime.to_datetime(event.stop)
-                        ),
+                        event_start,
+                        event_stop,
                         self.env["resource.calendar.leaves"],
                     )
                 )
