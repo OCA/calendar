@@ -9,7 +9,7 @@
     "website": "https://github.com/OCA/calendar",
     "license": "AGPL-3",
     "depends": ["resource_booking", "google_calendar"],
-    "data": [],
+    "data": ["data/mail_template_meet_link.xml"],
     "installable": True,
     "auto_install": False,
     "maintainers": ["dnplkndll"],
