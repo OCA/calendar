@@ -3,6 +3,6 @@
      License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
 <data>
     <record id="base.user_demo" model="res.users">
-        <field name="groups_id" eval="[(4, ref('group_user'))]" />
+        <field name="group_ids" eval="[(4, ref('group_user'))]" />
     </record>
 </data>

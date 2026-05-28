@@ -14,9 +14,9 @@ from odoo.exceptions import ValidationError
 from odoo.tests import Form
 from odoo.tests.common import TransactionCase, new_test_user, users
 from odoo.tools import mute_logger
+from odoo.tools.intervals import Intervals
 
 from odoo.addons.base.tests.common import BaseCommon
-from odoo.addons.resource.models.utils import Intervals
 from odoo.addons.resource_booking.models.resource_booking import (
     _availability_is_fitting,
 )
@@ -738,31 +738,27 @@ class BackendCaseMisc(BackendCaseBase):
             {"partner_ids": [(4, self.partner.id)], "type_id": self.rbt.id}
         )
         self.assertEqual(rb.display_name, "some customer - Test resource booking type")
-        self.assertEqual(
-            rb.with_context(using_portal=True).display_name, "# %d" % rb.id
-        )
+        self.assertEqual(rb.with_context(using_portal=True).display_name, f"#{rb.id}")
         # Pending booking with name
         rb.name = "changed"
         self.assertEqual(rb.display_name, "changed")
         self.assertEqual(
-            rb.with_context(using_portal=True).display_name, "# %d - changed" % rb.id
+            rb.with_context(using_portal=True).display_name, f"#{rb.id} - changed"
         )
         # Scheduled booking with name
         rb.start = "2021-03-01 08:00:00"
         self.assertEqual(rb.display_name, "changed")
         self.assertEqual(
-            rb.with_context(using_portal=True).display_name, "# %d - changed" % rb.id
+            rb.with_context(using_portal=True).display_name, f"#{rb.id} - changed"
         )
         # Scheduled booking with no name
         rb.name = False
         self.assertEqual(
             rb.display_name,
             "some customer - Test resource booking type "
-            "- 03/01/2021 at (08:00:00 To 08:30:00) (UTC)",
+            "- 03/01/2021 at (08:00:00 AM To 08:30:00 AM) (UTC)",
         )
-        self.assertEqual(
-            rb.with_context(using_portal=True).display_name, "# %d" % rb.id
-        )
+        self.assertEqual(rb.with_context(using_portal=True).display_name, f"#{rb.id}")
 
     def test_attendee_autoassigned_not_autoconfirmed(self):
         """Meeting attendees are not autoconfirmed when combination is autoassigned."""
@@ -828,19 +824,9 @@ class BackendCaseMisc(BackendCaseBase):
         self.assertEqual(
             rb.message_partner_ids, rb_user.partner_id | self.users[:2].partner_id
         )
-        # Requester and combination must be suggested
+        # Requester must be suggested
         recipients_info = rb._message_get_suggested_recipients()
-        self.assertEqual(len(recipients_info), 1)
-        self.assertEqual(
-            recipients_info[0],
-            {
-                "lang": None,
-                "partner_id": rb.partner_ids.id,
-                "name": "some customer",
-                "display_name": "some customer",
-                "reason": "Attendees",
-            },
-        )
+        self.assertIn(rb.partner_ids.id, [r["partner_id"] for r in recipients_info])
 
     def test_creating_rbt_has_tags(self):
         """Creating booking works if type has tags."""

@@ -92,7 +92,7 @@
             <search>
                 <field name="name" />
                 <field name="company_id" groups="base.group_multi_company" />
-                <group expand="0" name="groupby" string="Group By">
+                <group name="groupby">
                     <filter
                         string="Company"
                         name="groupby_company_id"

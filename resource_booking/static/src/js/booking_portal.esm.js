@@ -1,10 +1,10 @@
-import {PortalHomeCounters} from "@portal/js/portal";
+import {PortalHomeCounters} from "@portal/interactions/portal_home_counters";
+import {patch} from "@web/core/utils/patch";
 
-PortalHomeCounters.include({
-    /**
-     * @override
-     */
-    _getCountersAlwaysDisplayed() {
-        return this._super(...arguments).concat(["booking_count"]);
+// Extend the portal home counters to always display the booking counter
+patch(PortalHomeCounters.prototype, {
+    getCountersAlwaysDisplayed() {
+        const base = super.getCountersAlwaysDisplayed();
+        return [...base, "booking_count"];
     },
 });
