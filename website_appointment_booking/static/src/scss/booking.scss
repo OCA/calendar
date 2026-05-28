@@ -1,0 +1,479 @@
+/* Copyright 2025 Ledo Enterprises LLC - Don Kendall
+ * License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). */
+
+// ---------------------------------------------------------------------------
+// Variables — uses Bootstrap/Odoo theme tokens so site-wide branding applies
+// ---------------------------------------------------------------------------
+$wab-radius: 0.75rem;
+$wab-radius-sm: 0.5rem;
+
+// ---------------------------------------------------------------------------
+// Page wrapper
+// ---------------------------------------------------------------------------
+.o_wab_page {
+    min-height: 60vh;
+}
+
+// ---------------------------------------------------------------------------
+// Header card
+// ---------------------------------------------------------------------------
+.o_wab_header {
+    border: none;
+    border-radius: $wab-radius;
+    background: var(--o-gray-100, #f8f9fa);
+    border-left: 4px solid var(--o-brand-primary, #714b67);
+
+    .o_wab_title {
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: var(--o-body-color, #212529);
+    }
+
+    .o_wab_description {
+        color: var(--o-gray-600, #6c757d);
+        line-height: 1.6;
+    }
+}
+
+.o_wab_meta_pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 2rem;
+    font-size: 0.82rem;
+    font-weight: 500;
+    background: var(--o-gray-200, #e9ecef);
+    color: var(--o-gray-700, #495057);
+
+    i {
+        font-size: 0.78rem;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Out-of-hours request banner — shown when the visitor's tz has no slot
+// overlap with the published booking calendar.
+// ---------------------------------------------------------------------------
+.o_wab_request_banner {
+    border-radius: $wab-radius;
+    background: linear-gradient(
+        135deg,
+        rgba(var(--o-brand-primary-rgb, 113, 75, 103), 0.04),
+        rgba(var(--o-brand-primary-rgb, 113, 75, 103), 0.1)
+    );
+    border: 1px solid rgba(var(--o-brand-primary-rgb, 113, 75, 103), 0.25);
+
+    .o_wab_request_icon {
+        flex-shrink: 0;
+        width: 2rem;
+        height: 2rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: rgba(var(--o-brand-primary-rgb, 113, 75, 103), 0.15);
+        color: var(--o-brand-primary, #714b67);
+        font-size: 0.95rem;
+    }
+
+    .o_wab_request_toggle {
+        border-radius: $wab-radius-sm;
+        font-weight: 500;
+    }
+
+    .o_wab_request_form {
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        padding-top: 1rem;
+    }
+}
+
+.o_wab_success_banner {
+    border-radius: $wab-radius;
+    border-left: 4px solid var(--bs-success, #198754);
+    background: rgba(25, 135, 84, 0.06);
+}
+
+// ---------------------------------------------------------------------------
+// Calendar wrapper — two-column on desktop
+// ---------------------------------------------------------------------------
+.o_wab_calendar {
+    border-radius: $wab-radius;
+}
+
+.o_wab_cal_grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+
+    @media (min-width: 768px) {
+        grid-template-columns: 1fr 280px;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Month navigation
+// ---------------------------------------------------------------------------
+.o_wab_month_nav {
+    user-select: none;
+
+    .o_wab_month_label {
+        font-size: 1.1rem;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+    }
+
+    .o_wab_nav_btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.2rem;
+        height: 2.2rem;
+        border-radius: 50%;
+        border: 1px solid var(--o-gray-300, #dee2e6);
+        background: #fff;
+        color: var(--o-gray-600, #6c757d);
+        transition: all 0.15s ease;
+        text-decoration: none;
+
+        &:hover {
+            border-color: var(--o-gray-500, #adb5bd);
+            color: var(--o-body-color, #212529);
+            background: var(--o-gray-100, #f8f9fa);
+        }
+
+        i {
+            font-size: 0.75rem;
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Calendar table
+// ---------------------------------------------------------------------------
+.o_wab_table {
+    border-collapse: separate;
+    border-spacing: 2px;
+    table-layout: fixed;
+
+    th {
+        font-size: 0.72rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--o-gray-500, #adb5bd);
+        padding: 0.5rem 0.25rem;
+        border: none;
+        background: none;
+    }
+
+    td {
+        border: none;
+        padding: 0;
+        vertical-align: middle;
+        text-align: center;
+    }
+
+    // Day cell
+    .o_wab_day {
+        position: relative;
+        width: 2.5rem;
+        height: 2.5rem;
+        line-height: 2.5rem;
+        font-size: 0.88rem;
+        border-radius: 50%;
+        transition: all 0.15s ease;
+
+        &.text-muted {
+            opacity: 0.3;
+        }
+    }
+
+    // Available day
+    .o_wab_day_available {
+        cursor: pointer;
+        font-weight: 600;
+        color: var(--o-body-color, #212529);
+
+        &::after {
+            content: "";
+            position: absolute;
+            bottom: 3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 4px;
+            background: var(--o-brand-primary, #714b67);
+            border-radius: 50%;
+        }
+
+        &:hover {
+            background: var(--o-gray-200, #e9ecef);
+        }
+
+        &:focus-visible {
+            outline: 2px solid var(--o-brand-primary, #714b67);
+            outline-offset: 2px;
+            background: var(--o-gray-200, #e9ecef);
+        }
+    }
+
+    // Selected day
+    .o_wab_day_selected {
+        background: var(--o-brand-primary, #714b67) !important;
+        color: #fff !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
+        &::after {
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        &:hover {
+            color: #fff;
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Slots panel (right column)
+// ---------------------------------------------------------------------------
+.o_wab_slots_panel {
+    border-radius: $wab-radius-sm;
+    background: var(--o-gray-100, #f8f9fa);
+    padding: 1.25rem;
+
+    .o_wab_slots_title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--o-gray-700, #495057);
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.6rem;
+        border-bottom: 1px solid var(--o-gray-200, #e9ecef);
+    }
+
+    .o_wab_slots_list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+    }
+}
+
+.o_wab_slot_btn {
+    min-width: 4.5rem;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.82rem;
+    font-weight: 500;
+    border-radius: $wab-radius-sm;
+    border: 1px solid var(--o-gray-300, #dee2e6);
+    background: #fff;
+    color: var(--o-body-color, #212529);
+    transition: all 0.15s ease;
+
+    &:hover {
+        border-color: var(--o-gray-500, #adb5bd);
+        background: var(--o-gray-100, #f8f9fa);
+    }
+
+    &.active {
+        background: var(--o-brand-primary, #714b67);
+        border-color: var(--o-brand-primary, #714b67);
+        color: #fff;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+}
+
+// Placeholder when no day is selected
+.o_wab_slots_empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 160px;
+    text-align: center;
+    color: var(--o-gray-400, #ced4da);
+
+    i {
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+    }
+
+    span {
+        font-size: 0.85rem;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Booking form
+// ---------------------------------------------------------------------------
+.o_wab_form {
+    border-radius: $wab-radius;
+    border: 1px solid var(--o-gray-200, #e9ecef);
+    background: #fff;
+    padding: 1.5rem;
+
+    .o_wab_form_title {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid var(--o-gray-200, #e9ecef);
+    }
+
+    .o_wab_selected_slot {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.4rem 0.85rem;
+        border-radius: $wab-radius-sm;
+        background: var(--o-gray-100, #f8f9fa);
+        color: var(--o-gray-700, #495057);
+        font-weight: 500;
+        font-size: 0.88rem;
+
+        i {
+            font-size: 0.8rem;
+            color: var(--bs-success, #198754);
+        }
+    }
+
+    .form-label {
+        font-size: 0.82rem;
+        font-weight: 500;
+        color: var(--o-gray-600, #6c757d);
+    }
+
+    .form-control {
+        border-radius: $wab-radius-sm;
+    }
+
+    .o_wab_submit_btn {
+        padding: 0.6rem 2rem;
+        border-radius: $wab-radius-sm;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// No-slots empty state
+// ---------------------------------------------------------------------------
+.o_wab_empty_month {
+    border-radius: $wab-radius;
+    background: var(--o-gray-100, #f8f9fa);
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+
+    i {
+        font-size: 2.5rem;
+        color: var(--o-gray-300, #dee2e6);
+        margin-bottom: 1rem;
+    }
+
+    p {
+        color: var(--o-gray-600, #6c757d);
+        margin-bottom: 0.75rem;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Timezone selector + note
+// ---------------------------------------------------------------------------
+.o_wab_tz_control {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.o_wab_tz_select {
+    max-width: 16rem;
+    font-size: 0.82rem;
+    border-radius: $wab-radius-sm;
+}
+
+.o_wab_tz_note {
+    font-size: 0.78rem;
+    color: var(--o-gray-500, #adb5bd);
+
+    #o_wab_tz_secondary {
+        font-size: 0.72rem;
+        color: var(--o-gray-400, #ced4da);
+    }
+}
+
+// Tz badge on the success page next to the booking time
+.o_wab_detail_tz {
+    display: inline-block;
+    margin-left: 0.4rem;
+    padding: 0.05rem 0.45rem;
+    border-radius: 0.6rem;
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--o-gray-600, #6c757d);
+    background: var(--o-gray-200, #e9ecef);
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+// ---------------------------------------------------------------------------
+// Success page
+// ---------------------------------------------------------------------------
+.o_wab_success {
+    .o_wab_success_icon {
+        width: 5rem;
+        height: 5rem;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(25, 135, 84, 0.1);
+        color: var(--bs-success, #198754);
+        font-size: 2.2rem;
+    }
+
+    .o_wab_detail_card {
+        border: none;
+        border-radius: $wab-radius;
+        background: var(--o-gray-100, #f8f9fa);
+
+        .o_wab_detail_row {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.65rem 0;
+
+            &:not(:last-child) {
+                border-bottom: 1px solid var(--o-gray-200, #e9ecef);
+            }
+
+            i {
+                width: 1.2rem;
+                text-align: center;
+                color: var(--o-gray-500, #adb5bd);
+                padding-top: 0.15rem;
+            }
+
+            .o_wab_detail_label {
+                font-size: 0.78rem;
+                font-weight: 500;
+                color: var(--o-gray-500, #adb5bd);
+                text-transform: uppercase;
+                letter-spacing: 0.04em;
+            }
+
+            .o_wab_detail_value {
+                font-weight: 500;
+                color: var(--o-body-color, #212529);
+            }
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Error alert
+// ---------------------------------------------------------------------------
+.o_wab_error {
+    border-radius: $wab-radius-sm;
+    border-left: 4px solid var(--bs-danger, #dc3545);
+    background: rgba(220, 53, 69, 0.04);
+}
