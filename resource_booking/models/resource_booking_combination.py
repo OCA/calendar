@@ -2,9 +2,7 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 from odoo import api, fields, models
-
-from odoo.addons.hr_work_entry_contract.models.hr_work_intervals import WorkIntervals
-from odoo.addons.resource.models.utils import Intervals
+from odoo.tools.intervals import Intervals
 
 
 class ResourceBookingCombination(models.Model):
@@ -81,7 +79,7 @@ class ResourceBookingCombination(models.Model):
         bookings = self.mapped("booking_ids")
         return bookings._check_scheduling()
 
-    def _get_intervals(self, start_dt, end_dt, tz):
+    def _get_intervals(self, start_dt, end_dt, tz=None):
         """Get available intervals for this booking combination."""
         base = Intervals([(start_dt, end_dt, self)])
         result = Intervals([])
@@ -97,15 +95,13 @@ class ResourceBookingCombination(models.Model):
                 combination_intervals_in_tz = calendar._work_intervals_batch(
                     start_dt, end_dt, res
                 )[res.id]
-                # Convert to the specified time zone if needed
-                # to display the intervals correctly in the same time zone.
-                if calendar.tz != tz.zone:
+                if tz and calendar.tz != tz.zone:
                     new_intervals = []
                     for interval in combination_intervals_in_tz:
                         start = interval[0].astimezone(tz)
                         end = interval[1].astimezone(tz)
                         new_intervals.append((start, end, interval[2]))
-                    combination_intervals_in_tz = WorkIntervals(new_intervals)
+                    combination_intervals_in_tz = Intervals(new_intervals)
                 combination_intervals &= combination_intervals_in_tz
             result |= combination_intervals
         return result

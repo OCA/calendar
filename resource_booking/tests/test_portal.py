@@ -164,7 +164,7 @@ class PortalCase(HttpCase):
         )
         self.assertTrue(public_page.cssselect(selector_10am))
         self.assertTrue(public_page.cssselect(selector_1030am))
-        form = public_page.cssselect("form#modal-confirm-%d" % slot)[0]
+        form = public_page.cssselect(f"form#modal-confirm-{int(slot)}")[0]
         public_url = form.get("action")
         data = {
             element.get("name"): element.get("value")
@@ -186,7 +186,7 @@ class PortalCase(HttpCase):
         self.assertTrue(
             public_page.cssselect(
                 'div:contains("Dates:")'
-                ':contains("03/01/2021 at (10:00:00 To 10:30:00) (UTC)")'
+                ':contains("03/01/2021 at (10:00:00 AM To 10:30:00 AM) (UTC)")'
             )
         )
         # Public guy's booking and related meeting are OK in backend
@@ -207,7 +207,7 @@ class PortalCase(HttpCase):
         # appears as free to him due to the race condition we just created
         self.assertTrue(portal_page.cssselect(selector_10am))
         self.assertTrue(portal_page.cssselect(selector_1030am))
-        form = portal_page.cssselect("form#modal-confirm-%d" % slot)[0]
+        form = portal_page.cssselect(f"form#modal-confirm-{int(slot)}")[0]
         portal_url = form.get("action")
         data = {
             element.get("name"): element.get("value")
@@ -230,7 +230,7 @@ class PortalCase(HttpCase):
         self.assertTrue(portal_page.cssselect(selector_1030am))
         slot = datetime(2021, 3, 1, 10, 30).timestamp()
         self.assertTrue(portal_page.cssselect("#dropdown-trigger-2021-03-08"))
-        form = portal_page.cssselect("form#modal-confirm-%d" % slot)[0]
+        form = portal_page.cssselect(f"form#modal-confirm-{int(slot)}")[0]
         portal_url = form.get("action")
         data = {
             element.get("name"): element.get("value")
@@ -252,7 +252,7 @@ class PortalCase(HttpCase):
         self.assertTrue(
             portal_page.cssselect(
                 'div:contains("Dates:")'
-                ':contains("03/01/2021 at (10:30:00 To 11:30:00) (UTC)")'
+                ':contains("03/01/2021 at (10:30:00 AM To 11:30:00 AM) (UTC)")'
             )
         )
         # Portal guy cancels

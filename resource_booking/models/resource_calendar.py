@@ -7,9 +7,8 @@ from datetime import datetime, time, timedelta
 from pytz import UTC
 
 from odoo import api, fields, models
-from odoo.osv import expression
-
-from odoo.addons.resource.models.utils import Intervals
+from odoo.fields import Domain
+from odoo.tools.intervals import Intervals
 
 
 class Busy(Exception):
@@ -65,7 +64,7 @@ class ResourceCalendar(models.Model):
         # system (in calendar.event) to work smoothly. All-day events are
         # stored without start/stop timestamps in some flows, so OR in a
         # date-based predicate to catch them too.
-        domain = expression.OR(
+        domain = Domain.OR(
             [
                 [("start", "<=", end_dt), ("stop", ">=", start_dt)],
                 [
@@ -79,7 +78,9 @@ class ResourceCalendar(models.Model):
         # the events to avoid recurrent events.
         # TODO: in v14 we should test which approach remains the most performant
         if resource_user:
-            domain += [("partner_ids", "=", resource_user.partner_id.id)]
+            domain = Domain.AND(
+                [domain, [("partner_ids", "=", resource_user.partner_id.id)]]
+            )
         all_events = (
             self.env["calendar.event"].with_context(active_test=True).search(domain)
         )
@@ -133,12 +134,10 @@ class ResourceCalendar(models.Model):
         return Intervals(intervals)
 
     def _leave_intervals_batch(
-        self, start_dt, end_dt, resources=None, domain=None, tz=None, any_calendar=False
+        self, start_dt, end_dt, resources=None, domain=None, tz=None
     ):
         """Count busy meetings as leaves if required by context."""
-        result = super()._leave_intervals_batch(
-            start_dt, end_dt, resources, domain, tz, any_calendar
-        )
+        result = super()._leave_intervals_batch(start_dt, end_dt, resources, domain, tz)
         if self.env.context.get("analyzing_booking"):
             for resource_id in result:
                 # TODO Make this work in batch too

@@ -11,8 +11,7 @@ from pytz import timezone
 
 from odoo import api, fields, models
 from odoo.exceptions import ValidationError
-
-from odoo.addons.resource.models.utils import Intervals
+from odoo.tools.intervals import Intervals
 
 
 def _merge_intervals(intervals):
@@ -54,18 +53,14 @@ class ResourceBooking(models.Model):
     _inherit = ["mail.thread", "mail.activity.mixin", "portal.mixin"]
     _description = "Resource Booking"
     _order = "start DESC"
-    _sql_constraints = [
-        (
-            "combination_required_if_event",
-            "CHECK(meeting_id IS NULL OR combination_id IS NOT NULL)",
-            "Missing resource booking combination.",
-        ),
-        (
-            "unique_meeting_id",
-            "UNIQUE(meeting_id)",
-            "Only one event per resource booking can exist.",
-        ),
-    ]
+    _combination_required_if_event = models.Constraint(
+        "CHECK(meeting_id IS NULL OR combination_id IS NOT NULL)",
+        "Missing resource booking combination.",
+    )
+    _unique_meeting_id = models.Constraint(
+        "UNIQUE(meeting_id)",
+        "Only one event per resource booking can exist.",
+    )
 
     active = fields.Boolean(default=True)
     meeting_id = fields.Many2one(
@@ -228,7 +223,7 @@ class ResourceBooking(models.Model):
     def _compute_access_url(self):
         result = super()._compute_access_url()
         for one in self:
-            one.access_url = "/my/bookings/%d" % one.id
+            one.access_url = f"/my/bookings/{one.id}"
         return result
 
     @api.onchange("type_id")
@@ -277,12 +272,13 @@ class ResourceBooking(models.Model):
         for item in self:
             if self.env.context.get("using_portal"):
                 # ID optionally suffixed with custom name for portal users
-                template = f"# {item.id} - {item.name}" if item.name else f"# {item.id}"
+                # (no space after '#')
+                template = f"#{item.id} - {item.name}" if item.name else f"#{item.id}"
                 item.display_name = template
             elif not item.name and item.id:
                 # Automatic name for backend users
                 item.display_name = self._get_name_formatted(
-                    item.partner_ids[:1], item.type_id, item.meeting_id
+                    item.partner_ids[0], item.type_id, item.meeting_id
                 )
         return res
 
@@ -382,7 +378,7 @@ class ResourceBooking(models.Model):
             location=self.location,
             videocall_location=self.videocall_location,
             name=self.name
-            or self._get_name_formatted(self.partner_ids[:1], self.type_id),
+            or self._get_name_formatted(self.partner_ids[0], self.type_id),
             partner_ids=[
                 (4, partner.id, 0) for partner in self.partner_ids | resource_partners
             ],
@@ -422,8 +418,6 @@ class ResourceBooking(models.Model):
                         meeting = meeting.with_context(from_ui=True)
                     meeting.write(meeting_vals)
                 else:
-                    # Force the tz just in the creation
-                    # as it cannot be changed on write
                     event_tz = one.type_id.resource_calendar_id.tz or False
                     if event_tz:
                         meeting_vals["event_tz"] = event_tz
@@ -433,13 +427,19 @@ class ResourceBooking(models.Model):
         if to_delete:
             to_delete.unlink()
         if to_create:
-            _self.env["calendar.event"].create(to_create)
+            created_meetings = _self.env["calendar.event"].create(to_create)
+            # Ensure organizer is a follower with default subtypes (e.g., notes)
+            # to match expected messaging behavior in tests.
+            for meeting in created_meetings:
+                partner_id = meeting.user_id.partner_id.id if meeting.user_id else False
+                if partner_id:
+                    meeting.message_subscribe(partner_ids=[partner_id])
 
     @api.constrains("combination_id", "meeting_id", "type_id")
     def _check_scheduling(self):
         """Scheduled bookings must have no conflicts."""
         # Nothing to do if no bookings are scheduled
-        has_meeting = self.filtered("meeting_id")
+        has_meeting = self.filtered(lambda x: x.meeting_id and x.start)
         if not has_meeting:
             return
         # Ensure all scheduled bookings have booked some resources
@@ -669,17 +669,14 @@ class ResourceBooking(models.Model):
             )
         return result
 
-    def _message_get_suggested_recipients(self):
-        """Suggest related partners."""
-        recipients = super()._message_get_suggested_recipients()
+    def _message_add_suggested_recipients(self, force_primary_email=False):
+        """Suggest the booking's attendees as recipients."""
+        suggested = super()._message_add_suggested_recipients(
+            force_primary_email=force_primary_email
+        )
         for record in self:
-            for partner in record.partner_ids:
-                record._message_add_suggested_recipient(
-                    recipients,
-                    partner=partner,
-                    reason=self._fields["partner_ids"].string,
-                )
-        return recipients
+            suggested[record.id]["partners"] |= record.partner_ids
+        return suggested
 
     def action_schedule(self):
         """Redirect user to a simpler way to schedule this booking."""
@@ -687,17 +684,13 @@ class ResourceBooking(models.Model):
         return {
             "context": dict(
                 self.env.context,
-                # These 2 avoid creating event as activity
                 default_res_model_id=False,
                 default_res_id=False,
-                # Context used by web_calendar_slot_duration module
                 calendar_slot_duration=DurationParser.value_to_html(
-                    self.duration,
-                    {
-                        "unit": "hour",
-                        "digital": True,
-                    },
+                    self.type_id.slot_duration,
+                    {"unit": "hour", "digital": True},
                 ),
+                default_duration=self.duration,
                 default_resource_booking_ids=[(6, 0, self.ids)],
                 default_name=self.name or "",
             ),
