@@ -4,9 +4,6 @@ from unittest.mock import patch
 
 from odoo.addons.microsoft_calendar.models.res_users import User
 from odoo.addons.microsoft_calendar.tests.common import TestCommon, mock_get_token
-from odoo.addons.microsoft_calendar.utils.microsoft_calendar import (
-    MicrosoftCalendarService,
-)
 from odoo.addons.microsoft_calendar.utils.microsoft_event import MicrosoftEvent
 
 from ..models.res_config_settings import FILTER_PRIVATE_EVENTS
@@ -26,7 +23,7 @@ class TestFilterPrivateEvents(TestCommon):
         existing_records = Calendar.search([])
         expected_event = dict(self.expected_odoo_event_from_outlook, user_id=False)
         microsoft_events = self._get_public_and_private_event()
-        self._synchronize_events(microsoft_events)
+        Calendar.with_user(self.organizer_user)._sync_microsoft2odoo(microsoft_events)
         # Only the public event should have been synchronized.
         records = Calendar.search([])
         new_records = records - existing_records
@@ -39,7 +36,8 @@ class TestFilterPrivateEvents(TestCommon):
         Calendar = self.env["calendar.event"]
         existing_records = Calendar.search([])
         public_event_dict = self._get_public_event()
-        self._synchronize_events(MicrosoftEvent([public_event_dict]))
+        microsoft_events = MicrosoftEvent([public_event_dict])
+        Calendar.with_user(self.organizer_user)._sync_microsoft2odoo(microsoft_events)
         records = Calendar.search([])
         new_records = records - existing_records
         self.assertEqual(len(new_records), 1)
@@ -47,18 +45,11 @@ class TestFilterPrivateEvents(TestCommon):
         # Make the public event private and test removal
         to_be_removed_id = new_records.id
         public_event_dict["sensitivity"] = "private"
-        self._synchronize_events(MicrosoftEvent([public_event_dict]))
+        microsoft_events = MicrosoftEvent([public_event_dict])
+        Calendar.with_user(self.organizer_user)._sync_microsoft2odoo(microsoft_events)
         # The record should have been removed now.
         record_still_there = Calendar.search([("id", "=", to_be_removed_id)])
         self.assertEqual(len(record_still_there), 0)
-
-    @patch.object(MicrosoftCalendarService, "get_events")
-    def _synchronize_events(self, microsoft_events, mock_get_events):
-        """Synchronize the given MS events."""
-        mock_get_events.return_value = (microsoft_events, None)
-        self.organizer_user.with_user(
-            self.organizer_user
-        ).sudo()._sync_microsoft_calendar()
 
     def test_filter_events(self):
         CalendarSync = self.env["microsoft.calendar.sync"]
