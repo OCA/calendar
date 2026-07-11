@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+website_appointment_booking_type_public,Public read on resource booking types,resource_booking.model_resource_booking_type,base.group_public,1,0,0,0
+website_appointment_booking_combination_public,Public read on resource booking combinations,resource_booking.model_resource_booking_combination,base.group_public,1,0,0,0
+website_appointment_booking_combination_rel_public,Public read on resource booking type combination relations,resource_booking.model_resource_booking_type_combination_rel,base.group_public,1,0,0,0
