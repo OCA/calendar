@@ -76,16 +76,6 @@ class CalendarEvent(models.Model):
         records += super().create(vals_list2)
         return records
 
-    def get_interval(self, interval, tz=None):
-        """Autofix tz from related resource booking.
-
-        This function is called to render calendar.event notification mails.
-        Any notification related to a resource.booking must be emitted in the
-        same TZ as the resource.booking. Otherwise it's confusing to the user.
-        """
-        tz = self.resource_booking_ids.type_id.resource_calendar_id.tz or tz
-        return super().get_interval(interval=interval, tz=tz)
-
     def _attendees_values(self, partner_commands):
         """Autoconfirm resource attendees if preselected and hand-picked on RB.
 
