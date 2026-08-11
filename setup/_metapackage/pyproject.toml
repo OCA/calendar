@@ -1,8 +1,9 @@
 [project]
 name = "odoo-addons-oca-calendar"
-version = "19.0.20260302.0"
+version = "19.0.20260811.0"
 dependencies = [
     "odoo-addon-calendar_public_holiday==19.0.*",
+    "odoo-addon-resource_booking==19.0.*",
 ]
 classifiers=[
     "Programming Language :: Python",
