@@ -311,6 +311,11 @@ msgid "Bookings available for this type"
 msgstr ""
 
 #. module: resource_booking
+#: model:ir.model,name:resource_booking.model_calendar_attendee
+msgid "Calendar Attendee Information"
+msgstr ""
+
+#. module: resource_booking
 #: model:ir.model,name:resource_booking.model_calendar_event
 msgid "Calendar Event"
 msgstr ""
@@ -487,6 +492,7 @@ msgid "Description"
 msgstr ""
 
 #. module: resource_booking
+#: model:ir.model.fields,field_description:resource_booking.field_calendar_attendee__display_name
 #: model:ir.model.fields,field_description:resource_booking.field_calendar_event__display_name
 #: model:ir.model.fields,field_description:resource_booking.field_mail_activity__display_name
 #: model:ir.model.fields,field_description:resource_booking.field_mail_activity_schedule__display_name
@@ -563,6 +569,7 @@ msgid "Has Message"
 msgstr ""
 
 #. module: resource_booking
+#: model:ir.model.fields,field_description:resource_booking.field_calendar_attendee__id
 #: model:ir.model.fields,field_description:resource_booking.field_calendar_event__id
 #: model:ir.model.fields,field_description:resource_booking.field_mail_activity__id
 #: model:ir.model.fields,field_description:resource_booking.field_mail_activity_schedule__id
