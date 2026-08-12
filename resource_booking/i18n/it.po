@@ -18,43 +18,13 @@ msgstr ""
 
 #. module: resource_booking
 #. odoo-python
-#: code:addons/resource_booking/models/resource_booking.py:0
-#, python-format
-msgid "# %(id)d"
-msgstr "N. %(id)d"
-
-#. module: resource_booking
-#. odoo-python
-#: code:addons/resource_booking/models/resource_booking.py:0
-#, python-format
-msgid "# %(id)d - %(name)s"
-msgstr "N. %(id)d - %(name)s"
-
-#. module: resource_booking
-#. odoo-python
-#: code:addons/resource_booking/models/resource_booking.py:0
-#, python-format
-msgid "%(partner)s - %(type)s"
-msgstr "%(partner)s - %(type)s"
-
-#. module: resource_booking
-#. odoo-python
-#: code:addons/resource_booking/models/resource_booking.py:0
-#, python-format
-msgid "%(partner)s - %(type)s - %(time)s"
-msgstr "%(partner)s - %(type)s - %(time)s"
-
-#. module: resource_booking
-#. odoo-python
 #: code:addons/resource_booking/models/resource_booking_combination.py:0
-#, python-format
 msgid "%(resources)s"
 msgstr "%(resources)s"
 
 #. module: resource_booking
 #. odoo-python
 #: code:addons/resource_booking/models/resource_booking_combination.py:0
-#, python-format
 msgid "%(resources)s (using calendar %(calendar)s)"
 msgstr "%(resources)s (sta usando il calendario %(calendar)s)"
 
@@ -334,7 +304,6 @@ msgstr "Rif. prenotazione"
 #. odoo-python
 #: code:addons/resource_booking/models/resource_booking_combination.py:0
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_combination__type_count
-#, python-format
 msgid "Booking types"
 msgstr "Tipologie di prenotazione"
 
@@ -353,7 +322,6 @@ msgstr "Tipologie di prenotazione"
 #: model_terms:ir.ui.view,arch_db:resource_booking.portal_my_home
 #: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_view_calendar
 #: model_terms:ir.ui.view,arch_db:resource_booking.view_partner_form
-#, python-format
 msgid "Bookings"
 msgstr "Prenotazioni"
 
@@ -361,6 +329,11 @@ msgstr "Prenotazioni"
 #: model:ir.model.fields,help:resource_booking.field_resource_booking_type__booking_ids
 msgid "Bookings available for this type"
 msgstr "Prenotazioni disponibili per questa tipologia"
+
+#. module: resource_booking
+#: model:ir.model,name:resource_booking.model_calendar_attendee
+msgid "Calendar Attendee Information"
+msgstr ""
 
 #. module: resource_booking
 #: model:ir.model,name:resource_booking.model_calendar_event
@@ -381,7 +354,6 @@ msgstr "Annullata"
 #. module: resource_booking
 #. odoo-python
 #: code:addons/resource_booking/models/resource_booking.py:0
-#, python-format
 msgid ""
 "Cannot schedule these bookings because no resources are selected for them:\n"
 "\n"
@@ -395,7 +367,6 @@ msgstr ""
 #. module: resource_booking
 #. odoo-python
 #: code:addons/resource_booking/models/resource_booking.py:0
-#, python-format
 msgid ""
 "Cannot schedule these bookings because they do not fit in their type or "
 "resources calendars, or because all resources are busy:\n"
@@ -512,11 +483,6 @@ msgid "Customer Portal URL"
 msgstr "URL portale cliente"
 
 #. module: resource_booking
-#: model:resource.booking.type,name:resource_booking.resource_booking_type_customer
-msgid "Customer meeting"
-msgstr "Riunione cliente"
-
-#. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.portal_my_bookings
 msgid "Date"
 msgstr "Data"
@@ -563,10 +529,18 @@ msgid "Description"
 msgstr "Descrizione"
 
 #. module: resource_booking
+#: model:ir.model.fields,field_description:resource_booking.field_calendar_attendee__display_name
+#: model:ir.model.fields,field_description:resource_booking.field_calendar_event__display_name
+#: model:ir.model.fields,field_description:resource_booking.field_mail_activity__display_name
+#: model:ir.model.fields,field_description:resource_booking.field_mail_activity_schedule__display_name
+#: model:ir.model.fields,field_description:resource_booking.field_mail_activity_type__display_name
+#: model:ir.model.fields,field_description:resource_booking.field_res_partner__display_name
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__display_name
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_combination__display_name
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__display_name
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type_combination_rel__display_name
+#: model:ir.model.fields,field_description:resource_booking.field_resource_calendar__display_name
+#: model:ir.model.fields,field_description:resource_booking.field_resource_resource__display_name
 msgid "Display Name"
 msgstr "Nome visualizzato"
 
@@ -589,7 +563,6 @@ msgstr "Durata:"
 #. module: resource_booking
 #. odoo-python
 #: code:addons/resource_booking/models/mail_activity.py:0
-#, python-format
 msgid "Feedback: %(feedback)s"
 msgstr "Commento: %(feedback)s"
 
@@ -627,22 +600,24 @@ msgid "Go back"
 msgstr "Indietro"
 
 #. module: resource_booking
-#: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_type_view_search
-#: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_view_search
-msgid "Group By"
-msgstr "Raggruppa per"
-
-#. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__has_message
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__has_message
 msgid "Has Message"
 msgstr "Ha un messaggio"
 
 #. module: resource_booking
+#: model:ir.model.fields,field_description:resource_booking.field_calendar_attendee__id
+#: model:ir.model.fields,field_description:resource_booking.field_calendar_event__id
+#: model:ir.model.fields,field_description:resource_booking.field_mail_activity__id
+#: model:ir.model.fields,field_description:resource_booking.field_mail_activity_schedule__id
+#: model:ir.model.fields,field_description:resource_booking.field_mail_activity_type__id
+#: model:ir.model.fields,field_description:resource_booking.field_res_partner__id
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__id
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_combination__id
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__id
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type_combination_rel__id
+#: model:ir.model.fields,field_description:resource_booking.field_resource_calendar__id
+#: model:ir.model.fields,field_description:resource_booking.field_resource_resource__id
 msgid "ID"
 msgstr "ID"
 
@@ -717,14 +692,6 @@ msgid "It will disappear from your bookings list."
 msgstr "Scomparirà dalla lista prenotazioni."
 
 #. module: resource_booking
-#: model:ir.model.fields,field_description:resource_booking.field_resource_booking____last_update
-#: model:ir.model.fields,field_description:resource_booking.field_resource_booking_combination____last_update
-#: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type____last_update
-#: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type_combination_rel____last_update
-msgid "Last Modified on"
-msgstr "Ultima modifica il"
-
-#. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__write_uid
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_combination__write_uid
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__write_uid
@@ -750,12 +717,6 @@ msgstr "Lasciare vuoto per generare automaticamente un nome prenotazione."
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__location
 msgid "Location"
 msgstr "Ubicazione"
-
-#. module: resource_booking
-#: model:ir.model.fields,field_description:resource_booking.field_resource_booking__message_main_attachment_id
-#: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__message_main_attachment_id
-msgid "Main Attachment"
-msgstr "Allegato principale"
 
 #. module: resource_booking
 #: model:res.groups,name:resource_booking.group_manager
@@ -792,7 +753,8 @@ msgstr "Valori predefiniti incontro"
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking_type__alarm_ids
 msgid "Meetings will be created with these reminders by default."
-msgstr "Gli incontri verranno creati in modo predefinito con questo promemoria."
+msgstr ""
+"Gli incontri verranno creati in modo predefinito con questo promemoria."
 
 #. module: resource_booking
 #: model:ir.model.fields,help:resource_booking.field_resource_booking_type__categ_ids
@@ -877,7 +839,6 @@ msgstr "Nessun intervallo libero questo mese."
 #. module: resource_booking
 #. odoo-python
 #: code:addons/resource_booking/models/resource_booking.py:0
-#, python-format
 msgid "No resource combinations available on %s"
 msgstr "Nessuna combinazione risorse disponibile in %s"
 
@@ -911,6 +872,7 @@ msgid "Only one event per resource booking can exist."
 msgstr "Può esistere solo un evento per prenotazione risorsa."
 
 #. module: resource_booking
+#: model_terms:ir.ui.view,arch_db:resource_booking.mail_activity_schedule_view_form
 #: model_terms:ir.ui.view,arch_db:resource_booking.mail_activity_view_form_popup
 msgid "Open Resource Booking"
 msgstr "Apri prenotazione risorsa"
@@ -1087,7 +1049,6 @@ msgstr "Programma"
 #. module: resource_booking
 #. odoo-python
 #: code:addons/resource_booking/models/resource_booking.py:0
-#, python-format
 msgid "Schedule booking"
 msgstr "Programma prenotazione"
 
@@ -1384,7 +1345,6 @@ msgstr "La prenotazione sta per essere confermata:"
 #. module: resource_booking
 #. odoo-python
 #: code:addons/resource_booking/models/calendar_event.py:0
-#, python-format
 msgid ""
 "You are not allowed to alter these bookings because they exceeded their "
 "modification deadlines:\n"
@@ -1400,3 +1360,31 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:resource_booking.message_combination_assigned
 msgid "because you belong to the chosen resource combination:"
 msgstr "perché appartiene alla combinazione risorsa scelta:"
+
+#, python-format
+#~ msgid "# %(id)d"
+#~ msgstr "N. %(id)d"
+
+#, python-format
+#~ msgid "# %(id)d - %(name)s"
+#~ msgstr "N. %(id)d - %(name)s"
+
+#, python-format
+#~ msgid "%(partner)s - %(type)s"
+#~ msgstr "%(partner)s - %(type)s"
+
+#, python-format
+#~ msgid "%(partner)s - %(type)s - %(time)s"
+#~ msgstr "%(partner)s - %(type)s - %(time)s"
+
+#~ msgid "Customer meeting"
+#~ msgstr "Riunione cliente"
+
+#~ msgid "Group By"
+#~ msgstr "Raggruppa per"
+
+#~ msgid "Last Modified on"
+#~ msgstr "Ultima modifica il"
+
+#~ msgid "Main Attachment"
+#~ msgstr "Allegato principale"
