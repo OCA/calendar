@@ -378,14 +378,21 @@ book an appointment without logging in.</p>
 <p>Key features:</p>
 <ul class="simple">
 <li>Public booking page at <tt class="docutils literal"><span class="pre">/book/&lt;slug&gt;</span></tt> for each published booking
-type</li>
+type, listed in the website sitemap</li>
 <li>Monthly calendar showing available time slots based on resource
 availability</li>
-<li>Server-rendered slot data – no extra AJAX calls needed</li>
+<li>Slots displayed in the visitor’s timezone, with a selector to switch</li>
+<li>Server-rendered slot data: no extra AJAX calls needed</li>
 <li>Automatic partner creation or reuse based on visitor email</li>
-<li>Calendar invitation sent to both parties upon confirmation</li>
+<li>Calendar invitation sent to both parties upon confirmation, organized
+by the assigned resource</li>
+<li>Submitted times are validated server-side against the offered slots</li>
+<li>Honeypot and optional reCAPTCHA v3 protection on the public form</li>
 <li>Race condition handling when two visitors try to book the same slot</li>
 </ul>
+<p>Visitors whose working hours do not overlap the published calendar are
+not handled here: turning those into leads needs <tt class="docutils literal">crm</tt>, so it is left
+to a separate glue module.</p>
 <p><strong>Table of contents</strong></p>
 <div class="contents local topic" id="contents">
 <ul class="simple">
@@ -422,13 +429,18 @@ assign the combinations to it.</li>
 <p>To publish a booking type on the website:</p>
 <ol class="arabic simple" start="4">
 <li>Open the booking type you want to publish.</li>
-<li>In the <strong>Website</strong> section, check <strong>Published on Website</strong>.</li>
+<li>In the <strong>Website</strong> section, check <strong>Visible on current website</strong> (or
+use the <strong>Go to Website</strong> smart button).</li>
 <li>Optionally customize the <strong>Website Slug</strong> (auto-generated from the
-name).</li>
+name, normalised to lowercase letters, digits and dashes).</li>
 <li>Optionally add a <strong>Website Description</strong> that will appear on the
 booking page.</li>
 <li>The booking page is now accessible at <tt class="docutils literal"><span class="pre">/book/&lt;slug&gt;</span></tt>.</li>
 </ol>
+<p>To protect the public form against bots beyond the built-in honeypot,
+configure a reCAPTCHA v3 site key and secret under <strong>Website &gt;
+Settings</strong>. The form is verified with the action name
+<tt class="docutils literal">website_appointment_booking</tt>.</p>
 </div>
 <div class="section" id="usage">
 <h1><a class="toc-backref" href="#toc-entry-3">Usage</a></h1>
@@ -436,13 +448,15 @@ booking page.</li>
 <ol class="arabic simple">
 <li>Share the URL <tt class="docutils literal"><span class="pre">/book/&lt;slug&gt;</span></tt> with your clients or embed it on your
 website.</li>
-<li>Visitors see a monthly calendar with available days highlighted.</li>
+<li>Visitors see a monthly calendar with available days highlighted, in
+their own timezone; a dropdown lets them display another one.</li>
 <li>Clicking a day reveals the available time slots for that day.</li>
 <li>Clicking a time slot shows a simple form asking for name and email.</li>
 <li>Upon confirmation, a <tt class="docutils literal">resource.booking</tt> record is created and
 confirmed automatically, and calendar invitations are sent to both
-parties.</li>
-<li>If a slot is no longer available (race condition), the visitor is
+parties. The meeting organizer is the assigned resource’s user.</li>
+<li>If a slot is no longer available (race condition, or a tampered
+request asking for a time that was never offered), the visitor is
 redirected back to the calendar with an informative error message.</li>
 </ol>
 </div>
@@ -460,6 +474,7 @@ If you spotted it first, help us to smash it by providing a detailed and welcome
 <h2><a class="toc-backref" href="#toc-entry-6">Authors</a></h2>
 <ul class="simple">
 <li>Ledo Enterprises LLC</li>
+<li>ForgeFlow</li>
 </ul>
 </div>
 <div class="section" id="contributors">
@@ -467,6 +482,10 @@ If you spotted it first, help us to smash it by providing a detailed and welcome
 <ul class="simple">
 <li><a class="reference external" href="https://ledoweb.com">Ledo Enterprises LLC</a>:<ul>
 <li>Don Kendall</li>
+</ul>
+</li>
+<li><a class="reference external" href="https://www.forgeflow.com">ForgeFlow</a>:<ul>
+<li>Jordi Ballester Alomar</li>
 </ul>
 </li>
 </ul>

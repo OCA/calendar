@@ -1,27 +1,15 @@
 # Copyright 2025 Ledo Enterprises LLC - Don Kendall
+# Copyright 2026 ForgeFlow S.L.
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
-import re
-
 from odoo import api, fields, models
-
-
-def _slugify(value):
-    """Convert a string to a URL-friendly slug."""
-    value = (value or "").lower().strip()
-    value = re.sub(r"[^\w\s-]", "", value)
-    value = re.sub(r"[-\s]+", "-", value)
-    return value.strip("-")
+from odoo.exceptions import ValidationError
 
 
 class ResourceBookingType(models.Model):
-    _inherit = "resource.booking.type"
+    _name = "resource.booking.type"
+    _inherit = ["resource.booking.type", "website.published.mixin"]
 
-    website_published = fields.Boolean(
-        copy=False,
-        help="When checked, this booking type will be available on a public "
-        "booking page accessible without login.",
-    )
     website_slug = fields.Char(
         compute="_compute_website_slug",
         store=True,
@@ -44,8 +32,42 @@ class ResourceBookingType(models.Model):
         ),
     ]
 
+    def _slugify(self, value):
+        """URL-safe version of ``value`` (platform rules: ascii, lowercase, dashes)."""
+        return self.env["ir.http"]._slugify(value or "")
+
     @api.depends("name")
     def _compute_website_slug(self):
         for record in self:
             if not record.website_slug and record.name:
-                record.website_slug = _slugify(record.name)
+                record.website_slug = self._slugify(record.name)
+
+    @api.depends("website_slug")
+    def _compute_website_url(self):
+        result = super()._compute_website_url()
+        for record in self.filtered("website_slug"):
+            record.website_url = f"/book/{record.website_slug}"
+        return result
+
+    @api.constrains("is_published", "website_slug")
+    def _check_published_has_slug(self):
+        for record in self:
+            if record.is_published and not record.website_slug:
+                raise ValidationError(
+                    self.env._(
+                        "A website slug is required to publish '%(name)s'.",
+                        name=record.display_name,
+                    )
+                )
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get("website_slug"):
+                vals["website_slug"] = self._slugify(vals["website_slug"])
+        return super().create(vals_list)
+
+    def write(self, vals):
+        if vals.get("website_slug"):
+            vals = dict(vals, website_slug=self._slugify(vals["website_slug"]))
+        return super().write(vals)

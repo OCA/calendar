@@ -38,13 +38,21 @@ book an appointment without logging in.
 Key features:
 
 - Public booking page at ``/book/<slug>`` for each published booking
-  type
+  type, listed in the website sitemap
 - Monthly calendar showing available time slots based on resource
   availability
-- Server-rendered slot data -- no extra AJAX calls needed
+- Slots displayed in the visitor's timezone, with a selector to switch
+- Server-rendered slot data: no extra AJAX calls needed
 - Automatic partner creation or reuse based on visitor email
-- Calendar invitation sent to both parties upon confirmation
+- Calendar invitation sent to both parties upon confirmation, organized
+  by the assigned resource
+- Submitted times are validated server-side against the offered slots
+- Honeypot and optional reCAPTCHA v3 protection on the public form
 - Race condition handling when two visitors try to book the same slot
+
+Visitors whose working hours do not overlap the published calendar are
+not handled here: turning those into leads needs ``crm``, so it is left
+to a separate glue module.
 
 **Table of contents**
 
@@ -74,12 +82,18 @@ Before publishing a booking type, ensure you have configured the
 To publish a booking type on the website:
 
 4. Open the booking type you want to publish.
-5. In the **Website** section, check **Published on Website**.
+5. In the **Website** section, check **Visible on current website** (or
+   use the **Go to Website** smart button).
 6. Optionally customize the **Website Slug** (auto-generated from the
-   name).
+   name, normalised to lowercase letters, digits and dashes).
 7. Optionally add a **Website Description** that will appear on the
    booking page.
 8. The booking page is now accessible at ``/book/<slug>``.
+
+To protect the public form against bots beyond the built-in honeypot,
+configure a reCAPTCHA v3 site key and secret under **Website >
+Settings**. The form is verified with the action name
+``website_appointment_booking``.
 
 Usage
 =====
@@ -88,13 +102,15 @@ Once a booking type is published:
 
 1. Share the URL ``/book/<slug>`` with your clients or embed it on your
    website.
-2. Visitors see a monthly calendar with available days highlighted.
+2. Visitors see a monthly calendar with available days highlighted, in
+   their own timezone; a dropdown lets them display another one.
 3. Clicking a day reveals the available time slots for that day.
 4. Clicking a time slot shows a simple form asking for name and email.
 5. Upon confirmation, a ``resource.booking`` record is created and
    confirmed automatically, and calendar invitations are sent to both
-   parties.
-6. If a slot is no longer available (race condition), the visitor is
+   parties. The meeting organizer is the assigned resource's user.
+6. If a slot is no longer available (race condition, or a tampered
+   request asking for a time that was never offered), the visitor is
    redirected back to the calendar with an informative error message.
 
 Bug Tracker
@@ -114,6 +130,7 @@ Authors
 -------
 
 * Ledo Enterprises LLC
+* ForgeFlow
 
 Contributors
 ------------
@@ -121,6 +138,10 @@ Contributors
 - `Ledo Enterprises LLC <https://ledoweb.com>`__:
 
   - Don Kendall
+
+- `ForgeFlow <https://www.forgeflow.com>`__:
+
+  - Jordi Ballester Alomar
 
 Maintainers
 -----------

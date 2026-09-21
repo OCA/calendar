@@ -1,4 +1,5 @@
 /* Copyright 2025 Ledo Enterprises LLC - Don Kendall
+ * Copyright 2026 ForgeFlow S.L.
  * License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). */
 
 /**
@@ -19,7 +20,10 @@
  */
 
 /* eslint-env browser */
+import {FormGuard} from "@website_appointment_booking/js/form_guard.esm";
 import publicWidget from "@web/legacy/js/public/public_widget";
+
+export const RECAPTCHA_ACTION = "website_appointment_booking";
 
 /** Build an ``Intl.DateTimeFormat`` keyed in the given timezone. */
 function _dateFormatterFor(tz) {
@@ -49,34 +53,30 @@ function _detectBrowserTz() {
 }
 
 /**
- * Out-of-hours request banner — the "Request a custom slot" CTA on the
- * booking page when the visitor's timezone has no overlap with the
- * published booking hours. Lives as a sibling of the main calendar
- * widget so its toggle state is independent.
+ * Description block: when it holds several ``<details>`` sections, keep at
+ * most one open. ``toggle`` does not bubble, so bind each element directly.
  */
-publicWidget.registry.WebsiteAppointmentRequestBanner = publicWidget.Widget.extend({
-    selector: ".o_wab_request_banner",
-    events: {
-        "click .o_wab_request_toggle": "_onToggle",
-    },
+publicWidget.registry.WebsiteAppointmentDescription = publicWidget.Widget.extend({
+    selector: ".o_wab_description",
 
-    _onToggle(ev) {
-        const form = this.el.querySelector("#o_wab_request_form");
-        const toggleBtn = ev.currentTarget;
-        if (!form) {
-            return;
+    /**
+     * @override
+     */
+    start() {
+        const details = this.el.querySelectorAll("details");
+        for (const el of details) {
+            el.addEventListener("toggle", () => {
+                if (!el.open) {
+                    return;
+                }
+                for (const other of details) {
+                    if (other !== el) {
+                        other.removeAttribute("open");
+                    }
+                }
+            });
         }
-        const willShow = form.classList.contains("d-none");
-        form.classList.toggle("d-none", !willShow);
-        // Disable the toggle button when the form is open so a second click
-        // doesn't collapse the form while the user is mid-fill.
-        toggleBtn.setAttribute("disabled", "disabled");
-        toggleBtn.classList.add("d-none");
-        // Move focus to the name field so keyboard users land in the form.
-        const nameInput = form.querySelector("#o_wab_request_name");
-        if (nameInput) {
-            nameInput.focus();
-        }
+        return this._super(...arguments);
     },
 });
 
@@ -87,7 +87,6 @@ publicWidget.registry.WebsiteAppointmentBooking = publicWidget.Widget.extend({
         "keydown .o_wab_day_available": "_onDayKeydown",
         "click .o_wab_slot_btn": "_onSlotClick",
         "change #o_wab_tz_select": "_onTzSelectChange",
-        "toggle .o_wab_description details": "_onDetailsToggle",
     },
 
     /**
@@ -107,6 +106,8 @@ publicWidget.registry.WebsiteAppointmentBooking = publicWidget.Widget.extend({
             ? this.panel.querySelector(".o_wab_slots_list")
             : null;
         this.form = this.el.querySelector("#o_wab_form");
+        this.guard = new FormGuard(RECAPTCHA_ACTION);
+        this.guard.attach(this.form ? this.form.querySelector("form") : null);
         this.whenInput = this.el.querySelector("#o_wab_when");
         this.displayTzInput = this.el.querySelector("#o_wab_display_tz");
         this.selectedDisplay = this.el.querySelector("#o_wab_selected_display");
@@ -356,20 +357,12 @@ publicWidget.registry.WebsiteAppointmentBooking = publicWidget.Widget.extend({
     },
 
     /**
-     * Tz dropdown change — reload with ``?tz=<value>`` so the server
-     * buckets explicitly. ``URL`` preserves the current path (incl. the
-     * optional ``/year/month`` segments).
+     * Tz dropdown change: reload with ``?tz=<value>`` so the server buckets
+     * explicitly. ``URL`` preserves the current path (incl. the optional
+     * ``/year/month`` segments).
      *
      * @param {Event} ev
      */
-    _onDetailsToggle(ev) {
-        const opened = ev.currentTarget;
-        if (!opened.open) return;
-        this.el.querySelectorAll(".o_wab_description details").forEach((d) => {
-            if (d !== opened) d.removeAttribute("open");
-        });
-    },
-
     _onTzSelectChange(ev) {
         const tz = ev.currentTarget.value;
         if (!tz) {

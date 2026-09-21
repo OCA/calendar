@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!-- Copyright 2025 Ledo Enterprises LLC - Don Kendall
+     Copyright 2026 ForgeFlow S.L.
      License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
 <odoo>
     <record id="resource_booking_type_view_form_inherit_website" model="ir.ui.view">
@@ -10,11 +11,19 @@
             ref="resource_booking.resource_booking_type_view_form"
         />
         <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <field name="is_published" widget="website_redirect_button" />
+            </xpath>
             <xpath expr="//group[@name='main']" position="after">
                 <group name="website" string="Website">
                     <group>
                         <field name="website_published" />
                         <field name="website_slug" invisible="not website_published" />
+                        <field
+                            name="website_url"
+                            widget="url"
+                            invisible="not website_published"
+                        />
                     </group>
                     <group>
                         <field

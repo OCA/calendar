@@ -1,7 +1,24 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!-- Copyright 2025 Ledo Enterprises LLC - Don Kendall
+     Copyright 2026 ForgeFlow S.L.
      License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
 <odoo>
+    <!-- Hidden fields every public form of the page carries: the CSRF token,
+         the honeypot (visually hidden, must stay empty) and the reCAPTCHA v3
+         token filled by JS when the website has a site key. -->
+    <template id="booking_form_guard" name="Booking form guard fields">
+        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+        <input type="hidden" name="recaptcha_token_response" value="" />
+        <div class="o_wab_hp" aria-hidden="true">
+            <input
+                type="text"
+                t-att-name="honeypot_field"
+                tabindex="-1"
+                autocomplete="off"
+            />
+        </div>
+    </template>
+
     <template id="booking_page" name="Public Appointment Booking">
         <t t-call="website.layout">
             <div id="wrap">
@@ -38,8 +55,9 @@
                         </div>
                     </div>
 
-                    <!-- Error alert -->
-                    <div t-if="error" class="row mb-3">
+                    <!-- Error alert: ``error`` is a translated message resolved
+                         server-side from a code, never raw query-string text -->
+                    <div t-if="error" class="row mb-3 o_wab_alerts_row">
                         <div class="col-lg-10 mx-auto">
                             <div
                                 class="alert o_wab_error alert-dismissible fade show d-flex align-items-center gap-2"
@@ -59,142 +77,8 @@
                         </div>
                     </div>
 
-                    <!-- Out-of-hours request — success confirmation -->
-                    <div t-if="request_success" class="row mb-3">
-                        <div class="col-lg-10 mx-auto">
-                            <div
-                                class="alert o_wab_success_banner alert-dismissible fade show d-flex align-items-center gap-2"
-                                role="alert"
-                            >
-                                <i class="fa fa-paper-plane text-success" />
-                                <span>
-                                    Request received — we'll reply within one business day.
-                                </span>
-                                <button
-                                    type="button"
-                                    class="btn-close"
-                                    data-bs-dismiss="alert"
-                                    aria-label="Close"
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Out-of-hours request — banner + form (shown when the
-                         visitor's local working hours have no overlap with
-                         the published booking calendar) -->
-                    <div t-if="show_request_banner" class="row mb-3">
-                        <div class="col-lg-10 mx-auto">
-                            <div class="o_wab_request_banner p-4">
-                                <div class="d-flex align-items-start gap-3">
-                                    <i class="fa fa-globe o_wab_request_icon" />
-                                    <div class="flex-grow-1">
-                                        <p class="mb-1 fw-semibold">
-                                            None of these times fit your timezone?
-                                        </p>
-                                        <p class="mb-2 text-muted small">
-                                            Tell us when you'd like to talk —
-                                            we'll open a slot and reply within
-                                            one business day.
-                                        </p>
-                                        <button
-                                            type="button"
-                                            class="btn btn-outline-primary btn-sm o_wab_request_toggle"
-                                        >
-                                            <i class="fa fa-envelope me-1" />
-                                            Request a custom slot
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <form
-                                    id="o_wab_request_form"
-                                    method="post"
-                                    t-attf-action="/book/#{booking_type.website_slug}/request"
-                                    class="o_wab_request_form d-none mt-4"
-                                >
-                                    <input
-                                        type="hidden"
-                                        name="csrf_token"
-                                        t-att-value="request.csrf_token()"
-                                    />
-                                    <input
-                                        type="hidden"
-                                        name="visitor_tz"
-                                        t-att-value="effective_tz"
-                                    />
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <label
-                                                for="o_wab_request_name"
-                                                class="form-label"
-                                            >Name *</label>
-                                            <input
-                                                type="text"
-                                                class="form-control"
-                                                id="o_wab_request_name"
-                                                name="name"
-                                                required="required"
-                                                placeholder="Your full name"
-                                            />
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label
-                                                for="o_wab_request_email"
-                                                class="form-label"
-                                            >Email *</label>
-                                            <input
-                                                type="email"
-                                                class="form-control"
-                                                id="o_wab_request_email"
-                                                name="email"
-                                                required="required"
-                                                placeholder="you@example.com"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div class="mt-3">
-                                        <label
-                                            for="o_wab_request_window"
-                                            class="form-label"
-                                        >Preferred 2-hour window (in your timezone)</label>
-                                        <input
-                                            type="text"
-                                            class="form-control"
-                                            id="o_wab_request_window"
-                                            name="preferred_window"
-                                            placeholder="e.g. Tue / Thu 09:00–11:00 NZST"
-                                        />
-                                    </div>
-                                    <div class="mt-3">
-                                        <label
-                                            for="o_wab_request_note"
-                                            class="form-label"
-                                        >Anything else we should know?</label>
-                                        <textarea
-                                            class="form-control"
-                                            id="o_wab_request_note"
-                                            name="note"
-                                            rows="2"
-                                            placeholder="Optional context — what you'd like to discuss, project specifics, etc."
-                                        />
-                                    </div>
-                                    <div class="mt-3">
-                                        <button
-                                            type="submit"
-                                            class="btn btn-primary o_wab_submit_btn"
-                                        >
-                                            <i class="fa fa-paper-plane me-1" />
-                                            Submit Request
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Calendar + Slots -->
-                    <div class="row">
+                    <div class="row o_wab_calendar_row">
                         <div class="col-lg-10 mx-auto">
                             <div
                                 class="o_wab_calendar"
@@ -411,10 +295,8 @@
                                         method="post"
                                         t-attf-action="/book/#{booking_type.website_slug}/confirm"
                                     >
-                                        <input
-                                            type="hidden"
-                                            name="csrf_token"
-                                            t-att-value="request.csrf_token()"
+                                        <t
+                                            t-call="website_appointment_booking.booking_form_guard"
                                         />
                                         <input
                                             type="hidden"
@@ -422,10 +304,7 @@
                                             id="o_wab_when"
                                         />
                                         <!-- Initial value is the server-rendered effective_tz; JS
-                                             overwrites with the detected browser tz on hydration.
-                                             There is no no-JS submit path (the slot button itself
-                                             is JS-rendered), so the form can only be submitted after
-                                             JS has set this field. -->
+                                             overwrites with the detected browser tz on hydration. -->
                                         <input
                                             type="hidden"
                                             name="display_tz"

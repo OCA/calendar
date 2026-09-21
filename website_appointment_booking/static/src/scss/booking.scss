@@ -1,4 +1,5 @@
 /* Copyright 2025 Ledo Enterprises LLC - Don Kendall
+ * Copyright 2026 ForgeFlow S.L.
  * License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). */
 
 // ---------------------------------------------------------------------------
@@ -52,46 +53,16 @@ $wab-radius-sm: 0.5rem;
 }
 
 // ---------------------------------------------------------------------------
-// Out-of-hours request banner — shown when the visitor's tz has no slot
-// overlap with the published booking calendar.
+// Honeypot: kept out of sight and out of the tab order, never display:none
+// (some bots skip hidden inputs, none skip off-screen ones).
 // ---------------------------------------------------------------------------
-.o_wab_request_banner {
-    border-radius: $wab-radius;
-    background: linear-gradient(
-        135deg,
-        rgba(var(--o-brand-primary-rgb, 113, 75, 103), 0.04),
-        rgba(var(--o-brand-primary-rgb, 113, 75, 103), 0.1)
-    );
-    border: 1px solid rgba(var(--o-brand-primary-rgb, 113, 75, 103), 0.25);
-
-    .o_wab_request_icon {
-        flex-shrink: 0;
-        width: 2rem;
-        height: 2rem;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        background: rgba(var(--o-brand-primary-rgb, 113, 75, 103), 0.15);
-        color: var(--o-brand-primary, #714b67);
-        font-size: 0.95rem;
-    }
-
-    .o_wab_request_toggle {
-        border-radius: $wab-radius-sm;
-        font-weight: 500;
-    }
-
-    .o_wab_request_form {
-        border-top: 1px solid rgba(0, 0, 0, 0.05);
-        padding-top: 1rem;
-    }
-}
-
-.o_wab_success_banner {
-    border-radius: $wab-radius;
-    border-left: 4px solid var(--bs-success, #198754);
-    background: rgba(25, 135, 84, 0.06);
+.o_wab_hp {
+    position: absolute;
+    left: -10000px;
+    top: auto;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
 }
 
 // ---------------------------------------------------------------------------
