@@ -231,7 +231,9 @@
                                         </li>
                                         <li t-if="selected_combination">
                                             Resources:
-                                            <strong t-out="selected_combination.display_name" />
+                                            <strong
+                                            t-out="selected_combination.display_name"
+                                        />
                                         </li>
                                     </ul>
                                     <p>Are you sure?</p>
