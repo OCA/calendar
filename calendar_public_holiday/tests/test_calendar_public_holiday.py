@@ -3,6 +3,7 @@
 # Copyright 2018 Brainbean Apps
 # Copyright 2020 InitOS Gmbh
 # Copyright 2024 Camptocamp
+# Copyright 2026 glueckkanja AG
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 from datetime import date
@@ -111,9 +112,10 @@ class TestCalendarPublicHoliday(BaseCommon):
             # same country with holiday_1
             self.holiday_model.create({"year": 2024, "country_id": self.country_1.id})
 
-    def test_duplicate_date_state_fail(self):
-        # ensures that duplicate date cannot be created for the same country
-        # state or with state null
+    def test_duplicate_date_region_fail(self):
+        # ensures that duplicate date cannot be created for the same
+        # region or with no region
+        region = self.env["calendar.public.holiday.region"].create({"name": "Plant 1"})
         holiday_4 = self.holiday_model.create(
             {"year": 2024, "country_id": self.country_3.id}
         )
@@ -132,14 +134,14 @@ class TestCalendarPublicHoliday(BaseCommon):
                     "public_holiday_id": holiday_4.id,
                 }
             )
-        holiday_4_line.state_ids = [(6, 0, [self.country_3.id])]
+        holiday_4_line.region_ids = [(6, 0, region.ids)]
         with self.assertRaises(ValidationError):
             self.holiday_line_model.create(
                 {
                     "name": "holiday x",
                     "date": "2024-12-25",
                     "public_holiday_id": holiday_4.id,
-                    "state_ids": [(6, 0, [self.country_3.id])],
+                    "region_ids": [(6, 0, region.ids)],
                 }
             )
 

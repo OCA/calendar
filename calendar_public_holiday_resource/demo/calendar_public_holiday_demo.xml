@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- The demo company (YourCompany) is located in the United States, so
+         the fixed-date US public holidays of the current year demonstrate the
+         company-wide generation out of the box. Loading these lines runs the
+         synchronisation, so a demo database shows the generated time off
+         right away. -->
+    <record id="public_holiday_demo" model="calendar.public.holiday">
+        <field name="year" eval="int(time.strftime('%Y'))" />
+        <field name="country_id" ref="base.us" />
+    </record>
+
+    <record id="public_holiday_line_new_year" model="calendar.public.holiday.line">
+        <field name="name">New Year's Day</field>
+        <field name="date" eval="time.strftime('%Y-01-01')" />
+        <field name="variable_date" eval="False" />
+        <field name="public_holiday_id" ref="public_holiday_demo" />
+    </record>
+    <record id="public_holiday_line_juneteenth" model="calendar.public.holiday.line">
+        <field name="name">Juneteenth</field>
+        <field name="date" eval="time.strftime('%Y-06-19')" />
+        <field name="variable_date" eval="False" />
+        <field name="public_holiday_id" ref="public_holiday_demo" />
+    </record>
+    <record
+        id="public_holiday_line_independence_day"
+        model="calendar.public.holiday.line"
+    >
+        <field name="name">Independence Day</field>
+        <field name="date" eval="time.strftime('%Y-07-04')" />
+        <field name="variable_date" eval="False" />
+        <field name="public_holiday_id" ref="public_holiday_demo" />
+    </record>
+    <record id="public_holiday_line_veterans_day" model="calendar.public.holiday.line">
+        <field name="name">Veterans Day</field>
+        <field name="date" eval="time.strftime('%Y-11-11')" />
+        <field name="variable_date" eval="False" />
+        <field name="public_holiday_id" ref="public_holiday_demo" />
+    </record>
+    <record id="public_holiday_line_christmas" model="calendar.public.holiday.line">
+        <field name="name">Christmas Day</field>
+        <field name="date" eval="time.strftime('%Y-12-25')" />
+        <field name="variable_date" eval="False" />
+        <field name="public_holiday_id" ref="public_holiday_demo" />
+    </record>
+
+    <!-- A day only one working schedule gets: the standard demo schedule is
+         listed on the line, so it receives an entry carrying the schedule
+         instead of a company-wide record. -->
+    <record
+        id="public_holiday_line_maintenance_day"
+        model="calendar.public.holiday.line"
+    >
+        <field name="name">Maintenance Shutdown</field>
+        <field name="date" eval="time.strftime('%Y-08-15')" />
+        <field name="variable_date" eval="False" />
+        <field name="public_holiday_id" ref="public_holiday_demo" />
+        <field
+            name="additional_resource_calendar_ids"
+            eval="[Command.set([ref('resource.resource_calendar_std')])]"
+        />
+    </record>
+</odoo>

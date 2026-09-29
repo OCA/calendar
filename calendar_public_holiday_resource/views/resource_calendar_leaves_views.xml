@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="resource_calendar_leaves_form_view" model="ir.ui.view">
+        <field name="name">resource.calendar.leaves.form.public.holiday</field>
+        <field name="model">resource.calendar.leaves</field>
+        <field name="inherit_id" ref="resource.resource_calendar_leave_form" />
+        <field name="arch" type="xml">
+            <field name="calendar_id" position="after">
+                <field
+                    name="public_holiday_line_id"
+                    invisible="not public_holiday_line_id"
+                />
+            </field>
+        </field>
+    </record>
+
+    <record id="resource_calendar_leaves_tree_view" model="ir.ui.view">
+        <field name="name">resource.calendar.leaves.list.public.holiday</field>
+        <field name="model">resource.calendar.leaves</field>
+        <field name="inherit_id" ref="resource.resource_calendar_leave_tree" />
+        <field name="arch" type="xml">
+            <field name="date_to" position="after">
+                <field name="public_holiday_line_id" optional="show" />
+            </field>
+        </field>
+    </record>
+
+    <!-- Filters on the standard Public Holidays list, so that time off entered
+         by hand can be told apart from what the public holiday calendar
+         generates without needing a menu of its own. -->
+    <record id="resource_calendar_leaves_search_view" model="ir.ui.view">
+        <field name="name">resource.calendar.leaves.search.public.holiday</field>
+        <field name="model">resource.calendar.leaves</field>
+        <field name="inherit_id" ref="resource.view_resource_calendar_leaves_search" />
+        <field name="arch" type="xml">
+            <field name="calendar_id" position="after">
+                <field name="public_holiday_line_id" />
+            </field>
+            <filter name="filter_date" position="before">
+                <filter
+                    name="filter_generated_public_holiday"
+                    string="From Public Holidays (OCA)"
+                    domain="[('public_holiday_line_id', '!=', False)]"
+                    help="Time off generated from the public holiday calendar"
+                />
+                <filter
+                    name="filter_unmanaged_public_holiday"
+                    string="Not From Public Holidays (OCA)"
+                    domain="[('public_holiday_line_id', '=', False)]"
+                    help="Time off entered by hand, which the public holiday calendar does not maintain"
+                />
+                <separator />
+            </filter>
+            <filter name="leave_month" position="after">
+                <filter
+                    string="Public Holiday"
+                    name="group_public_holiday_line"
+                    domain="[]"
+                    context="{'group_by': 'public_holiday_line_id'}"
+                />
+            </filter>
+        </field>
+    </record>
+</odoo>

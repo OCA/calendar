@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!-- Copyright 2024 Camptocamp
+     Copyright 2026 glueckkanja AG
      License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
 <odoo>
     <record id="view_calendar_public_holiday_list" model="ir.ui.view">
@@ -27,6 +28,8 @@
                     </group>
                 </group>
                 <separator string="Public Holidays" name="group_detail" />
+                <!-- Disabled lines stay visible through the field-level
+                     context on `line_ids`, so they can be enabled again. -->
                 <field name="line_ids" nolabel="1">
                     <list editable="top">
                         <field
@@ -36,13 +39,35 @@
                         />
                         <field name="name" />
                         <field
-                            name="state_ids"
+                            name="region_ids"
                             widget="many2many_tags"
-                            domain="[('country_id', '=', parent.country_id)]"
+                            placeholder="All Regions"
+                            optional="show"
                         />
                         <field name="variable_date" />
+                        <field name="active" widget="boolean_toggle" optional="show" />
                     </list>
                 </field>
+            </form>
+        </field>
+    </record>
+    <record id="view_calendar_public_holiday_line_form" model="ir.ui.view">
+        <field name="name">calendar.public.holiday.line.form</field>
+        <field name="model">calendar.public.holiday.line</field>
+        <field name="arch" type="xml">
+            <form>
+                <group name="group_main">
+                    <field name="name" />
+                    <field name="date" />
+                    <field name="public_holiday_id" />
+                    <field
+                        name="region_ids"
+                        widget="many2many_tags"
+                        placeholder="All Regions"
+                    />
+                    <field name="variable_date" />
+                    <field name="active" widget="boolean_toggle" />
+                </group>
             </form>
         </field>
     </record>
@@ -62,5 +87,11 @@
         id="menu_calendar_public_holiday_view"
         parent="menu_calendar_public_holiday"
         sequence="61"
+    />
+    <menuitem
+        action="calendar_public_holiday_region_action"
+        id="menu_calendar_public_holiday_region"
+        parent="menu_calendar_public_holiday"
+        sequence="62"
     />
 </odoo>

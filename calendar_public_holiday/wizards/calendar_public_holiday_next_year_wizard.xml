@@ -68,4 +68,25 @@
         parent="menu_calendar_public_holiday"
         sequence="71"
     />
+    <!-- Creating next year's public holidays also belongs with the list it
+         copies from. -->
+    <record id="view_calendar_public_holiday_list_next_year" model="ir.ui.view">
+        <field name="name">calendar.public.holiday.list.next.year</field>
+        <field name="model">calendar.public.holiday</field>
+        <field name="inherit_id" ref="view_calendar_public_holiday_list" />
+        <field name="arch" type="xml">
+            <list position="inside">
+                <header>
+                    <button
+                        name="%(action_create_next_year_public_holidays)d"
+                        type="action"
+                        string="Create Next Year"
+                        display="always"
+                        class="btn-secondary"
+                        help="Copy a year of public holidays onto the following year."
+                    />
+                </header>
+            </list>
+        </field>
+    </record>
 </odoo>

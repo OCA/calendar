@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_calendar_public_holiday_form" model="ir.ui.view">
+        <field name="name">calendar.public.holiday.form.resource</field>
+        <field name="model">calendar.public.holiday</field>
+        <field
+            name="inherit_id"
+            ref="calendar_public_holiday.view_calendar_public_holiday_form"
+        />
+        <field name="arch" type="xml">
+            <group name="group_main" position="before">
+                <div class="oe_button_box" name="button_box">
+                    <button
+                        name="action_view_resource_calendars"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-calendar-o"
+                        help="Working schedules these public holidays apply to."
+                    >
+                        <field
+                            name="resource_calendar_count"
+                            widget="statinfo"
+                            string="Working Schedules"
+                        />
+                    </button>
+                    <button
+                        name="action_view_global_leaves"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-plane"
+                        help="Global time off generated from these public holidays."
+                    >
+                        <field
+                            name="global_leave_count"
+                            widget="statinfo"
+                            string="Generated Time Off"
+                        />
+                    </button>
+                </div>
+                <div
+                    class="alert alert-warning"
+                    role="alert"
+                    invisible="not sync_warning"
+                >
+                    <strong>No time off generated for some public holidays.</strong>
+                    <field name="sync_warning" readonly="1" nolabel="1" />
+                </div>
+            </group>
+            <group name="group_main_right" position="inside">
+                <field name="global_leave_count" invisible="1" />
+                <field name="resource_calendar_count" invisible="1" />
+            </group>
+            <xpath
+                expr="//field[@name='line_ids']/list/field[@name='region_ids']"
+                position="after"
+            >
+                <field
+                    name="additional_resource_calendar_ids"
+                    widget="many2many_tags"
+                    optional="hide"
+                />
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_calendar_public_holiday_line_form" model="ir.ui.view">
+        <field name="name">calendar.public.holiday.line.form.resource</field>
+        <field name="model">calendar.public.holiday.line</field>
+        <field
+            name="inherit_id"
+            ref="calendar_public_holiday.view_calendar_public_holiday_line_form"
+        />
+        <field name="arch" type="xml">
+            <field name="region_ids" position="after">
+                <field
+                    name="additional_resource_calendar_ids"
+                    widget="many2many_tags"
+                />
+            </field>
+            <field name="active" position="after">
+                <field name="global_leave_count" string="Generated Time Off" />
+            </field>
+        </field>
+    </record>
+
+    <record id="view_calendar_public_holiday_list" model="ir.ui.view">
+        <field name="name">calendar.public.holiday.list.resource</field>
+        <field name="model">calendar.public.holiday</field>
+        <field
+            name="inherit_id"
+            ref="calendar_public_holiday.view_calendar_public_holiday_list"
+        />
+        <field name="arch" type="xml">
+            <field name="country_id" position="after">
+                <field name="global_leave_count" string="Generated Time Off" />
+            </field>
+        </field>
+    </record>
+
+    <!-- Offered on the list rather than as a menu: it applies to whichever
+         public holiday calendars are selected. -->
+    <record id="action_sync_public_holidays" model="ir.actions.server">
+        <field name="name">Synchronise Public Holidays Template</field>
+        <field
+            name="model_id"
+            ref="calendar_public_holiday.model_calendar_public_holiday"
+        />
+        <field
+            name="binding_model_id"
+            ref="calendar_public_holiday.model_calendar_public_holiday"
+        />
+        <field name="binding_view_types">list,form</field>
+        <field name="state">code</field>
+        <field name="code">
+if records:
+    action = records.action_sync_global_leaves()
+        </field>
+    </record>
+</odoo>

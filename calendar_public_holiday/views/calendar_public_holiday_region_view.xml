@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2026 glueckkanja AG
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="calendar_public_holiday_region_view_list" model="ir.ui.view">
+        <field name="name">calendar.public.holiday.region.list</field>
+        <field name="model">calendar.public.holiday.region</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name" />
+                <field name="country_id" />
+                <field name="company_id" groups="base.group_multi_company" />
+            </list>
+        </field>
+    </record>
+
+    <record id="calendar_public_holiday_region_view_form" model="ir.ui.view">
+        <field name="name">calendar.public.holiday.region.form</field>
+        <field name="model">calendar.public.holiday.region</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <widget
+                        name="web_ribbon"
+                        title="Archived"
+                        bg_color="text-bg-danger"
+                        invisible="active"
+                    />
+                    <group>
+                        <group>
+                            <field name="active" invisible="1" />
+                            <field name="name" />
+                        </group>
+                        <group>
+                            <field name="country_id" />
+                            <field
+                                name="company_id"
+                                groups="base.group_multi_company"
+                            />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="public_holidays" string="Public Holidays">
+                            <field name="public_holiday_overview_line_ids">
+                                <list>
+                                    <field name="date" />
+                                    <field name="name" />
+                                    <field name="public_holiday_id" />
+                                    <field
+                                        name="region_ids"
+                                        widget="many2many_tags"
+                                        optional="show"
+                                    />
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="calendar_public_holiday_region_view_search" model="ir.ui.view">
+        <field name="name">calendar.public.holiday.region.search</field>
+        <field name="model">calendar.public.holiday.region</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" />
+                <filter
+                    string="Archived"
+                    name="inactive"
+                    domain="[('active', '=', False)]"
+                />
+            </search>
+        </field>
+    </record>
+
+    <record id="calendar_public_holiday_region_action" model="ir.actions.act_window">
+        <field name="name">Public Holiday Regions</field>
+        <field name="res_model">calendar.public.holiday.region</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a public holiday region
+            </p>
+            <p>
+                A public holiday can be granted to the people of specific
+                regions instead of the whole country.
+            </p>
+        </field>
+    </record>
+</odoo>
