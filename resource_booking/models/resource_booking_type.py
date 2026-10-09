@@ -100,6 +100,19 @@ class ResourceBookingType(models.Model):
             "and in calendar views for scheduling."
         ),
     )
+    booking_mode = fields.Selection(
+        selection=[
+            ("combination", "By combination"),
+            ("resource", "By resources"),
+        ],
+        string="Booking mode",
+        required=True,
+        default="combination",
+    )
+    resource_ids = fields.Many2many(
+        comodel_name="resource.resource",
+        string="Available resources",
+    )
 
     @api.model
     def _default_resource_calendar(self):
@@ -115,10 +128,17 @@ class ResourceBookingType(models.Model):
         for booking_type in self:
             booking_type.booking_count = booking_data.get(booking_type, 0)
 
-    @api.constrains("booking_ids", "resource_calendar_id", "combination_rel_ids")
+    @api.constrains(
+        "booking_ids",
+        "resource_calendar_id",
+        "combination_rel_ids",
+        "booking_mode",
+        "resource_ids",
+    )
     def _check_bookings_scheduling(self):
         """Scheduled bookings must have no conflicts."""
         bookings = self.mapped("booking_ids")
+        bookings._check_selected_resources()
         return bookings._check_scheduling()
 
     def _get_combinations_priorized(self):
