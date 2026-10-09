@@ -54,7 +54,8 @@ class ResourceBooking(models.Model):
     _description = "Resource Booking"
     _order = "start DESC"
     _combination_required_if_event = models.Constraint(
-        "CHECK(meeting_id IS NULL OR combination_id IS NOT NULL)",
+        "CHECK(meeting_id IS NULL OR booking_mode "
+        "= 'resource' OR combination_id IS NOT NULL)",
         "Missing resource booking combination.",
     )
     _unique_meeting_id = models.Constraint(
@@ -192,6 +193,39 @@ class ResourceBooking(models.Model):
     booking_activity_ids = fields.One2many(
         "mail.activity", "booking_id", string="Booking Activities"
     )
+    booking_mode = fields.Selection(related="type_id.booking_mode", store=True)
+    available_resource_ids = fields.Many2many(related="type_id.resource_ids")
+    resource_ids = fields.Many2many(
+        comodel_name="resource.resource",
+        string="Resources",
+        domain="[('id', 'in', available_resource_ids)]",
+        tracking=True,
+    )
+
+    def _get_resources(self):
+        """Return the resources actually selected for these bookings."""
+        return (
+            self.filtered(
+                lambda booking: booking.booking_mode == "resource"
+            ).resource_ids
+            | self.filtered(
+                lambda booking: booking.booking_mode == "combination"
+            ).combination_id.resource_ids
+        )
+
+    @api.constrains("resource_ids", "type_id")
+    def _check_selected_resources(self):
+        for booking in self.filtered(
+            lambda booking: booking.booking_mode == "resource"
+        ):
+            if booking.resource_ids - booking.type_id.resource_ids:
+                raise ValidationError(
+                    self.env._("Select resources available for the booking type.")
+                )
+
+    @api.onchange("type_id")
+    def _onchange_type_resources(self):
+        self.resource_ids = self.resource_ids & self.type_id.resource_ids
 
     @api.model
     def _mail_get_partner_fields(self, introspect_fields=False):
@@ -232,12 +266,15 @@ class ResourceBooking(models.Model):
         for one in self.filtered("type_id"):
             one.categ_ids = one.type_id.categ_ids
 
-    @api.depends("start", "type_id", "combination_auto_assign")
+    @api.depends("start", "type_id", "booking_mode", "combination_auto_assign")
     def _compute_combination_id(self):
         """Select best combination candidate when changing booking dates."""
         # Useless without the interval
-        for one in self.filtered(lambda x: x.start and x.combination_auto_assign):
-            one.combination_id = one._get_best_combination()
+        for one in self:
+            if one.booking_mode == "resource":
+                one.combination_id = False
+            elif one.start and one.combination_auto_assign:
+                one.combination_id = one._get_best_combination()
 
     @api.depends("start")
     def _compute_is_overdue(self):
@@ -368,9 +405,11 @@ class ResourceBooking(models.Model):
             record.user_id = record.meeting_id.user_id
 
     def _prepare_meeting_vals(self):
-        resource_partners = self.combination_id.resource_ids.filtered(
-            lambda res: res.resource_type == "user"
-        ).mapped("user_id.partner_id")
+        resource_partners = (
+            self._get_resources()
+            .filtered(lambda res: res.resource_type == "user")
+            .mapped("user_id.partner_id")
+        )
         meeting_vals = dict(
             alarm_ids=[(6, 0, self.type_id.alarm_ids.ids)],
             categ_ids=[(6, 0, self.categ_ids.ids)],
@@ -435,7 +474,9 @@ class ResourceBooking(models.Model):
                 if partner_id:
                     meeting.message_subscribe(partner_ids=[partner_id])
 
-    @api.constrains("combination_id", "meeting_id", "type_id")
+    @api.constrains(
+        "combination_id", "resource_ids", "meeting_id", "type_id", "booking_mode"
+    )
     def _check_scheduling(self):
         """Scheduled bookings must have no conflicts."""
         # Nothing to do if no bookings are scheduled
@@ -444,7 +485,7 @@ class ResourceBooking(models.Model):
             return
         # Ensure all scheduled bookings have booked some resources
         has_rbc = self.with_context(active_test=False).filtered(
-            "combination_id.resource_ids"
+            lambda booking: booking._get_resources()
         )
         missing_rbc = has_meeting - has_rbc
         if missing_rbc:
@@ -604,6 +645,15 @@ class ResourceBooking(models.Model):
             )[False]
         else:
             result = Intervals([])
+        if booking.booking_mode == "resource":
+            resources = booking.resource_ids
+            if not resources:
+                return Intervals([])
+            for resource in resources:
+                result &= resource.calendar_id._work_intervals_batch(
+                    start_dt, end_dt, resources=resource
+                )[resource.id]
+            return result
         # Restrict with the chosen combination, or to at least one of the
         # available ones
         combinations = (
@@ -712,8 +762,8 @@ class ResourceBooking(models.Model):
             if not booking.meeting_id:
                 continue
             # Make sure requesters and user resources are meeting attendees
-            booking.meeting_id.partner_ids |= booking.partner_ids | booking.mapped(
-                "combination_id.resource_ids.user_id.partner_id"
+            booking.meeting_id.partner_ids |= (
+                booking.partner_ids | booking._get_resources().user_id.partner_id
             )
             # Find meeting attendees that should be confirmed
             partners_to_confirm = confirm_always | booking.partner_ids

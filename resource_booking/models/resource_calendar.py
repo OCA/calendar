@@ -29,6 +29,8 @@ class ResourceCalendar(models.Model):
                     ("state", "=", "confirmed"),
                     ("stop", ">=", fields.Datetime.now()),
                     "|",
+                    "|",
+                    ("resource_ids.calendar_id", "in", self.ids),
                     ("combination_id.forced_calendar_id", "in", self.ids),
                     ("combination_id.resource_ids.calendar_id", "in", self.ids),
                 ]
@@ -90,9 +92,7 @@ class ResourceCalendar(models.Model):
                 continue
             try:
                 # Is the event not booking our resource?
-                if resource & event.mapped(
-                    "resource_booking_ids.combination_id.resource_ids"
-                ):
+                if resource & event.resource_booking_ids._get_resources():
                     raise Busy
                 # Special cases when the booked resource is a person
                 if resource_user:

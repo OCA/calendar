@@ -384,7 +384,7 @@
                                 <strong>Booked resources:</strong>
                                 <ul>
                                     <t
-                                        t-foreach="booking_sudo.combination_id.resource_ids"
+                                        t-foreach="booking_sudo._get_resources()"
                                         t-as="resource"
                                     >
                                         <li>
