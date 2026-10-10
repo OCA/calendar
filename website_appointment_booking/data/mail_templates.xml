@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2025 Ledo Enterprises LLC - Don Kendall
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo noupdate="1">
+    <!-- Sent to the visitor when they submit the out-of-hours request
+     form. Mirrors the tone of the existing /contact confirmation —
+     brief, human, no detail echoed back (security: don't render
+     user-submitted content from a template firing on their input). -->
+    <record id="mail_template_booking_request_confirmation" model="mail.template">
+        <field name="name">Out-of-Hours Booking Request — Visitor Confirmation</field>
+        <field name="model_id" ref="crm.model_crm_lead" />
+        <field name="subject">We received your booking request</field>
+        <field
+            name="email_from"
+        >{{ (object.user_id.email_formatted or user.email_formatted) }}</field>
+        <field name="email_to">{{ object.email_from }}</field>
+        <field name="body_html" type="html">
+            <div
+                style="font-family: -apple-system, system-ui, sans-serif; font-size: 14px; line-height: 1.6; color: #212529; max-width: 540px;"
+            >
+                <p>Hi,</p>
+                <p
+                >Thanks for submitting your booking request. None of our published times fit your timezone, so we're going to open a custom slot for you.</p>
+                <p
+                >You'll hear from us within one business day with a couple of options.</p>
+                <p>If you need to reach out sooner, just reply to this email.</p>
+                <p style="margin-top: 24px;">— The team at Ledoweb</p>
+                <p style="margin-top: 32px; font-size: 12px; color: #adb5bd;">
+                This is an automated confirmation. Your request has been logged and assigned to our team.
+            </p>
+            </div>
+        </field>
+        <field name="auto_delete" eval="True" />
+    </record>
+</odoo>

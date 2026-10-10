@@ -1,0 +1,592 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2025 Ledo Enterprises LLC - Don Kendall
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <template id="booking_page" name="Public Appointment Booking">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="container o_wab_page py-4">
+                    <!-- Header -->
+                    <div class="row mb-4">
+                        <div class="col-lg-10 mx-auto">
+                            <div class="o_wab_header p-4">
+                                <h1
+                                    class="o_wab_title h3 mb-2"
+                                    t-field="booking_type.name"
+                                />
+                                <div
+                                    t-if="booking_type.website_description"
+                                    t-field="booking_type.website_description"
+                                    class="o_wab_description mb-3"
+                                />
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span class="o_wab_meta_pill">
+                                        <i class="fa fa-clock-o" />
+                                        <t
+                                            t-out="'%d min' % int(booking_type.duration * 60)"
+                                        />
+                                    </span>
+                                    <span
+                                        t-if="booking_type.location"
+                                        class="o_wab_meta_pill"
+                                    >
+                                        <i class="fa fa-map-marker" />
+                                        <t t-out="booking_type.location" />
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Error alert -->
+                    <div t-if="error" class="row mb-3">
+                        <div class="col-lg-10 mx-auto">
+                            <div
+                                class="alert o_wab_error alert-dismissible fade show d-flex align-items-center gap-2"
+                                role="alert"
+                            >
+                                <i class="fa fa-exclamation-circle text-danger" />
+                                <span>
+                                    <t t-out="error" />
+                                </span>
+                                <button
+                                    type="button"
+                                    class="btn-close"
+                                    data-bs-dismiss="alert"
+                                    aria-label="Close"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Out-of-hours request — success confirmation -->
+                    <div t-if="request_success" class="row mb-3">
+                        <div class="col-lg-10 mx-auto">
+                            <div
+                                class="alert o_wab_success_banner alert-dismissible fade show d-flex align-items-center gap-2"
+                                role="alert"
+                            >
+                                <i class="fa fa-paper-plane text-success" />
+                                <span>
+                                    Request received — we'll reply within one business day.
+                                </span>
+                                <button
+                                    type="button"
+                                    class="btn-close"
+                                    data-bs-dismiss="alert"
+                                    aria-label="Close"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Out-of-hours request — banner + form (shown when the
+                         visitor's local working hours have no overlap with
+                         the published booking calendar) -->
+                    <div t-if="show_request_banner" class="row mb-3">
+                        <div class="col-lg-10 mx-auto">
+                            <div class="o_wab_request_banner p-4">
+                                <div class="d-flex align-items-start gap-3">
+                                    <i class="fa fa-globe o_wab_request_icon" />
+                                    <div class="flex-grow-1">
+                                        <p class="mb-1 fw-semibold">
+                                            None of these times fit your timezone?
+                                        </p>
+                                        <p class="mb-2 text-muted small">
+                                            Tell us when you'd like to talk —
+                                            we'll open a slot and reply within
+                                            one business day.
+                                        </p>
+                                        <button
+                                            type="button"
+                                            class="btn btn-outline-primary btn-sm o_wab_request_toggle"
+                                        >
+                                            <i class="fa fa-envelope me-1" />
+                                            Request a custom slot
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <form
+                                    id="o_wab_request_form"
+                                    method="post"
+                                    t-attf-action="/book/#{booking_type.website_slug}/request"
+                                    class="o_wab_request_form d-none mt-4"
+                                >
+                                    <input
+                                        type="hidden"
+                                        name="csrf_token"
+                                        t-att-value="request.csrf_token()"
+                                    />
+                                    <input
+                                        type="hidden"
+                                        name="visitor_tz"
+                                        t-att-value="effective_tz"
+                                    />
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label
+                                                for="o_wab_request_name"
+                                                class="form-label"
+                                            >Name *</label>
+                                            <input
+                                                type="text"
+                                                class="form-control"
+                                                id="o_wab_request_name"
+                                                name="name"
+                                                required="required"
+                                                placeholder="Your full name"
+                                            />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label
+                                                for="o_wab_request_email"
+                                                class="form-label"
+                                            >Email *</label>
+                                            <input
+                                                type="email"
+                                                class="form-control"
+                                                id="o_wab_request_email"
+                                                name="email"
+                                                required="required"
+                                                placeholder="you@example.com"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div class="mt-3">
+                                        <label
+                                            for="o_wab_request_window"
+                                            class="form-label"
+                                        >Preferred 2-hour window (in your timezone)</label>
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            id="o_wab_request_window"
+                                            name="preferred_window"
+                                            placeholder="e.g. Tue / Thu 09:00–11:00 NZST"
+                                        />
+                                    </div>
+                                    <div class="mt-3">
+                                        <label
+                                            for="o_wab_request_note"
+                                            class="form-label"
+                                        >Anything else we should know?</label>
+                                        <textarea
+                                            class="form-control"
+                                            id="o_wab_request_note"
+                                            name="note"
+                                            rows="2"
+                                            placeholder="Optional context — what you'd like to discuss, project specifics, etc."
+                                        />
+                                    </div>
+                                    <div class="mt-3">
+                                        <button
+                                            type="submit"
+                                            class="btn btn-primary o_wab_submit_btn"
+                                        >
+                                            <i class="fa fa-paper-plane me-1" />
+                                            Submit Request
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Calendar + Slots -->
+                    <div class="row">
+                        <div class="col-lg-10 mx-auto">
+                            <div
+                                class="o_wab_calendar"
+                                t-att-data-resource-tz="resource_tz"
+                                t-att-data-effective-tz="effective_tz"
+                            >
+                                <t
+                                    t-set="start_next"
+                                    t-value="start + relativedelta(months=1)"
+                                />
+                                <t
+                                    t-set="start_previous"
+                                    t-value="start - relativedelta(months=1)"
+                                />
+
+                                <!-- No slots this month -->
+                                <t t-if="not slots">
+                                    <div class="o_wab_empty_month">
+                                        <i class="fa fa-calendar-o d-block" />
+                                        <p class="mb-2">
+                                            No available slots this month.
+                                        </p>
+                                        <a
+                                            t-attf-href="/book/#{booking_type.website_slug}/#{start_next.year}/#{start_next.month}"
+                                            class="btn btn-outline-primary btn-sm"
+                                        >
+                                            Try next month
+                                            <i class="fa fa-arrow-right ms-1" />
+                                        </a>
+                                    </div>
+                                </t>
+
+                                <!-- Calendar grid + Slots panel -->
+                                <t t-if="slots">
+                                    <div class="o_wab_cal_grid">
+                                        <!-- Left: Calendar -->
+                                        <div>
+                                            <!-- Month navigation -->
+                                            <div
+                                                class="o_wab_month_nav d-flex justify-content-between align-items-center mb-3"
+                                            >
+                                                <t t-if="start > now">
+                                                    <a
+                                                        t-attf-href="/book/#{booking_type.website_slug}/#{start_previous.year}/#{start_previous.month}"
+                                                        class="o_wab_nav_btn"
+                                                        aria-label="Previous month"
+                                                    >
+                                                        <i class="fa fa-chevron-left" />
+                                                    </a>
+                                                </t>
+                                                <span t-else="" style="width:2.2rem" />
+                                                <span
+                                                    class="o_wab_month_label"
+                                                    t-out="start.strftime('%B %Y')"
+                                                />
+                                                <a
+                                                    t-attf-href="/book/#{booking_type.website_slug}/#{start_next.year}/#{start_next.month}"
+                                                    class="o_wab_nav_btn"
+                                                    aria-label="Next month"
+                                                >
+                                                    <i class="fa fa-chevron-right" />
+                                                </a>
+                                            </div>
+
+                                            <!-- Calendar table -->
+                                            <table
+                                                class="table text-center o_wab_table mb-2"
+                                            >
+                                                <thead>
+                                                    <tr>
+                                                        <t
+                                                            t-foreach="calendar.iterweekdays()"
+                                                            t-as="weekday"
+                                                        >
+                                                            <th
+                                                                t-att-title="weekday_names[str(weekday + 1)]"
+                                                                t-out="weekday_names[str(weekday + 1)][:3]"
+                                                            />
+                                                        </t>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <t
+                                                        t-foreach="calendar.monthdatescalendar(start.year, start.month)"
+                                                        t-as="week"
+                                                    >
+                                                        <tr>
+                                                            <t
+                                                                t-foreach="week"
+                                                                t-as="day"
+                                                            >
+                                                                <t
+                                                                    t-set="has_slots"
+                                                                    t-value="day.month == start.month and slots.get(day)"
+                                                                />
+                                                                <td>
+                                                                    <div
+                                                                        t-att-class="'o_wab_day' + (' o_wab_day_available' if has_slots else '') + (' text-muted' if day.month != start.month else '')"
+                                                                        t-att-data-date="day.isoformat()"
+                                                                        t-att-data-in-month="'1' if day.month == start.month else '0'"
+                                                                        t-att-role="'button' if has_slots else None"
+                                                                        t-att-tabindex="'0' if has_slots else None"
+                                                                    >
+                                                                        <t
+                                                                            t-out="day.day"
+                                                                        />
+                                                                    </div>
+                                                                </td>
+                                                            </t>
+                                                        </tr>
+                                                    </t>
+                                                </tbody>
+                                            </table>
+
+                                            <!-- Timezone selector + note -->
+                                            <div class="o_wab_tz_control mt-2">
+                                                <label
+                                                    class="o_wab_tz_label visually-hidden"
+                                                    for="o_wab_tz_select"
+                                                >Display timezone</label>
+                                                <select
+                                                    id="o_wab_tz_select"
+                                                    class="form-select form-select-sm o_wab_tz_select"
+                                                    aria-label="Display timezone"
+                                                >
+                                                    <!-- Populated server-side with a few common picks; JS inserts the
+                                                         detected browser tz at the top if it's different. -->
+                                                    <t
+                                                        t-set="common_tz_choices"
+                                                        t-value="[
+                                                            'America/New_York',
+                                                            'America/Chicago',
+                                                            'America/Denver',
+                                                            'America/Los_Angeles',
+                                                            'Europe/London',
+                                                            'Europe/Berlin',
+                                                            'Asia/Kolkata',
+                                                            'Asia/Singapore',
+                                                            'Asia/Tokyo',
+                                                            'Australia/Sydney',
+                                                            'Pacific/Auckland',
+                                                            'UTC',
+                                                        ]"
+                                                    />
+                                                    <t
+                                                        t-set="all_tz_choices"
+                                                        t-value="[resource_tz] + [t for t in common_tz_choices if t != resource_tz]"
+                                                    />
+                                                    <t
+                                                        t-foreach="all_tz_choices"
+                                                        t-as="tz_choice"
+                                                    >
+                                                        <option
+                                                            t-att-value="tz_choice"
+                                                            t-att-selected="'selected' if tz_choice == effective_tz else None"
+                                                            t-out="tz_choice"
+                                                        />
+                                                    </t>
+                                                </select>
+                                                <p
+                                                    class="o_wab_tz_note text-center mt-1 mb-0"
+                                                >
+                                                    Times in
+                                                    <span
+                                                    id="o_wab_tz_label"
+                                                    t-out="effective_tz"
+                                                />
+                                                    <span
+                                                    id="o_wab_tz_secondary"
+                                                    t-att-class="'d-none' if effective_tz == resource_tz else ''"
+                                                >
+                                                        · Working hours set in
+                                                        <span t-out="resource_tz" />
+                                                    </span>
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Right: Slots panel -->
+                                        <div>
+                                            <div
+                                                id="o_wab_slots_panel"
+                                                class="o_wab_slots_panel d-none"
+                                            >
+                                                <div class="o_wab_slots_title" />
+                                                <div class="o_wab_slots_list" />
+                                            </div>
+                                            <!-- Placeholder before day selection -->
+                                            <div
+                                                id="o_wab_slots_empty"
+                                                class="o_wab_slots_panel o_wab_slots_empty"
+                                            >
+                                                <i class="fa fa-hand-pointer-o" />
+                                                <span
+                                                >Select a day to view available times</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Hidden slot data for JS -->
+                                    <div
+                                        class="d-none"
+                                        id="o_wab_slot_data"
+                                        t-att-data-slots="slot_data_json"
+                                    />
+                                </t>
+
+                                <!-- Booking form (hidden by default) -->
+                                <div id="o_wab_form" class="o_wab_form d-none mt-4">
+                                    <div class="o_wab_form_title">
+                                        Confirm your booking
+                                    </div>
+                                    <form
+                                        method="post"
+                                        t-attf-action="/book/#{booking_type.website_slug}/confirm"
+                                    >
+                                        <input
+                                            type="hidden"
+                                            name="csrf_token"
+                                            t-att-value="request.csrf_token()"
+                                        />
+                                        <input
+                                            type="hidden"
+                                            name="when"
+                                            id="o_wab_when"
+                                        />
+                                        <!-- Initial value is the server-rendered effective_tz; JS
+                                             overwrites with the detected browser tz on hydration.
+                                             There is no no-JS submit path (the slot button itself
+                                             is JS-rendered), so the form can only be submitted after
+                                             JS has set this field. -->
+                                        <input
+                                            type="hidden"
+                                            name="display_tz"
+                                            id="o_wab_display_tz"
+                                            t-att-value="effective_tz"
+                                        />
+                                        <div class="mb-3">
+                                            <span class="o_wab_selected_slot">
+                                                <i class="fa fa-calendar-check-o" />
+                                                <span id="o_wab_selected_display" />
+                                            </span>
+                                        </div>
+                                        <div class="row g-3 mb-3">
+                                            <div class="col-md-6">
+                                                <label
+                                                    for="o_wab_name"
+                                                    class="form-label"
+                                                >Name</label>
+                                                <input
+                                                    type="text"
+                                                    class="form-control"
+                                                    id="o_wab_name"
+                                                    name="name"
+                                                    required="required"
+                                                    placeholder="Your full name"
+                                                />
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label
+                                                    for="o_wab_email"
+                                                    class="form-label"
+                                                >Email</label>
+                                                <input
+                                                    type="email"
+                                                    class="form-control"
+                                                    id="o_wab_email"
+                                                    name="email"
+                                                    required="required"
+                                                    placeholder="you@example.com"
+                                                />
+                                            </div>
+                                        </div>
+                                        <button
+                                            type="submit"
+                                            class="btn btn-primary o_wab_submit_btn"
+                                        >
+                                            <i class="fa fa-check me-1" />
+                                            Confirm Booking
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="booking_success" name="Booking Success">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="container py-5">
+                    <div class="row">
+                        <div class="col-lg-6 mx-auto text-center o_wab_success">
+                            <div class="mb-4">
+                                <span class="o_wab_success_icon">
+                                    <i class="fa fa-check" />
+                                </span>
+                            </div>
+                            <h1 class="h2 fw-bold">Booking Confirmed!</h1>
+                            <t t-if="last_booking">
+                                <p class="text-muted mt-2 mb-4">
+                                    Your appointment for
+                                    <strong t-out="last_booking.get('name', '')" />
+                                    has been confirmed.
+                                </p>
+                                <div
+                                    class="o_wab_detail_card p-4 text-start mx-auto"
+                                    style="max-width: 380px;"
+                                >
+                                    <div class="o_wab_detail_row">
+                                        <i class="fa fa-calendar" />
+                                        <div>
+                                            <div class="o_wab_detail_label">Date</div>
+                                            <div class="o_wab_detail_value">
+                                                <t
+                                                    t-out="last_booking.get('start', '')"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="o_wab_detail_row">
+                                        <i class="fa fa-clock-o" />
+                                        <div>
+                                            <div class="o_wab_detail_label">Time</div>
+                                            <div class="o_wab_detail_value">
+                                                <t
+                                                    t-out="last_booking.get('time', '')"
+                                                />
+                                                <t t-if="last_booking.get('tz')">
+                                                    <span
+                                                        class="o_wab_detail_tz"
+                                                        t-out="last_booking['tz']"
+                                                    />
+                                                </t>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <t t-if="last_booking.get('duration')">
+                                        <div class="o_wab_detail_row">
+                                            <i class="fa fa-hourglass-half" />
+                                            <div>
+                                                <div
+                                                    class="o_wab_detail_label"
+                                                >Duration</div>
+                                                <div class="o_wab_detail_value">
+                                                    <t
+                                                        t-out="'%d min' % int(last_booking['duration'] * 60)"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </t>
+                                    <t t-if="last_booking.get('location')">
+                                        <div class="o_wab_detail_row">
+                                            <i class="fa fa-map-marker" />
+                                            <div>
+                                                <div
+                                                    class="o_wab_detail_label"
+                                                >Location</div>
+                                                <div class="o_wab_detail_value">
+                                                    <t
+                                                        t-out="last_booking.get('location', '')"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </div>
+                                <p class="mt-4 text-muted small">
+                                    <i class="fa fa-envelope-o me-1" />
+                                    A calendar invitation has been sent to your email.
+                                </p>
+                            </t>
+                            <t t-else="">
+                                <p class="text-muted mt-3">
+                                    Your appointment has been booked successfully.
+                                </p>
+                            </t>
+                            <a
+                                t-attf-href="/book/#{booking_type.website_slug}"
+                                class="btn btn-outline-primary mt-3"
+                            >
+                                <i class="fa fa-arrow-left me-1" />
+                                Book another appointment
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>
