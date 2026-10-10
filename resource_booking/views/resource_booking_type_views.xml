@@ -41,6 +41,7 @@
                             />
                             <field name="duration" widget="float_time" />
                             <field name="slot_duration" widget="float_time" />
+                            <field name="max_advance_booking_days" />
                             <field name="modifications_deadline" widget="float_time" />
                             <field name="resource_calendar_id" />
                         </group>

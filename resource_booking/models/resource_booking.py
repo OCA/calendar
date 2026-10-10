@@ -561,6 +561,13 @@ class ResourceBooking(models.Model):
         start_dt = max(
             start_dt, now + timedelta(hours=self.type_id.modifications_deadline)
         )
+        # Cap the search window when the booking type restricts how far in
+        # advance a slot may start.
+        max_advance_days = self.type_id.max_advance_booking_days
+        max_start_dt = False
+        if max_advance_days:
+            max_start_dt = now + timedelta(days=max_advance_days)
+            end_dt = min(end_dt, max_start_dt + booking_duration)
         # available_intervals should start with the beginning of the work day,
         # to compute each slot based on the beginning of the work day.
         workday_min = start_dt.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -575,6 +582,7 @@ class ResourceBooking(models.Model):
                 test_stop = test_start + booking_duration
                 if (
                     test_start >= start_dt
+                    and (not max_start_dt or test_start <= max_start_dt)
                     and test_start >= available_start
                     and test_stop <= available_stop
                 ):
