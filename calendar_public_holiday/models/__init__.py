@@ -2,3 +2,5 @@
 
 from . import calendar_public_holiday
 from . import calendar_public_holiday_line
+from . import calendar_public_holiday_template
+from . import calendar_public_holiday_template_line

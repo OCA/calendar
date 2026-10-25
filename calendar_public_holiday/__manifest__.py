@@ -1,6 +1,7 @@
 # Copyright 2015 2011,2013 Michael Telahun Makonnen <mmakonnen@gmail.com>
 # Copyright 2020 InitOS Gmbh
 # Copyright 2024 Camptocamp
+# Copyright 2026 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 {
@@ -8,7 +9,7 @@
     "summary": """
         Manage Public Holidays
     """,
-    "version": "18.0.1.0.1",
+    "version": "18.0.1.1.0",
     "license": "AGPL-3",
     "category": "HR/Calendar",
     "author": "Michael Telahun Makonnen, "
@@ -24,6 +25,7 @@
         "data/data.xml",
         "security/ir.model.access.csv",
         "views/calendar_public_holiday_view.xml",
+        "views/calendar_public_holiday_template_view.xml",
         "wizards/calendar_public_holiday_next_year_wizard.xml",
     ],
     "pre_init_hook": "pre_init_hook",

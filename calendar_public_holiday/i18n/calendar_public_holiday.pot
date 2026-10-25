@@ -6,12 +6,31 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0\n"
 "Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-25 07:58+0000\n"
+"PO-Revision-Date: 2026-10-25 07:58+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: calendar_public_holiday
+#. odoo-python
+#: code:addons/calendar_public_holiday/models/calendar_public_holiday_template_line.py:0
+msgid "A date is required for the fixed holiday %s."
+msgstr ""
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_template__active
+msgid "Active"
+msgstr ""
+
+#. module: calendar_public_holiday
+#: model_terms:ir.ui.view,arch_db:calendar_public_holiday.view_calendar_public_holiday_template_form
+#: model_terms:ir.ui.view,arch_db:calendar_public_holiday.view_calendar_public_holiday_template_search
+msgid "Archived"
+msgstr ""
 
 #. module: calendar_public_holiday
 #: model_terms:ir.ui.view,arch_db:calendar_public_holiday.calendar_public_holiday_next_year_view
@@ -36,6 +55,16 @@ msgid "Calendar Public Holiday Line"
 msgstr ""
 
 #. module: calendar_public_holiday
+#: model:ir.model,name:calendar_public_holiday.model_calendar_public_holiday_template
+msgid "Calendar Public Holiday Template"
+msgstr ""
+
+#. module: calendar_public_holiday
+#: model:ir.model,name:calendar_public_holiday.model_calendar_public_holiday_template_line
+msgid "Calendar Public Holiday Template Line"
+msgstr ""
+
+#. module: calendar_public_holiday
 #: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday__year
 #: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_line__public_holiday_id
 msgid "Calendar Year"
@@ -48,6 +77,7 @@ msgstr ""
 
 #. module: calendar_public_holiday
 #: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday__country_id
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_template__country_id
 msgid "Country"
 msgstr ""
 
@@ -72,6 +102,8 @@ msgstr ""
 #: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday__create_uid
 #: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_line__create_uid
 #: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_next_year__create_uid
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_template__create_uid
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_template_line__create_uid
 msgid "Created by"
 msgstr ""
 
@@ -79,12 +111,20 @@ msgstr ""
 #: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday__create_date
 #: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_line__create_date
 #: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_next_year__create_date
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_template__create_date
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_template_line__create_date
 msgid "Created on"
 msgstr ""
 
 #. module: calendar_public_holiday
 #: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_line__date
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_template_line__date
 msgid "Date"
+msgstr ""
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_template_line__date_type
+msgid "Date Type"
 msgstr ""
 
 #. module: calendar_public_holiday
@@ -101,6 +141,11 @@ msgid ""
 msgstr ""
 
 #. module: calendar_public_holiday
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_template_line__day_offset
+msgid "Day Offset"
+msgstr ""
+
+#. module: calendar_public_holiday
 #: model_terms:ir.ui.view,arch_db:calendar_public_holiday.calendar_public_holiday_next_year_view
 msgid "Defaults"
 msgstr ""
@@ -109,7 +154,31 @@ msgstr ""
 #: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday__display_name
 #: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_line__display_name
 #: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_next_year__display_name
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_template__display_name
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_template_line__display_name
 msgid "Display Name"
+msgstr ""
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields.selection,name:calendar_public_holiday.selection__calendar_public_holiday_template_line__date_type__easter
+msgid "Easter Sunday"
+msgstr ""
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields.selection,name:calendar_public_holiday.selection__calendar_public_holiday_template_line__date_type__fixed
+msgid "Fixed Date"
+msgstr ""
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,help:calendar_public_holiday.field_calendar_public_holiday_template_line__date_type
+msgid ""
+"Fixed Date: the day and month of the date are used every year.\n"
+"Other values: the date is calculated for every year."
+msgstr ""
+
+#. module: calendar_public_holiday
+#: model_terms:ir.ui.view,arch_db:calendar_public_holiday.view_calendar_public_holiday_template_form
+msgid "Generate Holidays"
 msgstr ""
 
 #. module: calendar_public_holiday
@@ -118,9 +187,16 @@ msgid "Holiday Dates"
 msgstr ""
 
 #. module: calendar_public_holiday
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_template__line_ids
+msgid "Holidays"
+msgstr ""
+
+#. module: calendar_public_holiday
 #: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday__id
 #: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_line__id
 #: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_next_year__id
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_template__id
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_template_line__id
 msgid "ID"
 msgstr ""
 
@@ -128,6 +204,8 @@ msgstr ""
 #: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday__write_uid
 #: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_line__write_uid
 #: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_next_year__write_uid
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_template__write_uid
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_template_line__write_uid
 msgid "Last Updated by"
 msgstr ""
 
@@ -135,6 +213,8 @@ msgstr ""
 #: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday__write_date
 #: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_line__write_date
 #: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_next_year__write_date
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_template__write_date
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_template_line__write_date
 msgid "Last Updated on"
 msgstr ""
 
@@ -145,6 +225,8 @@ msgstr ""
 
 #. module: calendar_public_holiday
 #: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_line__name
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_template__name
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_template_line__name
 msgid "Name"
 msgstr ""
 
@@ -163,20 +245,37 @@ msgid ""
 msgstr ""
 
 #. module: calendar_public_holiday
+#: model:ir.model.fields,help:calendar_public_holiday.field_calendar_public_holiday_template_line__day_offset
+msgid ""
+"Number of days added to (or subtracted from, when negative) the calculated "
+"date."
+msgstr ""
+
+#. module: calendar_public_holiday
 #: model_terms:ir.ui.view,arch_db:calendar_public_holiday.calendar_public_holiday_next_year_view
 msgid "Optional"
 msgstr ""
 
 #. module: calendar_public_holiday
+#: model:ir.actions.act_window,name:calendar_public_holiday.open_calendar_public_holiday_template_view
+#: model:ir.ui.menu,name:calendar_public_holiday.menu_calendar_public_holiday_template_view
+msgid "Public Holiday Templates"
+msgstr ""
+
+#. module: calendar_public_holiday
+#. odoo-python
+#: code:addons/calendar_public_holiday/models/calendar_public_holiday_template.py:0
 #: model:ir.actions.act_window,name:calendar_public_holiday.open_calendar_public_holiday_view
 #: model:ir.ui.menu,name:calendar_public_holiday.menu_calendar_public_holiday
 #: model:ir.ui.menu,name:calendar_public_holiday.menu_calendar_public_holiday_view
 #: model_terms:ir.ui.view,arch_db:calendar_public_holiday.view_calendar_public_holiday_form
+#: model_terms:ir.ui.view,arch_db:calendar_public_holiday.view_calendar_public_holiday_template_form
 msgid "Public Holidays"
 msgstr ""
 
 #. module: calendar_public_holiday
 #: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_line__state_ids
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_template_line__state_ids
 msgid "Related States"
 msgstr ""
 
@@ -190,8 +289,19 @@ msgid ""
 msgstr ""
 
 #. module: calendar_public_holiday
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_template_line__template_id
+msgid "Template"
+msgstr ""
+
+#. module: calendar_public_holiday
 #: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_next_year__public_holiday_ids
 msgid "Templates"
+msgstr ""
+
+#. module: calendar_public_holiday
+#. odoo-python
+#: code:addons/calendar_public_holiday/models/calendar_public_holiday_template_line.py:0
+msgid "The 29th of February cannot be used as fixed holiday (%s)."
 msgstr ""
 
 #. module: calendar_public_holiday
@@ -202,6 +312,11 @@ msgid ""
 "                            an additional public holiday for the 150th\n"
 "                            anniversary of the Italian unification, so you want to\n"
 "                            replicate the 2010 Italian holidays to 2012.\""
+msgstr ""
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,help:calendar_public_holiday.field_calendar_public_holiday_template_line__date
+msgid "The year is ignored."
 msgstr ""
 
 #. module: calendar_public_holiday
@@ -218,7 +333,13 @@ msgstr ""
 
 #. module: calendar_public_holiday
 #: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_next_year__year
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_template__generate_year
 msgid "Year"
+msgstr ""
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,help:calendar_public_holiday.field_calendar_public_holiday_template__generate_year
+msgid "Year for which the public holidays are generated."
 msgstr ""
 
 #. module: calendar_public_holiday
@@ -226,6 +347,12 @@ msgstr ""
 msgid ""
 "Year for which you want to create the public holidays. By default, the year "
 "following the template."
+msgstr ""
+
+#. module: calendar_public_holiday
+#. odoo-python
+#: code:addons/calendar_public_holiday/models/calendar_public_holiday_line.py:0
+msgid "You can't create duplicate public holiday per date"
 msgstr ""
 
 #. module: calendar_public_holiday
