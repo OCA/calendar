@@ -1,13 +1,29 @@
 # Copyright 2021 Tecnativa - Jairo Llopis
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
-from odoo import api, models
+from odoo import api, fields, models
 
 from .resource_booking import _availability_is_fitting
 
 
 class ResourceResource(models.Model):
     _inherit = "resource.resource"
+    _sql_constraints = [
+        (
+            "booking_buffer_nonnegative",
+            "CHECK(booking_buffer >= 0)",
+            "Booking buffer must be zero or positive.",
+        ),
+    ]
+
+    booking_buffer = fields.Float(
+        string="Booking Buffer Time",
+        default=0.0,
+        help=(
+            "Extra time, expressed in hours, to block this resource after a "
+            "scheduled booking before it can be booked again. Set to 0 for no buffer."
+        ),
+    )
 
     @api.constrains("calendar_id", "resource_type", "tz", "user_id")
     def _check_bookings_scheduling(self):

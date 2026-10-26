@@ -41,6 +41,7 @@
         "views/res_partner_views.xml",
         "views/resource_booking_combination_views.xml",
         "views/resource_booking_type_views.xml",
+        "views/resource_resource_views.xml",
         "views/resource_booking_views.xml",
         "views/menus.xml",
     ],
