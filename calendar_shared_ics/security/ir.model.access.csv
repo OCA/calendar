@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_calendar_shared_ics_manager,access.calendar.shared.ics.manager,model_calendar_shared_ics,calendar_shared_ics.group_calendar_shared_ics_manager,1,1,1,1
+access_calendar_shared_ics_user_read,access.calendar.shared.ics.user.read,model_calendar_shared_ics,base.group_user,1,0,0,0
