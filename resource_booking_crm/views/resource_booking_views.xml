@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2026 ForgeFlow S.L.
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="resource_booking_view_form" model="ir.ui.view">
+        <field name="name">Resource booking form - resource_booking_crm</field>
+        <field name="model">resource.booking</field>
+        <field name="inherit_id" ref="resource_booking.resource_booking_view_form" />
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button
+                    name="action_view_crm_lead"
+                    type="object"
+                    class="oe_stat_button"
+                    icon="fa-star"
+                    invisible="not lead_id"
+                    groups="sales_team.group_sale_salesman"
+                >
+                    <span>Lead</span>
+                </button>
+            </div>
+            <field name="categ_ids" position="after">
+                <field name="lead_id" groups="sales_team.group_sale_salesman" />
+            </field>
+            <field name="description" position="before">
+                <group name="marketing" string="Marketing">
+                    <field
+                        name="campaign_id"
+                        options="{'create_name_field': 'title'}"
+                    />
+                    <field name="medium_id" />
+                    <field name="source_id" />
+                </group>
+            </field>
+        </field>
+    </record>
+    <record id="resource_booking_view_search" model="ir.ui.view">
+        <field name="name">resource.booking.view.search - resource_booking_crm</field>
+        <field name="model">resource.booking</field>
+        <field name="inherit_id" ref="resource_booking.resource_booking_view_search" />
+        <field name="arch" type="xml">
+            <field name="type_id" position="after">
+                <field name="campaign_id" />
+                <field name="source_id" />
+                <field name="medium_id" />
+            </field>
+        </field>
+    </record>
+</odoo>
