@@ -399,11 +399,18 @@ to a separate glue module.</p>
 <li><a class="reference internal" href="#installation" id="toc-entry-1">Installation</a></li>
 <li><a class="reference internal" href="#configuration" id="toc-entry-2">Configuration</a></li>
 <li><a class="reference internal" href="#usage" id="toc-entry-3">Usage</a></li>
-<li><a class="reference internal" href="#bug-tracker" id="toc-entry-4">Bug Tracker</a></li>
-<li><a class="reference internal" href="#credits" id="toc-entry-5">Credits</a><ul>
-<li><a class="reference internal" href="#authors" id="toc-entry-6">Authors</a></li>
-<li><a class="reference internal" href="#contributors" id="toc-entry-7">Contributors</a></li>
-<li><a class="reference internal" href="#maintainers" id="toc-entry-8">Maintainers</a></li>
+<li><a class="reference internal" href="#development" id="toc-entry-4">Development</a><ul>
+<li><a class="reference internal" href="#purpose" id="toc-entry-5">Purpose</a></li>
+<li><a class="reference internal" href="#model" id="toc-entry-6">Model</a></li>
+<li><a class="reference internal" href="#controller" id="toc-entry-7">Controller</a></li>
+<li><a class="reference internal" href="#extension-points" id="toc-entry-8">Extension points</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#bug-tracker" id="toc-entry-9">Bug Tracker</a></li>
+<li><a class="reference internal" href="#credits" id="toc-entry-10">Credits</a><ul>
+<li><a class="reference internal" href="#authors" id="toc-entry-11">Authors</a></li>
+<li><a class="reference internal" href="#contributors" id="toc-entry-12">Contributors</a></li>
+<li><a class="reference internal" href="#maintainers" id="toc-entry-13">Maintainers</a></li>
 </ul>
 </li>
 </ul>
@@ -460,8 +467,104 @@ request asking for a time that was never offered), the visitor is
 redirected back to the calendar with an informative error message.</li>
 </ol>
 </div>
+<div class="section" id="development">
+<h1><a class="toc-backref" href="#toc-entry-4">Development</a></h1>
+<div class="section" id="purpose">
+<h2><a class="toc-backref" href="#toc-entry-5">Purpose</a></h2>
+<p>Public, login-free booking pages for <tt class="docutils literal">resource.booking.type</tt> records,
+reusing the slot computation of <tt class="docutils literal">resource_booking</tt> instead of
+duplicating it.</p>
+</div>
+<div class="section" id="model">
+<h2><a class="toc-backref" href="#toc-entry-6">Model</a></h2>
+<ul class="simple">
+<li><tt class="docutils literal">resource.booking.type</tt> inherits <tt class="docutils literal">website.published.mixin</tt>: the
+stored flag is <tt class="docutils literal">is_published</tt>; <tt class="docutils literal">website_published</tt> is the mixin’s
+related field and the form keeps using it. <tt class="docutils literal">website_url</tt> is computed
+as <tt class="docutils literal"><span class="pre">/book/&lt;slug&gt;</span></tt>.</li>
+<li><tt class="docutils literal">website_slug</tt> is a stored compute with <tt class="docutils literal">readonly=False</tt>: filled
+from the name once, never overwritten afterwards, and normalised with
+the platform <tt class="docutils literal">slugify</tt> on create/write so a hand-typed value is
+URL-safe. It is unique (SQL constraint) and mandatory to publish
+(Python constraint).</li>
+</ul>
+</div>
+<div class="section" id="controller">
+<h2><a class="toc-backref" href="#toc-entry-7">Controller</a></h2>
+<p>One controller class, <tt class="docutils literal">WebsiteAppointmentBooking</tt>, with three routes:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="49%" />
+<col width="51%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Route</th>
+<th class="head">Purpose</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td><tt class="docutils literal"><span class="pre">/book/&lt;slug&gt;[/&lt;year&gt;/&lt;month&gt;]</span></tt></td>
+<td>booking page, in the sitemap</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">/book/&lt;slug&gt;/confirm</span></tt> (POST)</td>
+<td>create + confirm the booking</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">/book/&lt;slug&gt;/success</span></tt></td>
+<td>thank-you page fed from the session</td>
+</tr>
+</tbody>
+</table>
+<p>Invariants:</p>
+<ul class="simple">
+<li>Everything runs <tt class="docutils literal">sudo()</tt> on records looked up through the published
+slug; no ACL is granted to the public group.</li>
+<li>Slot computation uses a <em>phantom</em> booking (<tt class="docutils literal">new()</tt>), so nothing is
+written while browsing. The same computation validates a submitted
+time (<tt class="docutils literal">_is_available_slot</tt>): a POST can only book a time the page
+would have offered, which also enforces the modification deadline and
+working hours.</li>
+<li>Submitted <tt class="docutils literal">when</tt> values must carry an offset and are normalised to
+UTC; the success page is rendered from that canonical instant, never
+from client strings.</li>
+<li>Error feedback travels in the URL as a <em>code</em> (<tt class="docutils literal"><span class="pre">?error=slot_taken</span></tt>),
+mapped to a translated message by <tt class="docutils literal">_get_error_message</tt>. Unknown
+codes render nothing, so the page cannot be used to display arbitrary
+text.</li>
+<li>Public POSTs pass <tt class="docutils literal">_check_submission</tt>: a honeypot field
+(<tt class="docutils literal">HONEYPOT_FIELD</tt>, rendered by the <tt class="docutils literal">booking_form_guard</tt> template)
+and reCAPTCHA v3 through <tt class="docutils literal">ir.http._verify_request_recaptcha_token</tt>,
+which is a no-op until the website has a site key.</li>
+<li>The public user never owns records: the booking’s <tt class="docutils literal">user_id</tt> (and
+thus the meeting organizer) is set to the first human resource of the
+assigned combination (<tt class="docutils literal">_get_organizer</tt>); contacts are reused by
+email and an existing contact is not renamed.</li>
+</ul>
+</div>
+<div class="section" id="extension-points">
+<h2><a class="toc-backref" href="#toc-entry-8">Extension points</a></h2>
+<ul class="simple">
+<li><tt class="docutils literal">_prepare_booking_page_values(booking_type, year, month, **kw)</tt>
+returns the rendering values; overrides add keys. <tt class="docutils literal">padded_slots</tt>
+(tz-aware slots with one day of padding) is exposed for them.</li>
+<li><tt class="docutils literal">_get_error_message(code)</tt>: extend the code → message map.</li>
+<li><tt class="docutils literal">_check_submission(kwargs, action)</tt>,
+<tt class="docutils literal">_get_or_create_partner(name, email)</tt>: reusable by other public
+forms of the page.</li>
+<li>Template anchors: <tt class="docutils literal">.o_wab_alerts_row</tt> (error alert) and
+<tt class="docutils literal">.o_wab_calendar_row</tt> (calendar block) for <tt class="docutils literal">xpath</tt> insertions;
+<tt class="docutils literal">booking_form_guard</tt> for the hidden fields any new form must
+include.</li>
+<li>Frontend: <tt class="docutils literal">FormGuard</tt> (<tt class="docutils literal">static/src/js/form_guard.esm.js</tt>) attaches
+the reCAPTCHA token fetch to a form; other modules import it with
+their own action name.</li>
+</ul>
+<p>These points exist so that flows needing extra dependencies — turning
+out-of-hours visitors into CRM leads, for instance — can live in their
+own glue module instead of here.</p>
+</div>
+</div>
 <div class="section" id="bug-tracker">
-<h1><a class="toc-backref" href="#toc-entry-4">Bug Tracker</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-9">Bug Tracker</a></h1>
 <p>Bugs are tracked on <a class="reference external" href="https://github.com/OCA/calendar/issues">GitHub Issues</a>.
 In case of trouble, please check there if your issue has already been reported.
 If you spotted it first, help us to smash it by providing a detailed and welcomed
@@ -469,16 +572,16 @@ If you spotted it first, help us to smash it by providing a detailed and welcome
 <p>Do not contact contributors directly about support or help with technical issues.</p>
 </div>
 <div class="section" id="credits">
-<h1><a class="toc-backref" href="#toc-entry-5">Credits</a></h1>
+<h1><a class="toc-backref" href="#toc-entry-10">Credits</a></h1>
 <div class="section" id="authors">
-<h2><a class="toc-backref" href="#toc-entry-6">Authors</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-11">Authors</a></h2>
 <ul class="simple">
 <li>Ledo Enterprises LLC</li>
 <li>ForgeFlow</li>
 </ul>
 </div>
 <div class="section" id="contributors">
-<h2><a class="toc-backref" href="#toc-entry-7">Contributors</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-12">Contributors</a></h2>
 <ul class="simple">
 <li><a class="reference external" href="https://ledoweb.com">Ledo Enterprises LLC</a>:<ul>
 <li>Don Kendall</li>
@@ -491,7 +594,7 @@ If you spotted it first, help us to smash it by providing a detailed and welcome
 </ul>
 </div>
 <div class="section" id="maintainers">
-<h2><a class="toc-backref" href="#toc-entry-8">Maintainers</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-13">Maintainers</a></h2>
 <p>This module is maintained by the OCA.</p>
 <a class="reference external image-reference" href="https://odoo-community.org">
 <img alt="Odoo Community Association" src="https://odoo-community.org/logo.png" />

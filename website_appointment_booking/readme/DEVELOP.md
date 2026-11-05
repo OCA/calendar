@@ -1,5 +1,3 @@
-# website_appointment_booking — design notes
-
 ## Purpose
 
 Public, login-free booking pages for `resource.booking.type` records, reusing the slot
@@ -61,5 +59,6 @@ Invariants:
 - Frontend: `FormGuard` (`static/src/js/form_guard.esm.js`) attaches the reCAPTCHA token
   fetch to a form; other modules import it with their own action name.
 
-`website_appointment_booking_crm` is the reference extension (out-of-hours request → CRM
-lead).
+These points exist so that flows needing extra dependencies — turning out-of-hours
+visitors into CRM leads, for instance — can live in their own glue module instead of
+here.
