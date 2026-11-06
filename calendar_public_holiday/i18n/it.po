@@ -1,0 +1,287 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* calendar_public_holiday
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: 2025-02-15 10:06+0000\n"
+"Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
+"Language-Team: none\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.6.2\n"
+
+#. module: calendar_public_holiday
+#: model_terms:ir.ui.view,arch_db:calendar_public_holiday.calendar_public_holiday_next_year_view
+msgid ""
+"By default, the most recent public holidays\n"
+"                            for each country are used as template to create\n"
+"                            public holidays for the year following the templates.\n"
+"                            <br/><br/>\n"
+"                            Normally, you should not need to input anything in\n"
+"                            optional fields and only need to click on the button\n"
+"                            \"Create\"."
+msgstr ""
+"Per impostazione predefinita, i giorni festivi più recenti\n"
+"                            per ogni paese sono usati come modello per "
+"creare\n"
+"                            le festività per l'anno seguendo i modelli.\n"
+"                            <br/><br/>\n"
+"                            Normalmente, non dovrebbe essere necessario "
+"inserire nulla\n"
+"                            nei campi facoltativi ed è solo necessario fare "
+"clic sul pulsante\n"
+"                            \"Crea\"."
+
+#. module: calendar_public_holiday
+#: model:ir.model,name:calendar_public_holiday.model_calendar_public_holiday
+msgid "Calendar Public Holiday"
+msgstr "Calendario giorni festivi"
+
+#. module: calendar_public_holiday
+#: model:ir.model,name:calendar_public_holiday.model_calendar_public_holiday_line
+msgid "Calendar Public Holiday Line"
+msgstr "Riga giorno festivo calendario"
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday__year
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_line__public_holiday_id
+msgid "Calendar Year"
+msgstr "Anno del calendario"
+
+#. module: calendar_public_holiday
+#: model_terms:ir.ui.view,arch_db:calendar_public_holiday.calendar_public_holiday_next_year_view
+msgid "Cancel"
+msgstr "Annulla"
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday__country_id
+msgid "Country"
+msgstr "Nazione"
+
+#. module: calendar_public_holiday
+#: model_terms:ir.ui.view,arch_db:calendar_public_holiday.calendar_public_holiday_next_year_view
+msgid "Create"
+msgstr "Crea"
+
+#. module: calendar_public_holiday
+#: model:ir.actions.act_window,name:calendar_public_holiday.action_create_next_year_public_holidays
+#: model:ir.ui.menu,name:calendar_public_holiday.menu_create_next_year_public_holidays
+#: model_terms:ir.ui.view,arch_db:calendar_public_holiday.calendar_public_holiday_next_year_view
+msgid "Create Next Year Public Holidays"
+msgstr "Crea giorni festivi del prossimo anno"
+
+#. module: calendar_public_holiday
+#: model:ir.model,name:calendar_public_holiday.model_calendar_public_holiday_next_year
+msgid "Create Public Holiday From Existing Ones"
+msgstr "Crea giorni festivi da quelle esistenti"
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday__create_uid
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_line__create_uid
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_next_year__create_uid
+msgid "Created by"
+msgstr "Creato da"
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday__create_date
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_line__create_date
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_next_year__create_date
+msgid "Created on"
+msgstr "Creato il"
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_line__date
+msgid "Date"
+msgstr "Data"
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_line__variable_date
+msgid "Date may change"
+msgstr "Data variabile"
+
+#. module: calendar_public_holiday
+#. odoo-python
+#: code:addons/calendar_public_holiday/models/calendar_public_holiday_line.py:0
+msgid ""
+"Dates of holidays should be the same year as the calendar year they are "
+"being assigned to"
+msgstr ""
+"Le date delle vacanze dovrebbero coincidere con l'anno solare a cui sono "
+"state assegnate"
+
+#. module: calendar_public_holiday
+#: model_terms:ir.ui.view,arch_db:calendar_public_holiday.calendar_public_holiday_next_year_view
+msgid "Defaults"
+msgstr "Predefiniti"
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday__display_name
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_line__display_name
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_next_year__display_name
+msgid "Display Name"
+msgstr "Nome visualizzato"
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday__line_ids
+msgid "Holiday Dates"
+msgstr "Date festività"
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday__id
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_line__id
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_next_year__id
+msgid "ID"
+msgstr "ID"
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday__write_uid
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_line__write_uid
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_next_year__write_uid
+msgid "Last Updated by"
+msgstr "Ultimo aggiornamento di"
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday__write_date
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_line__write_date
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_next_year__write_date
+msgid "Last Updated on"
+msgstr "Ultimo aggiornamento il"
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_line__meeting_id
+msgid "Meeting"
+msgstr "Riunione"
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_line__name
+msgid "Name"
+msgstr "Nome"
+
+#. module: calendar_public_holiday
+#. odoo-python
+#: code:addons/calendar_public_holiday/wizards/calendar_public_holiday_next_year_wizard.py:0
+msgid "New public holidays"
+msgstr "Nuovi giorni festivi"
+
+#. module: calendar_public_holiday
+#. odoo-python
+#: code:addons/calendar_public_holiday/wizards/calendar_public_holiday_next_year_wizard.py:0
+msgid ""
+"No Public Holidays found as template. Please create the first Public "
+"Holidays manually."
+msgstr ""
+"Nessun giorno festivo trovato come modello. Si prega di creare i primi "
+"giorni festivi manualmente."
+
+#. module: calendar_public_holiday
+#: model_terms:ir.ui.view,arch_db:calendar_public_holiday.calendar_public_holiday_next_year_view
+msgid "Optional"
+msgstr "Opzionale"
+
+#. module: calendar_public_holiday
+#: model:ir.actions.act_window,name:calendar_public_holiday.open_calendar_public_holiday_view
+#: model:ir.ui.menu,name:calendar_public_holiday.menu_calendar_public_holiday
+#: model:ir.ui.menu,name:calendar_public_holiday.menu_calendar_public_holiday_view
+#: model_terms:ir.ui.view,arch_db:calendar_public_holiday.view_calendar_public_holiday_form
+msgid "Public Holidays"
+msgstr "Giorni festivi"
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_line__state_ids
+msgid "Related States"
+msgstr "Nazioni correlate"
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,help:calendar_public_holiday.field_calendar_public_holiday_next_year__public_holiday_ids
+msgid ""
+"Select the public holidays to use as template. If not set, latest public "
+"holidays of each country will be used. Only the last templates of each "
+"country for each year will be taken into account (If you select templates "
+"from 2012 and 2015, only the templates from 2015 will be taken into account."
+msgstr ""
+"Seleziona i giorni festivi da utilizzare come modello. In caso contrario, "
+"verranno utilizzati gli ultimi giorni festivi di ciascun paese. Verranno "
+"presi in considerazione solo gli ultimi modelli di ciascun paese per ogni "
+"anno (se si selezionano modelli del 2012 e del 2015, verranno presi in "
+"considerazione solo i modelli del 2015."
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_next_year__public_holiday_ids
+msgid "Templates"
+msgstr "Modelli"
+
+#. module: calendar_public_holiday
+#: model_terms:ir.ui.view,arch_db:calendar_public_holiday.calendar_public_holiday_next_year_view
+msgid ""
+"The below optional fields are here only to handle\n"
+"                            special situations like \"2011 was a special year with\n"
+"                            an additional public holiday for the 150th\n"
+"                            anniversary of the Italian unification, so you want to\n"
+"                            replicate the 2010 Italian holidays to 2012.\""
+msgstr ""
+"I campi facoltativi seguenti sono qui solo per gestire\n"
+"                             situazioni particolari come \"Il 2011 è stato "
+"un anno speciale con\n"
+"                             un giorno festivo aggiuntivo per il 150°\n"
+"                             anniversario dell'Unità d'Italia, quindi vuoi\n"
+"                             replicare le festività italiane dal 2010 al "
+"2012.\""
+
+#. module: calendar_public_holiday
+#: model_terms:ir.ui.view,arch_db:calendar_public_holiday.calendar_public_holiday_next_year_view
+msgid ""
+"Use this wizard to create public holidays based on the\n"
+"                        existing ones.<br/>\n"
+"                        Only the last templates of each country\n"
+"                        will be taken into account (If you select templates\n"
+"                        from 2012 and 2015 of the same country; '\n"
+"                        only the templates from 2015 will be taken into\n"
+"                        account)."
+msgstr ""
+"Utilizzare questa procedura guidata per creare giorni festivi basati su\n"
+"                        quelli esistenti.<br/>\n"
+"                        Solo gli ultimi modelli di ogni paese\n"
+"                        verranno presi in considerazione (se si selezionano "
+"i modelli\n"
+"                        dal 2012 al 2015 dello stesso Paese; '\n"
+"                        verranno presi in considerazione solo i modelli del "
+"2015\n"
+"                        )."
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_next_year__year
+msgid "Year"
+msgstr "Anno"
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,help:calendar_public_holiday.field_calendar_public_holiday_next_year__year
+msgid ""
+"Year for which you want to create the public holidays. By default, the year "
+"following the template."
+msgstr ""
+"Anno per il quale si desidera creare i giorni festivi. Per impostazione "
+"predefinita, l'anno successivo al modello."
+
+#. module: calendar_public_holiday
+#. odoo-python
+#: code:addons/calendar_public_holiday/models/calendar_public_holiday.py:0
+msgid "You can't create duplicate public holiday per year and/or country"
+msgstr "Non è possibile creare giorni festivi duplicati per anno e/o nazione"
+
+#. module: calendar_public_holiday
+#. odoo-python
+#: code:addons/calendar_public_holiday/wizards/calendar_public_holiday_next_year_wizard.py:0
+msgid ""
+"You cannot use as template the public holidays of a year that includes "
+"public holidays on 29th of February (2016, 2020...), please select a "
+"template from another year."
+msgstr ""
+"Non si possono utilizzare come modello i giorni festivi di un anno che "
+"presenta giorni festivi il 29 febbraio (2016, 2020...), seleziona un modello "
+"di un altro anno."

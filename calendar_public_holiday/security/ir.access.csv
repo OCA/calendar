@@ -1,0 +1,6 @@
+id,name,model_id,group_id/id,operation,domain
+access_calendar_public_holiday_user,Access calendar public holiday,calendar.public.holiday,base.group_user,r,
+access_calendar_public_holiday_manager,Manage calendar public holiday,calendar.public.holiday,base.group_system,crud,
+access_calendar_public_holiday_line_user,Access calendar public holiday line,calendar.public.holiday.line,base.group_user,r,
+access_calendar_public_holiday_line_manager,Manage calendar public holiday line,calendar.public.holiday.line,base.group_system,crud,
+access_calendar_public_holiday_manager_next_year,Manage next year public holiday wizard,calendar.public.holiday.next.year,base.group_system,crud,
