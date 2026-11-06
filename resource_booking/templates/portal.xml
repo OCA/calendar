@@ -29,7 +29,7 @@
                 class="alert-link"
             >
                     Try next month
-                    <i class="fa fa-chevron-right" />
+                    <i class="oi" data-icon="chevron_right" />
                 </a>
             </div>
             <!-- Monthly calendar -->
@@ -51,7 +51,7 @@
                                     t-att-href="booking.get_portal_url(suffix='/schedule/%d/%d' % (start_previous.year, start_previous.month))"
                                     title="Previous month"
                                 >
-                                    <i class="fa fa-chevron-left" />
+                                    <i class="oi" data-icon="chevron_left" />
                                 </a>
                             </th>
                             <th
@@ -65,7 +65,7 @@
                                     class="btn btn-secondary"
                                     title="Next month"
                                 >
-                                    <i class="fa fa-chevron-right" />
+                                    <i class="oi" data-icon="chevron_right" />
                                 </a>
                             </th>
                         </tr>
@@ -438,7 +438,7 @@
                             class="btn btn-primary"
                             t-att-href="booking_sudo.get_portal_url(suffix='/schedule')"
                         >
-                            <i class="fa fa-calendar" />
+                            <i class="oi" data-icon="calendar_today" />
                             Schedule
                         </a>
                     </div>
@@ -452,14 +452,14 @@
                             class="btn btn-secondary"
                             t-att-href="booking_sudo.get_portal_url(suffix='/schedule')"
                         >
-                            <i class="fa fa-calendar" />
+                            <i class="oi" data-icon="calendar_today" />
                             Reschedule
                         </a>
                     </div>
                 </t>
                 <div class="col-sm-auto mt8">
                     <a role="button" class="btn btn-secondary" href="#discussion">
-                        <i class="fa fa-comment" />
+                        <i class="oi" data-icon="chat_bubble" />
                         Feedback
                     </a>
                 </div>
@@ -474,7 +474,7 @@
                             data-bs-target="#modal_cancel"
                             href="#"
                         >
-                            <i class="fa fa-times" />
+                            <i class="oi" data-icon="close" />
                             Cancel
                         </a>
                     </div>
@@ -514,7 +514,7 @@
                                 t-att-href="booking_sudo.get_portal_url(suffix='/cancel')"
                                 class="btn btn-danger"
                             >
-                                <i class="fa fa-times" />
+                                <i class="oi" data-icon="close" />
                                 Cancel this booking
                             </a>
                             <button

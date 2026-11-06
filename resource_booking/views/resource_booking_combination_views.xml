@@ -22,7 +22,7 @@
                             name="action_open_bookings"
                             type="object"
                             class="oe_stat_button"
-                            icon="fa-calendar"
+                            icon="calendar_today"
                         >
                             <field name="booking_count" widget="statinfo" />
                         </button>
@@ -30,7 +30,7 @@
                             name="action_open_resource_booking_types"
                             type="object"
                             class="oe_stat_button"
-                            icon="fa-calendar"
+                            icon="calendar_today"
                         >
                             <field name="type_count" widget="statinfo" />
                         </button>

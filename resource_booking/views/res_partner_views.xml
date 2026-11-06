@@ -11,7 +11,7 @@
                     type="object"
                     name="action_view_resource_booking"
                     groups="resource_booking.group_user"
-                    icon="fa-calendar"
+                    icon="calendar_today"
                 >
                     <field
                         string="Bookings"
