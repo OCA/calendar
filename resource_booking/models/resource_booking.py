@@ -552,6 +552,38 @@ class ResourceBooking(models.Model):
                 )
             )
 
+    @api.constrains("start", "type_id")
+    def _check_max_advance_booking_days(self):
+        """Bookings must start within the advance horizon of their type.
+
+        Capping the suggested slots is not enough on its own: the portal
+        confirm route takes the start from the request, so a start beyond the
+        horizon has to be refused here too. Managers scheduling from the
+        backend are exempt, as they are for the modifications deadline in
+        :meth:`_compute_is_modifiable`.
+        """
+        is_manager = not self.env.context.get(
+            "using_portal"
+        ) and self.env.user.has_group("resource_booking.group_manager")
+        if is_manager:
+            return
+        now = fields.Datetime.now()
+        too_late = self.browse()
+        for one in self.filtered(
+            lambda one: one.start and one.type_id.max_advance_booking_days
+        ):
+            horizon = now + timedelta(days=one.type_id.max_advance_booking_days)
+            if one.start > horizon:
+                too_late += one
+        if too_late:
+            raise ValidationError(
+                self.env._(
+                    "Cannot schedule these bookings because they start after "
+                    "the maximum advance allowed by their type:\n\n- %s",
+                    "\n- ".join(too_late.mapped("display_name")),
+                )
+            )
+
     def _get_available_slots(self, start_dt, end_dt):
         """Return available slots for scheduling current booking."""
         result = {}
@@ -561,6 +593,16 @@ class ResourceBooking(models.Model):
         start_dt = max(
             start_dt, now + timedelta(hours=self.type_id.modifications_deadline)
         )
+        # Cap the search window when the booking type restricts how far in
+        # advance a slot may start. Capping the end of the window is enough:
+        # both _work_intervals_batch and _get_intervals clip their result to
+        # it, so no slot can stop after the window, and therefore none can
+        # start later than the horizon.
+        max_advance_days = self.type_id.max_advance_booking_days
+        if max_advance_days:
+            end_dt = min(
+                end_dt, now + timedelta(days=max_advance_days) + booking_duration
+            )
         # available_intervals should start with the beginning of the work day,
         # to compute each slot based on the beginning of the work day.
         workday_min = start_dt.replace(hour=0, minute=0, second=0, microsecond=0)

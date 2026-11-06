@@ -314,3 +314,30 @@ class PortalCase(HttpCase):
             "There are currently no bookings for your account.",
             response.text,
         )
+
+    def test_portal_confirm_beyond_max_advance(self):
+        """Tampering with ``when`` cannot book past the type's horizon.
+
+        The schedule page only offers slots inside the horizon, so the way to
+        sidestep it from a browser is to submit a legitimate confirm form with
+        a different ``when``. That carries a valid CSRF token, so capping the
+        offered slots is not enough on its own.
+        """
+        self.rbt.max_advance_booking_days = 4
+        booking = self.env["resource.booking"].create(
+            {"partner_ids": [(4, self.partner.id)], "type_id": self.rbt.id}
+        )
+        page = self._url_xml(booking.get_portal_url(suffix="/schedule/2021/3"))
+        form = page.cssselect("form[id^='modal-confirm-']")[0]
+        data = {
+            element.get("name"): element.get("value")
+            for element in form.cssselect("input")
+        }
+        # Next Monday 08:00 fits the calendar, but is 10 days out
+        data["when"] = "2021-03-08T08:00:00+00:00"
+        page = self._url_xml(form.get("action"), data)
+        # Back on the schedule page, with the reason shown, nothing confirmed
+        self.assertIn("maximum advance", page.text_content())
+        booking.invalidate_recordset()
+        self.assertEqual(booking.state, "pending")
+        self.assertFalse(booking.meeting_id)
