@@ -263,6 +263,69 @@ class TestWebsiteAppointmentBooking(HttpCase):
         self.assertEqual(len(partners), 1)
         self.assertEqual(partners.name, "Existing User")
 
+    def test_booking_form_has_optional_company_and_phone(self):
+        """The form asks for company and phone without requiring them."""
+        page = self._url_xml("/book/test-booking/2021/3")
+        for name in ("company", "phone"):
+            inputs = page.cssselect(f"#o_wab_form input[name='{name}']")
+            self.assertTrue(inputs)
+            self.assertIsNone(inputs[0].get("required"))
+
+    def test_confirm_stores_company_and_phone(self):
+        """A new contact gets the company name and phone given."""
+        self._confirm(
+            {
+                "name": "Test Visitor",
+                "email": "visitor@example.com",
+                "company": "  Visitor Inc  ",
+                "phone": "+34 600 000 000",
+                "when": "2021-03-01T10:00:00+00:00",
+            }
+        )
+        partner = self._booking_for("visitor@example.com").partner_id
+        self.assertEqual(partner.company_name, "Visitor Inc")
+        self.assertEqual(partner.phone, "+34 600 000 000")
+        self.assertFalse(partner.parent_id, "no company record is created")
+
+    def test_existing_partner_keeps_company_and_phone(self):
+        """A contact's company name and phone are only filled when empty."""
+        partner = self.env["res.partner"].create(
+            {
+                "name": "Existing User",
+                "email": "existing@example.com",
+                "company_name": "Existing Inc",
+                "phone": "+1 555 0100",
+            }
+        )
+        self._confirm(
+            {
+                "name": "Existing User",
+                "email": "existing@example.com",
+                "company": "Other Inc",
+                "phone": "+1 555 0199",
+                "when": "2021-03-01T10:00:00+00:00",
+            }
+        )
+        self.assertEqual(partner.company_name, "Existing Inc")
+        self.assertEqual(partner.phone, "+1 555 0100")
+
+    def test_existing_partner_gets_missing_company_and_phone(self):
+        """A contact without company name or phone gets the ones given."""
+        partner = self.env["res.partner"].create(
+            {"name": "Existing User", "email": "existing@example.com"}
+        )
+        self._confirm(
+            {
+                "name": "Existing User",
+                "email": "existing@example.com",
+                "company": "Existing Inc",
+                "phone": "+1 555 0100",
+                "when": "2021-03-01T10:00:00+00:00",
+            }
+        )
+        self.assertEqual(partner.company_name, "Existing Inc")
+        self.assertEqual(partner.phone, "+1 555 0100")
+
     def test_website_description_displayed(self):
         """Website description is shown on the booking page."""
         self.rbt.website_description = "<p>Welcome to our booking page!</p>"

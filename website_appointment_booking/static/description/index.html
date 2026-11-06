@@ -458,7 +458,9 @@ website.</li>
 <li>Visitors see a monthly calendar with available days highlighted, in
 their own timezone; a dropdown lets them display another one.</li>
 <li>Clicking a day reveals the available time slots for that day.</li>
-<li>Clicking a time slot shows a simple form asking for name and email.</li>
+<li>Clicking a time slot shows a simple form asking for name and email,
+and optionally company and phone. They are saved on the visitor’s
+contact; an existing contact only gets the ones it lacks.</li>
 <li>Upon confirmation, a <tt class="docutils literal">resource.booking</tt> record is created and
 confirmed automatically, and calendar invitations are sent to both
 parties. The meeting organizer is the assigned resource’s user.</li>
@@ -548,8 +550,9 @@ returns the rendering values; overrides add keys. <tt class="docutils literal">p
 (tz-aware slots with one day of padding) is exposed for them.</li>
 <li><tt class="docutils literal">_get_error_message(code)</tt>: extend the code → message map.</li>
 <li><tt class="docutils literal">_check_submission(kwargs, action)</tt>,
-<tt class="docutils literal">_get_or_create_partner(name, email)</tt>: reusable by other public
-forms of the page.</li>
+<tt class="docutils literal">_get_or_create_partner(name, email, company=None, phone=None)</tt> and
+<tt class="docutils literal">_get_optional_contact_values(kwargs)</tt> (the trimmed <tt class="docutils literal">company</tt> and
+<tt class="docutils literal">phone</tt> inputs): reusable by other public forms of the page.</li>
 <li>Template anchors: <tt class="docutils literal">.o_wab_alerts_row</tt> (error alert) and
 <tt class="docutils literal">.o_wab_calendar_row</tt> (calendar block) for <tt class="docutils literal">xpath</tt> insertions;
 <tt class="docutils literal">booking_form_guard</tt> for the hidden fields any new form must

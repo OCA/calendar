@@ -105,7 +105,9 @@ Once a booking type is published:
 2. Visitors see a monthly calendar with available days highlighted, in
    their own timezone; a dropdown lets them display another one.
 3. Clicking a day reveals the available time slots for that day.
-4. Clicking a time slot shows a simple form asking for name and email.
+4. Clicking a time slot shows a simple form asking for name and email,
+   and optionally company and phone. They are saved on the visitor's
+   contact; an existing contact only gets the ones it lacks.
 5. Upon confirmation, a ``resource.booking`` record is created and
    confirmed automatically, and calendar invitations are sent to both
    parties. The meeting organizer is the assigned resource's user.
@@ -182,8 +184,9 @@ Extension points
   (tz-aware slots with one day of padding) is exposed for them.
 - ``_get_error_message(code)``: extend the code → message map.
 - ``_check_submission(kwargs, action)``,
-  ``_get_or_create_partner(name, email)``: reusable by other public
-  forms of the page.
+  ``_get_or_create_partner(name, email, company=None, phone=None)`` and
+  ``_get_optional_contact_values(kwargs)`` (the trimmed ``company`` and
+  ``phone`` inputs): reusable by other public forms of the page.
 - Template anchors: ``.o_wab_alerts_row`` (error alert) and
   ``.o_wab_calendar_row`` (calendar block) for ``xpath`` insertions;
   ``booking_form_guard`` for the hidden fields any new form must

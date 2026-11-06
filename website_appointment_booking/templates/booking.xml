@@ -347,6 +347,36 @@
                                                 />
                                             </div>
                                         </div>
+                                        <div class="row g-3 mb-3">
+                                            <div class="col-md-6">
+                                                <label
+                                                    for="o_wab_company"
+                                                    class="form-label"
+                                                >Company (optional)</label>
+                                                <input
+                                                    type="text"
+                                                    class="form-control"
+                                                    id="o_wab_company"
+                                                    name="company"
+                                                    maxlength="128"
+                                                    autocomplete="organization"
+                                                />
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label
+                                                    for="o_wab_phone"
+                                                    class="form-label"
+                                                >Phone (optional)</label>
+                                                <input
+                                                    type="tel"
+                                                    class="form-control"
+                                                    id="o_wab_phone"
+                                                    name="phone"
+                                                    maxlength="32"
+                                                    autocomplete="tel"
+                                                />
+                                            </div>
+                                        </div>
                                         <button
                                             type="submit"
                                             class="btn btn-primary o_wab_submit_btn"
