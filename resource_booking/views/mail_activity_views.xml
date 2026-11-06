@@ -1,4 +1,4 @@
-<?xml version="1.0" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
     <record id="mail_activity_view_form_popup" model="ir.ui.view">
         <field name="name">mail.activity.form.inherit.booking</field>
@@ -23,7 +23,7 @@
             <xpath expr="//button[@name='action_done']" position="attributes">
                 <attribute
                     name="invisible"
-                >activity_category in ['resource_booking','meeting'] or chaining_type == 'trigger'</attribute>
+                >activity_category in ['resource_booking','meeting']</attribute>
             </xpath>
             <xpath expr="//field[@name='note']" position="attributes">
                 <attribute

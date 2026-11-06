@@ -44,7 +44,9 @@ class MailActivity(models.Model):
 
     def _action_done(self, feedback=False, attachment_ids=False):
         bookings = self.mapped("booking_id")
-        messages, activities = super()._action_done(
+        # Odoo 20: `_action_done` returns the posted messages only, the
+        # activities are archived in place.
+        messages = super()._action_done(
             feedback=feedback, attachment_ids=attachment_ids
         )
         if feedback:
@@ -60,4 +62,4 @@ class MailActivity(models.Model):
                     else "",
                 )
                 booking.write({"description": description})
-        return messages, activities
+        return messages

@@ -19,7 +19,7 @@ class ResourceResource(models.Model):
         )
         return bookings._check_scheduling()
 
-    def is_available(self, start_dt, end_dt, domain=None, tz=None):
+    def is_available(self, start_dt, end_dt, domain=None):
         """Convenience method to check whether a resource is available within a
         time span.
         """
@@ -29,7 +29,10 @@ class ResourceResource(models.Model):
         # available here, we set the value to -1.
         result = self.calendar_id.with_context(
             analyzing_booking=-1
-        )._work_intervals_batch(start_dt, end_dt, resources=self, domain=domain, tz=tz)[
-            self.id
-        ]
+        )._work_intervals_batch(
+            start_dt,
+            end_dt,
+            resources_per_tz=self._get_resources_per_tz(),
+            domain=domain,
+        )[self.id]
         return _availability_is_fitting(result, start_dt, end_dt)

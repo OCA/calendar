@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <!-- Copyright 2021 Tecnativa - Jairo Llopis
      Copyright 2023 Tecnativa - Carolina Fernandez
      License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
@@ -22,7 +22,7 @@
         <t t-set="start_next" t-value="start + relativedelta(months=1)" />
         <t t-set="start_previous" t-value="start - relativedelta(months=1)" />
         <div class="o_booking_calendar">
-            <div class="alert alert-danger" t-if="not slots">
+            <div t-if="not slots" class="alert alert-danger">
                 No free slots found this month.
                 <a
                 t-att-href="booking.get_portal_url(suffix='/schedule/%d/%d' % (start_next.year, start_next.month))"
@@ -47,8 +47,8 @@
                             <th class="text-start">
                                 <a
                                     t-if="start > now"
-                                    t-att-href="booking.get_portal_url(suffix='/schedule/%d/%d' % (start_previous.year, start_previous.month))"
                                     class="btn btn-secondary"
+                                    t-att-href="booking.get_portal_url(suffix='/schedule/%d/%d' % (start_previous.year, start_previous.month))"
                                     title="Previous month"
                                 >
                                     <i class="fa fa-chevron-left" />
@@ -96,13 +96,13 @@
                                             <!-- Day dropdown -->
                                             <div class="dropdown">
                                                 <button
+                                                    t-attf-id="dropdown-trigger-#{day.isoformat()}"
                                                     class="btn btn-primary dropdown-toggle"
                                                     type="button"
                                                     data-bs-toggle="dropdown"
                                                     aria-haspopup="true"
                                                     aria-expanded="false"
                                                     t-out="day.day"
-                                                    t-attf-id="dropdown-trigger-#{day.isoformat()}"
                                                 />
                                                 <div
                                                     class="dropdown-menu slots-dropdown"
@@ -137,7 +137,7 @@
                             <td
                                 colspan="7"
                             > All times are displayed using this timezone: <strong
-                                t-field="booking.type_id.resource_calendar_id.tz"
+                                t-out="booking.type_id._booking_timezone()"
                             />
                             </td>
                         </tr>
@@ -151,13 +151,13 @@
             >
                 <t t-foreach="week" t-as="day">
                     <form
+                        t-attf-id="modal-confirm-#{int(slot.timestamp())}"
+                        class="modal fade"
                         t-foreach="slots.get(day, [])"
                         t-as="slot"
                         method="post"
                         t-att-action="confirm_url"
-                        t-attf-id="modal-confirm-#{int(slot.timestamp())}"
                         t-attf-aria-labelledby="modal-title-#{int(slot.timestamp())}"
-                        class="modal fade"
                     >
                         <input
                             type="hidden"
@@ -250,30 +250,25 @@
                     </t>
                 </li>
                 <li
-                    class="breadcrumb-item active"
                     t-if="page_name == 'booking_schedule'"
+                    class="breadcrumb-item active"
                 >Schedule</li>
             </t>
         </xpath>
     </template>
-    <template
-        id="portal_my_home"
-        inherit_id="portal.portal_my_home"
-        customize_show="True"
-        priority="30"
-    >
-        <div id="portal_common_category" position="inside">
-            <t t-call="portal.portal_docs_entry">
-                <t
-                    t-set="icon"
-                    t-value="'/resource_booking/static/src/img/portal_icon.svg'"
-                />
-                <t t-set="title">Bookings</t>
-                <t t-set="url" t-value="'/my/bookings'" />
-                <t t-set="placeholder_count" t-value="'booking_count'" />
-            </t>
-        </div>
-    </template>
+    <record id="portal_entry_bookings" model="portal.entry">
+        <field name="name">Bookings</field>
+        <field name="description">Manage your resource bookings</field>
+        <field name="category">client_category</field>
+        <field name="url">/my/bookings</field>
+        <field name="sequence">60</field>
+        <field name="show_in_portal" eval="True" />
+        <field
+            name="image"
+            type="bytes"
+            file="resource_booking/static/src/img/portal_icon.svg"
+        />
+    </record>
     <template id="portal_my_bookings" name="My Bookings">
         <t t-call="portal.portal_layout">
             <t t-set="breadcrumbs_searchbar" t-value="True" />
@@ -425,8 +420,8 @@
                             </div>
                             <div
                                 t-if="booking_sudo.is_overdue"
-                                role="alert"
                                 class="mb-1 alert alert-warning"
+                                role="alert"
                             >
                                 This booking exceeded its modifications deadline.
                             </div>
@@ -485,7 +480,7 @@
                     </div>
                 </t>
             </div>
-            <div role="dialog" class="modal fade" id="modal_cancel">
+            <div id="modal_cancel" class="modal fade" role="dialog">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <input

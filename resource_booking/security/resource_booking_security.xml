@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <!-- Copyright 2021 Tecnativa - Jairo Llopis
      Copyright 2023 Tecnativa - Carolina Fernandez
      License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
@@ -22,45 +22,25 @@
         />
     </record>
     <data noupdate="1">
-        <record id="rule_resource_booking_type_company" model="ir.rule">
+        <!-- In Odoo 20, an `ir.access` record without a group is a
+             restriction (AND-ed with the permissions), while a record with a
+             group is a permission (OR-ed with the other permissions of the
+             user). Group-specific rules from `ir.rule` therefore cannot stay
+             here: their domains live on the matching permission in
+             `ir.access.csv`. Only the global (all-users) rules remain. -->
+        <record id="rule_resource_booking_type_company" model="ir.access">
             <field name="name">Resource booking type multi company rule</field>
+            <field name="operation">crud</field>
             <field name="model_id" ref="model_resource_booking_type" />
-            <field name="global" eval="True" />
-            <field
-                name="domain_force"
-            >[('company_id', 'in', company_ids + [False])]</field>
+            <field name="domain">[('company_id', 'in', company_ids + [False])]</field>
         </record>
-
-        <record id="rule_resource_booking_company" model="ir.rule">
+        <record id="rule_resource_booking_company" model="ir.access">
             <field name="name">Resource booking multi company rule</field>
+            <field name="operation">crud</field>
             <field name="model_id" ref="model_resource_booking" />
-            <field name="global" eval="True" />
             <field
-                name="domain_force"
+                name="domain"
             >[('type_id.company_id', 'in', company_ids + [False])]</field>
-        </record>
-
-        <record id="rule_resource_booking_portal" model="ir.rule">
-            <field name="name">Resource booking portal rule</field>
-            <field name="model_id" ref="model_resource_booking" />
-            <field name="groups" eval="[(4, ref('base.group_portal'))]" />
-            <field
-                name="domain_force"
-            >['|', ('partner_ids', 'child_of', user.partner_id.ids), ('message_partner_ids', 'child_of', user.partner_id.ids)]</field>
-        </record>
-        <record id="rule_resource_booking_user" model="ir.rule">
-            <field name="name">Resource booking user rule</field>
-            <field name="model_id" ref="model_resource_booking" />
-            <field name="groups" eval="[(4, ref('group_user'))]" />
-            <field
-                name="domain_force"
-            >['|', '|', ('partner_ids', 'child_of', user.partner_id.ids), ('message_partner_ids', 'child_of', user.partner_id.ids), ('combination_id.resource_ids.user_id', 'in', user.ids)]</field>
-        </record>
-        <record id="rule_resource_booking_manager" model="ir.rule">
-            <field name="name">Resource booking manager rule</field>
-            <field name="model_id" ref="model_resource_booking" />
-            <field name="groups" eval="[(4, ref('group_manager'))]" />
-            <field name="domain_force">[(1, '=', 1)]</field>
         </record>
     </data>
 </data>

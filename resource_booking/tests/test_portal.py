@@ -2,7 +2,7 @@
 # Copyright 2023 Tecnativa - Carolina Fernandez
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 from freezegun import freeze_time
 from lxml.html import fromstring
@@ -153,7 +153,7 @@ class PortalCase(HttpCase):
         self.assertTrue(public_page.cssselect(".o_booking_calendar .dropdown"))
         self.assertTrue(public_page.cssselect(".o_booking_calendar form"))
         # Public guy makes reservation next Monday at 10:00
-        slot = datetime(2021, 3, 1, 10).timestamp()
+        slot = datetime(2021, 3, 1, 10, tzinfo=timezone.utc).timestamp()
         selector_10am = (
             "#dropdown-trigger-2021-03-01 "
             "+ .slots-dropdown .dropdown-item:contains('10:00')"
@@ -186,7 +186,7 @@ class PortalCase(HttpCase):
         self.assertTrue(
             public_page.cssselect(
                 'div:contains("Dates:")'
-                ':contains("03/01/2021 at (10:00:00 AM To 10:30:00 AM) (UTC)")'
+                ':contains("03/01/2021 at (10:00 AM To 10:30 AM) (UTC)")'
             )
         )
         # Public guy's booking and related meeting are OK in backend
@@ -228,7 +228,7 @@ class PortalCase(HttpCase):
         # He can't select that slot anymore, so he books it 30 minutes later
         self.assertFalse(portal_page.cssselect(selector_10am))
         self.assertTrue(portal_page.cssselect(selector_1030am))
-        slot = datetime(2021, 3, 1, 10, 30).timestamp()
+        slot = datetime(2021, 3, 1, 10, 30, tzinfo=timezone.utc).timestamp()
         self.assertTrue(portal_page.cssselect("#dropdown-trigger-2021-03-08"))
         form = portal_page.cssselect(f"form#modal-confirm-{int(slot)}")[0]
         portal_url = form.get("action")
@@ -252,7 +252,7 @@ class PortalCase(HttpCase):
         self.assertTrue(
             portal_page.cssselect(
                 'div:contains("Dates:")'
-                ':contains("03/01/2021 at (10:30:00 AM To 11:30:00 AM) (UTC)")'
+                ':contains("03/01/2021 at (10:30 AM To 11:30 AM) (UTC)")'
             )
         )
         # Portal guy cancels
@@ -260,6 +260,40 @@ class PortalCase(HttpCase):
         portal_url = link.get("href")
         portal_page = self._url_xml(portal_url)
         self.assertTrue(portal_page.cssselect(".oe_login_form"))
+
+    def test_portal_access_scope(self):
+        """Portal users only read their own bookings, and cannot modify them."""
+        own = self.env["resource.booking"].create(
+            {
+                "partner_ids": [(4, self.user_portal.partner_id.id)],
+                "type_id": self.rbt.id,
+            }
+        )
+        other = self.env["resource.booking"].create(
+            {
+                "partner_ids": [(4, self.partner.id)],
+                "type_id": self.rbt.id,
+            }
+        )
+        own_as_portal = own.with_user(self.user_portal)
+        other_as_portal = other.with_user(self.user_portal)
+        self.assertTrue(own_as_portal.has_access("read"))
+        self.assertFalse(other_as_portal.has_access("read"))
+        self.assertFalse(own_as_portal.has_access("write"))
+        self.assertFalse(own_as_portal.has_access("unlink"))
+
+    def test_portal_home_bookings_card(self):
+        """Portal users see the Bookings card on their home page."""
+        entry = self.env.ref("resource_booking.portal_entry_bookings")
+        self.authenticate("ptl", "ptl")
+        response = self.url_open("/my", timeout=10)
+        self.assertEqual(response.status_code, 200)
+        tree = fromstring(response.text)
+        card = tree.cssselect(f'div[data-id="{entry.id}"]')
+        self.assertTrue(card, "the Bookings card should be rendered")
+        self.assertNotIn(
+            "d-none", card[0].get("class", ""), "the Bookings card should be visible"
+        )
 
     def test_portal_home_no_resource_booking_access(self):
         """Internal users without resource_booking permissions can still view /my.
@@ -290,6 +324,12 @@ class PortalCase(HttpCase):
             tree.cssselect(".o_portal_my_home, .o_portal_wrap"),
             "Portal home wrapper element should render even without "
             "resource.booking read access",
+        )
+        entry = self.env.ref("resource_booking.portal_entry_bookings")
+        card = tree.cssselect(f'div[data-id="{entry.id}"]')
+        self.assertTrue(card, "the Bookings card should still be rendered")
+        self.assertIn(
+            "d-none", card[0].get("class", ""), "the Bookings card should be hidden"
         )
 
     def test_portal_my_bookings_no_access_renders_empty(self):

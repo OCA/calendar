@@ -8,3 +8,4 @@ from . import resource_booking_type_combination_rel
 from . import resource_calendar
 from . import resource_resource
 from . import mail_activity
+from . import portal_entry

@@ -19,8 +19,9 @@ class CalendarAttendee(models.Model):
         """
         res = super()._compute_mail_tz()
         for attendee in self:
-            booking = attendee.event_id.sudo().resource_booking_ids
-            booking_tz = booking.type_id.resource_calendar_id.tz
-            if booking_tz:
-                attendee.mail_tz = booking_tz
+            # Plain calendar events have no booking: keep the attendee's own
+            # timezone instead of failing on an empty recordset.
+            booking_type = attendee.event_id.sudo().resource_booking_ids.type_id[:1]
+            if booking_type:
+                attendee.mail_tz = booking_type._booking_timezone()
         return res

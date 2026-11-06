@@ -8,7 +8,7 @@ from odoo import api, fields, models
 
 class ResourceBookingType(models.Model):
     _name = "resource.booking.type"
-    _inherit = ["mail.thread", "mail.activity.mixin"]
+    _inherit = ("mail.thread", "mail.activity.mixin")
     _description = "Resource Booking Type"
     _duration_positive = models.Constraint(
         "CHECK (duration > 0)",
@@ -52,7 +52,6 @@ class ResourceBookingType(models.Model):
         index=True,
         readonly=False,
         store=True,
-        string="Company",
         help="Company where this booking type is available.",
     )
     duration = fields.Float(
@@ -114,6 +113,19 @@ class ResourceBookingType(models.Model):
         )
         for booking_type in self:
             booking_type.booking_count = booking_data.get(booking_type, 0)
+
+    def _booking_timezone(self):
+        """Return the effective timezone of this booking type.
+
+        Odoo 20 removed ``tz`` from ``resource.calendar``: the timezone now
+        lives on the resource. Use the first resource of the availability
+        calendar, then fall back to the company, then to the user.
+        """
+        self.ensure_one()
+        resource = self.env["resource.resource"].search(
+            [("calendar_id", "=", self.resource_calendar_id.id)], limit=1
+        )
+        return resource.tz or self.company_id.partner_id.tz or self.env.user.tz or "UTC"
 
     @api.constrains("booking_ids", "resource_calendar_id", "combination_rel_ids")
     def _check_bookings_scheduling(self):

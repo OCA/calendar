@@ -90,12 +90,12 @@ class ResourceBookingCombination(models.Model):
                 if not combination_intervals:
                     break  # Can't restrict more
                 calendar = combination.forced_calendar_id or res.calendar_id
-                # combination_intervals &= calendar._work_intervals(start_dt,
-                # end_dt, res)
+                # Odoo 20: `_work_intervals_batch` takes a mapping of timezone
+                # to resources instead of a bare recordset.
                 combination_intervals_in_tz = calendar._work_intervals_batch(
-                    start_dt, end_dt, res
+                    start_dt, end_dt, res._get_resources_per_tz()
                 )[res.id]
-                if tz and calendar.tz != tz.zone:
+                if tz and res.tz != tz.key:
                     new_intervals = []
                     for interval in combination_intervals_in_tz:
                         start = interval[0].astimezone(tz)

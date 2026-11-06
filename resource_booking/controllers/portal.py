@@ -19,7 +19,7 @@ class CustomerPortal(portal.CustomerPortal):
             "resource.booking", booking_id, access_token
         )
         return booking_sudo.with_context(
-            using_portal=True, tz=booking_sudo.type_id.resource_calendar_id.tz
+            using_portal=True, tz=booking_sudo.type_id._booking_timezone()
         )
 
     def _prepare_home_portal_values(self, counters):

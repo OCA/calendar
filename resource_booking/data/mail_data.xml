@@ -1,9 +1,9 @@
-<?xml version="1.0" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <odoo noupdate="1">
     <record id="mail_activity_data_resource_booking" model="mail.activity.type">
         <field name="category">resource_booking</field>
         <field name="name">Resource Booking</field>
         <field name="icon">fa-users</field>
-        <field name="sequence">11</field>
+        <field name="sequence" eval="11" />
     </record>
 </odoo>

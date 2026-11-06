@@ -4,10 +4,10 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 import calendar
-from datetime import datetime, timedelta
+from datetime import timedelta
+from zoneinfo import ZoneInfo
 
 from dateutil.relativedelta import relativedelta
-from pytz import timezone
 
 from odoo import api, fields, models
 from odoo.exceptions import ValidationError
@@ -50,7 +50,7 @@ def _availability_is_fitting(available_intervals, start_dt, stop_dt):
 
 class ResourceBooking(models.Model):
     _name = "resource.booking"
-    _inherit = ["mail.thread", "mail.activity.mixin", "portal.mixin"]
+    _inherit = ("mail.thread", "mail.activity.mixin", "portal.mixin")
     _description = "Resource Booking"
     _order = "start DESC"
     _combination_required_if_event = models.Constraint(
@@ -65,7 +65,6 @@ class ResourceBooking(models.Model):
     active = fields.Boolean(default=True)
     meeting_id = fields.Many2one(
         comodel_name="calendar.event",
-        string="Meeting",
         context={"default_res_id": False, "default_res_model": False},
         copy=False,
         index=True,
@@ -183,7 +182,6 @@ class ResourceBooking(models.Model):
     )
     type_id = fields.Many2one(
         comodel_name="resource.booking.type",
-        string="Type",
         index=True,
         ondelete="cascade",
         required=True,
@@ -371,26 +369,26 @@ class ResourceBooking(models.Model):
         resource_partners = self.combination_id.resource_ids.filtered(
             lambda res: res.resource_type == "user"
         ).mapped("user_id.partner_id")
-        meeting_vals = dict(
-            alarm_ids=[(6, 0, self.type_id.alarm_ids.ids)],
-            categ_ids=[(6, 0, self.categ_ids.ids)],
-            duration=self.duration,
-            location=self.location,
-            videocall_location=self.videocall_location,
-            name=self.name
+        meeting_vals = {
+            "alarm_ids": [(6, 0, self.type_id.alarm_ids.ids)],
+            "categ_ids": [(6, 0, self.categ_ids.ids)],
+            "duration": self.duration,
+            "location": self.location,
+            "videocall_location": self.videocall_location,
+            "name": self.name
             or self._get_name_formatted(self.partner_ids[0], self.type_id),
-            partner_ids=[
+            "partner_ids": [
                 (4, partner.id, 0) for partner in self.partner_ids | resource_partners
             ],
-            resource_booking_ids=[(6, 0, self.ids)],
-            start=self.start,
-            stop=self.stop,
-            user_id=self.user_id.id,
-            show_as="busy",
+            "resource_booking_ids": [(6, 0, self.ids)],
+            "start": self.start,
+            "stop": self.stop,
+            "user_id": self.user_id.id,
+            "show_as": "busy",
             # These 2 avoid creating event as activity
-            res_model_id=False,
-            res_id=False,
-        )
+            "res_model_id": False,
+            "res_id": False,
+        }
         if self.type_id.requester_advice:
             meeting_vals["description"] = self.type_id.requester_advice
         return meeting_vals
@@ -418,7 +416,9 @@ class ResourceBooking(models.Model):
                         meeting = meeting.with_context(from_ui=True)
                     meeting.write(meeting_vals)
                 else:
-                    event_tz = one.type_id.resource_calendar_id.tz or False
+                    # Odoo 20: resource.calendar has no timezone anymore, the
+                    # booking type derives it from its resources.
+                    event_tz = one.type_id._booking_timezone()
                     if event_tz:
                         meeting_vals["event_tz"] = event_tz
                     to_create.append(meeting_vals)
@@ -598,9 +598,15 @@ class ResourceBooking(models.Model):
             analyzing_booking=booking_id, exclude_public_holidays=True
         )
         # RBT calendar uses no resources to restrict bookings
+        tz = ZoneInfo(self.type_id._booking_timezone())
         if booking.type_id:
+            # Odoo 20: calendars have no timezone anymore, so their attendance
+            # hours are read in the timezone given to the interval engine.
+            # Use the booking timezone instead of the viewer's one.
             result = booking.type_id.resource_calendar_id._work_intervals_batch(
-                start_dt, end_dt
+                start_dt,
+                end_dt,
+                resources_per_tz={tz: booking.env["resource.resource"]},
             )[False]
         else:
             result = Intervals([])
@@ -611,13 +617,12 @@ class ResourceBooking(models.Model):
             or booking.combination_id
             or booking.mapped("type_id.combination_rel_ids.combination_id")
         ).with_context(analyzing_booking=booking_id)
-        tz = timezone(self.type_id.resource_calendar_id.tz)
         result &= combinations._get_intervals(start_dt, end_dt, tz)
         return result
 
     def _sync_booking_activities_date(self):
         for rec in self.filtered("booking_activity_ids"):
-            start = rec.start or (datetime.now() + relativedelta(years=1000))
+            start = rec.start or (fields.Datetime.now() + relativedelta(years=1000))
             rec.booking_activity_ids.date_deadline = start
             # Set calendar_event_id to show Re-schedule button in activity block
             rec.booking_activity_ids.calendar_event_id = rec.meeting_id
