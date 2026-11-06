@@ -460,7 +460,10 @@ their own timezone; a dropdown lets them display another one.</li>
 <li>Clicking a day reveals the available time slots for that day.</li>
 <li>Clicking a time slot shows a simple form asking for name and email,
 and optionally company and phone. They are saved on the visitor’s
-contact; an existing contact only gets the ones it lacks.</li>
+contact; an existing contact only gets the ones it lacks. The visitor
+can also say what they want to discuss: the text is kept as the
+booking’s description and added to the meeting description, after the
+type’s advice.</li>
 <li>Upon confirmation, a <tt class="docutils literal">resource.booking</tt> record is created and
 confirmed automatically, and calendar invitations are sent to both
 parties. The meeting organizer is the assigned resource’s user.</li>
@@ -489,6 +492,13 @@ from the name once, never overwritten afterwards, and normalised with
 the platform <tt class="docutils literal">slugify</tt> on create/write so a hand-typed value is
 URL-safe. It is unique (SQL constraint) and mandatory to publish
 (Python constraint).</li>
+<li><tt class="docutils literal">resource.booking._prepare_meeting_vals</tt>: under the context key
+<tt class="docutils literal">website_appointment_booking_notes</tt>, set by the confirm route, the
+meeting description is the type’s advice followed by the booking’s
+description (the visitor’s notes, escaped with <tt class="docutils literal">plaintext2html</tt>).
+Other bookings keep the advice only, since their description may hold
+internal text. A meeting created again later, from the back office,
+has the advice only.</li>
 </ul>
 </div>
 <div class="section" id="controller">

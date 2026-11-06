@@ -12,6 +12,12 @@ computation of `resource_booking` instead of duplicating it.
   never overwritten afterwards, and normalised with the platform `slugify` on
   create/write so a hand-typed value is URL-safe. It is unique (SQL constraint) and
   mandatory to publish (Python constraint).
+- `resource.booking._prepare_meeting_vals`: under the context key
+  `website_appointment_booking_notes`, set by the confirm route, the meeting
+  description is the type's advice followed by the booking's description (the
+  visitor's notes, escaped with `plaintext2html`). Other bookings keep the advice
+  only, since their description may hold internal text. A meeting created again
+  later, from the back office, has the advice only.
 
 ## Controller
 

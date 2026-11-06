@@ -377,6 +377,19 @@
                                                 />
                                             </div>
                                         </div>
+                                        <div class="mb-3">
+                                            <label
+                                                for="o_wab_notes"
+                                                class="form-label"
+                                            >What would you like to discuss? (optional)</label>
+                                            <textarea
+                                                class="form-control"
+                                                id="o_wab_notes"
+                                                name="notes"
+                                                rows="3"
+                                                maxlength="2000"
+                                            />
+                                        </div>
                                         <button
                                             type="submit"
                                             class="btn btn-primary o_wab_submit_btn"

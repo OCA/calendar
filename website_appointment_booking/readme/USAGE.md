@@ -6,7 +6,9 @@ Once a booking type is published:
 3. Clicking a day reveals the available time slots for that day.
 4. Clicking a time slot shows a simple form asking for name and email, and
    optionally company and phone. They are saved on the visitor's contact; an
-   existing contact only gets the ones it lacks.
+   existing contact only gets the ones it lacks. The visitor can also say what
+   they want to discuss: the text is kept as the booking's description and added
+   to the meeting description, after the type's advice.
 5. Upon confirmation, a `resource.booking` record is created and confirmed
    automatically, and calendar invitations are sent to both parties. The
    meeting organizer is the assigned resource's user.

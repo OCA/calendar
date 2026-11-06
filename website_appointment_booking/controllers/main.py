@@ -14,7 +14,7 @@ from werkzeug.exceptions import NotFound
 from odoo import SUPERUSER_ID, http
 from odoo.exceptions import ValidationError
 from odoo.http import request
-from odoo.tools.mail import email_normalize
+from odoo.tools.mail import email_normalize, plaintext2html
 
 _logger = logging.getLogger(__name__)
 
@@ -26,6 +26,7 @@ RECAPTCHA_ACTION = "website_appointment_booking"
 # Longest company name and phone kept from the optional inputs of the forms.
 COMPANY_MAX_LENGTH = 128
 PHONE_MAX_LENGTH = 32
+NOTES_MAX_LENGTH = 2000
 
 
 def sitemap_booking(env, rule, qs):
@@ -315,6 +316,7 @@ class WebsiteAppointmentBooking(http.Controller):
         name = (kwargs.get("name") or "").strip()
         email = (kwargs.get("email") or "").strip()
         when_str = kwargs.get("when", "")
+        notes = (kwargs.get("notes") or "").strip()[:NOTES_MAX_LENGTH]
         if not name or not email or not when_str:
             return self._redirect_error(slug, "missing_fields")
         email = email_normalize(email)
@@ -348,6 +350,7 @@ class WebsiteAppointmentBooking(http.Controller):
                     tz=resource_tz,
                     using_portal=True,
                     mail_create_nosubscribe=True,
+                    website_appointment_booking_notes=True,
                 ).create(
                     {
                         "type_id": booking_type.id,
@@ -356,6 +359,7 @@ class WebsiteAppointmentBooking(http.Controller):
                         # The organizer defaults to the current (public) user.
                         # Set it once the combination is known, see below.
                         "user_id": False,
+                        "description": plaintext2html(notes) if notes else False,
                     }
                 )
                 booking.start = when_naive

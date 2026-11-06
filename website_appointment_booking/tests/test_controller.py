@@ -271,6 +271,65 @@ class TestWebsiteAppointmentBooking(HttpCase):
             self.assertTrue(inputs)
             self.assertIsNone(inputs[0].get("required"))
 
+    def test_booking_form_has_optional_notes(self):
+        """The form asks for the purpose of the meeting without requiring it."""
+        page = self._url_xml("/book/test-booking/2021/3")
+        notes = page.cssselect("#o_wab_form textarea[name='notes']")
+        self.assertTrue(notes)
+        self.assertIsNone(notes[0].get("required"))
+
+    def test_confirm_notes_reach_booking_and_meeting(self):
+        """The notes go to the booking and, after the type's advice, to the
+        meeting its invitation is sent from."""
+        self.rbt.requester_advice = "Bring your questions"
+        self._confirm(
+            {
+                "name": "Test Visitor",
+                "email": "visitor@example.com",
+                "notes": "Migration from Odoo 16",
+                "when": "2021-03-01T10:00:00+00:00",
+            }
+        )
+        booking = self._booking_for("visitor@example.com")
+        self.assertIn("Migration from Odoo 16", booking.description)
+        description = booking.meeting_id.description
+        self.assertIn("Bring your questions", description)
+        self.assertIn("Migration from Odoo 16", description)
+        self.assertLess(
+            description.index("Bring your questions"),
+            description.index("Migration from Odoo 16"),
+        )
+
+    def test_confirm_notes_are_escaped(self):
+        """Markup typed by a visitor is shown as text, not rendered."""
+        self._confirm(
+            {
+                "name": "Test Visitor",
+                "email": "visitor@example.com",
+                "notes": "<b>bold</b> <script>alert(1)</script>",
+                "when": "2021-03-01T10:00:00+00:00",
+            }
+        )
+        booking = self._booking_for("visitor@example.com")
+        for html in (booking.description, booking.meeting_id.description):
+            self.assertNotIn("<script", html)
+            self.assertNotIn("<b>", html)
+            self.assertIn("&lt;b&gt;bold&lt;/b&gt;", html)
+
+    def test_confirm_without_notes_keeps_the_advice(self):
+        """Without notes the meeting description is the type's advice."""
+        self.rbt.requester_advice = "Bring your questions"
+        self._confirm(
+            {
+                "name": "Test Visitor",
+                "email": "visitor@example.com",
+                "when": "2021-03-01T10:00:00+00:00",
+            }
+        )
+        booking = self._booking_for("visitor@example.com")
+        self.assertFalse(booking.description)
+        self.assertIn("Bring your questions", booking.meeting_id.description)
+
     def test_confirm_stores_company_and_phone(self):
         """A new contact gets the company name and phone given."""
         self._confirm(
