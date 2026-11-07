@@ -38,7 +38,7 @@
                                 />
                                 <div class="d-flex flex-wrap gap-2">
                                     <span class="o_wab_meta_pill">
-                                        <i class="fa fa-clock-o" />
+                                        <i class="oi" data-icon="schedule" />
                                         <t
                                             t-out="'%d min' % int(booking_type.duration * 60)"
                                         />
@@ -47,7 +47,7 @@
                                         t-if="booking_type.location"
                                         class="o_wab_meta_pill"
                                     >
-                                        <i class="fa fa-map-marker" />
+                                        <i class="oi" data-icon="location_on" />
                                         <t t-out="booking_type.location" />
                                     </span>
                                 </div>
@@ -63,7 +63,7 @@
                                 class="alert o_wab_error alert-dismissible fade show d-flex align-items-center gap-2"
                                 role="alert"
                             >
-                                <i class="fa fa-exclamation-circle text-danger" />
+                                <i class="oi text-danger" data-icon="error" />
                                 <span>
                                     <t t-out="error" />
                                 </span>
@@ -97,7 +97,10 @@
                                 <!-- No slots this month -->
                                 <t t-if="not slots">
                                     <div class="o_wab_empty_month">
-                                        <i class="fa fa-calendar-o d-block" />
+                                        <i
+                                            class="oi d-block"
+                                            data-icon="calendar_today"
+                                        />
                                         <p class="mb-2">
                                             No available slots this month.
                                         </p>
@@ -106,7 +109,10 @@
                                             class="btn btn-outline-primary btn-sm"
                                         >
                                             Try next month
-                                            <i class="fa fa-arrow-right ms-1" />
+                                            <i
+                                            class="oi ms-1"
+                                            data-icon="arrow_forward"
+                                        />
                                         </a>
                                     </div>
                                 </t>
@@ -126,7 +132,10 @@
                                                         class="o_wab_nav_btn"
                                                         aria-label="Previous month"
                                                     >
-                                                        <i class="fa fa-chevron-left" />
+                                                        <i
+                                                            class="oi"
+                                                            data-icon="chevron_left"
+                                                        />
                                                     </a>
                                                 </t>
                                                 <span t-else="" style="width:2.2rem" />
@@ -139,7 +148,10 @@
                                                     class="o_wab_nav_btn"
                                                     aria-label="Next month"
                                                 >
-                                                    <i class="fa fa-chevron-right" />
+                                                    <i
+                                                        class="oi"
+                                                        data-icon="chevron_right"
+                                                    />
                                                 </a>
                                             </div>
 
@@ -271,7 +283,7 @@
                                                 id="o_wab_slots_empty"
                                                 class="o_wab_slots_panel o_wab_slots_empty"
                                             >
-                                                <i class="fa fa-hand-pointer-o" />
+                                                <i class="oi" data-icon="touch_app" />
                                                 <span
                                                 >Select a day to view available times</span>
                                             </div>
@@ -313,7 +325,10 @@
                                         />
                                         <div class="mb-3">
                                             <span class="o_wab_selected_slot">
-                                                <i class="fa fa-calendar-check-o" />
+                                                <i
+                                                    class="oi"
+                                                    data-icon="event_available"
+                                                />
                                                 <span id="o_wab_selected_display" />
                                             </span>
                                         </div>
@@ -351,7 +366,7 @@
                                             type="submit"
                                             class="btn btn-primary o_wab_submit_btn"
                                         >
-                                            <i class="fa fa-check me-1" />
+                                            <i class="oi me-1" data-icon="check" />
                                             Confirm Booking
                                         </button>
                                     </form>
@@ -372,7 +387,7 @@
                         <div class="col-lg-6 mx-auto text-center o_wab_success">
                             <div class="mb-4">
                                 <span class="o_wab_success_icon">
-                                    <i class="fa fa-check" />
+                                    <i class="oi" data-icon="check" />
                                 </span>
                             </div>
                             <h1 class="h2 fw-bold">Booking Confirmed!</h1>
@@ -387,7 +402,7 @@
                                     style="max-width: 380px;"
                                 >
                                     <div class="o_wab_detail_row">
-                                        <i class="fa fa-calendar" />
+                                        <i class="oi" data-icon="calendar_today" />
                                         <div>
                                             <div class="o_wab_detail_label">Date</div>
                                             <div class="o_wab_detail_value">
@@ -398,7 +413,7 @@
                                         </div>
                                     </div>
                                     <div class="o_wab_detail_row">
-                                        <i class="fa fa-clock-o" />
+                                        <i class="oi" data-icon="schedule" />
                                         <div>
                                             <div class="o_wab_detail_label">Time</div>
                                             <div class="o_wab_detail_value">
@@ -416,7 +431,7 @@
                                     </div>
                                     <t t-if="last_booking.get('duration')">
                                         <div class="o_wab_detail_row">
-                                            <i class="fa fa-hourglass-half" />
+                                            <i class="oi" data-icon="hourglass_top" />
                                             <div>
                                                 <div
                                                     class="o_wab_detail_label"
@@ -431,7 +446,7 @@
                                     </t>
                                     <t t-if="last_booking.get('location')">
                                         <div class="o_wab_detail_row">
-                                            <i class="fa fa-map-marker" />
+                                            <i class="oi" data-icon="location_on" />
                                             <div>
                                                 <div
                                                     class="o_wab_detail_label"
@@ -446,7 +461,7 @@
                                     </t>
                                 </div>
                                 <p class="mt-4 text-muted small">
-                                    <i class="fa fa-envelope-o me-1" />
+                                    <i class="oi me-1" data-icon="mail" />
                                     A calendar invitation has been sent to your email.
                                 </p>
                             </t>
@@ -459,7 +474,7 @@
                                 t-attf-href="/book/#{booking_type.website_slug}"
                                 class="btn btn-outline-primary mt-3"
                             >
-                                <i class="fa fa-arrow-left me-1" />
+                                <i class="oi me-1" data-icon="arrow_back" />
                                 Book another appointment
                             </a>
                         </div>

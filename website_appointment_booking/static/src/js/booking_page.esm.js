@@ -5,8 +5,7 @@
 /**
  * Public booking page interactivity.
  *
- * Uses Odoo's publicWidget system so that the widget initializes correctly
- * with deferred/lazy asset loading in Odoo 18.  Reads slot data from a
+ * Uses the Odoo 20 public Interaction system. Reads slot data from a
  * hidden data attribute rendered server-side and handles day/slot
  * selection without additional network requests.
  *
@@ -19,8 +18,10 @@
  * (overrides browser detection); a dropdown lets the visitor pick.
  */
 
+import {registry} from "@web/core/registry";
+import {Interaction} from "@web/public/interaction";
+
 import {FormGuard} from "@website_appointment_booking/js/form_guard.esm";
-import publicWidget from "@web/legacy/js/public/public_widget";
 
 export const RECAPTCHA_ACTION = "website_appointment_booking";
 
@@ -55,12 +56,9 @@ function _detectBrowserTz() {
  * Description block: when it holds several ``<details>`` sections, keep at
  * most one open. ``toggle`` does not bubble, so bind each element directly.
  */
-publicWidget.registry.WebsiteAppointmentDescription = publicWidget.Widget.extend({
-    selector: ".o_wab_description",
+class WebsiteAppointmentDescription extends Interaction {
+    static selector = ".o_wab_description";
 
-    /**
-     * @override
-     */
     start() {
         const details = this.el.querySelectorAll("details");
         for (const el of details) {
@@ -75,26 +73,20 @@ publicWidget.registry.WebsiteAppointmentDescription = publicWidget.Widget.extend
                 }
             });
         }
-        return this._super(...arguments);
-    },
-});
+    }
+}
 
-publicWidget.registry.WebsiteAppointmentBooking = publicWidget.Widget.extend({
-    selector: ".o_wab_calendar",
-    events: {
-        "click .o_wab_day_available": "_onDayClick",
-        "keydown .o_wab_day_available": "_onDayKeydown",
-        "click .o_wab_slot_btn": "_onSlotClick",
-        "change #o_wab_tz_select": "_onTzSelectChange",
-    },
+registry
+    .category("public.interactions")
+    .add("website_appointment_booking.description", WebsiteAppointmentDescription);
 
-    /**
-     * @override
-     */
+class WebsiteAppointmentBooking extends Interaction {
+    static selector = ".o_wab_calendar";
+
     start() {
         const dataEl = this.el.querySelector("#o_wab_slot_data");
         if (!dataEl) {
-            return this._super(...arguments);
+            return;
         }
         this.allSlots = JSON.parse(dataEl.dataset.slots || "[]");
         this.panel = this.el.querySelector("#o_wab_slots_panel");
@@ -144,8 +136,42 @@ publicWidget.registry.WebsiteAppointmentBooking = publicWidget.Widget.extend({
                 slot
             );
         }
-        return this._super(...arguments);
-    },
+        this._bindEvents();
+    }
+
+    _bindEvents() {
+        const onClick = (ev) => {
+            const day = ev.target.closest(".o_wab_day_available");
+            if (day && this.el.contains(day)) {
+                this._onDayClick({currentTarget: day});
+                return;
+            }
+            const slot = ev.target.closest(".o_wab_slot_btn");
+            if (slot && this.el.contains(slot)) {
+                this._onSlotClick({currentTarget: slot});
+            }
+        };
+        const onKeydown = (ev) => {
+            const day = ev.target.closest(".o_wab_day_available");
+            if (day && (ev.key === "Enter" || ev.key === " ")) {
+                ev.preventDefault();
+                this._onDayClick({currentTarget: day});
+            }
+        };
+        const onChange = (ev) => {
+            if (ev.target.id === "o_wab_tz_select") {
+                this._onTzSelectChange({currentTarget: ev.target});
+            }
+        };
+        this.el.addEventListener("click", onClick);
+        this.el.addEventListener("keydown", onKeydown);
+        this.el.addEventListener("change", onChange);
+        this.registerCleanup(() => {
+            this.el.removeEventListener("click", onClick);
+            this.el.removeEventListener("keydown", onKeydown);
+            this.el.removeEventListener("change", onChange);
+        });
+    }
 
     // -------------------------------------------------------------------------
     // Timezone re-bucketing
@@ -202,7 +228,7 @@ publicWidget.registry.WebsiteAppointmentBooking = publicWidget.Widget.extend({
                 cell.removeAttribute("tabindex");
             }
         }
-    },
+    }
 
     _updateTzLabel(tz) {
         if (this.tzLabel) {
@@ -211,7 +237,7 @@ publicWidget.registry.WebsiteAppointmentBooking = publicWidget.Widget.extend({
         if (this.tzSecondary && tz !== this.resourceTz) {
             this.tzSecondary.classList.remove("d-none");
         }
-    },
+    }
 
     _ensureOptionPresent(select, value) {
         if (!value) {
@@ -225,7 +251,7 @@ publicWidget.registry.WebsiteAppointmentBooking = publicWidget.Widget.extend({
             // Insert at the top so it's the first thing users see.
             select.insertBefore(opt, select.firstChild);
         }
-    },
+    }
 
     // -------------------------------------------------------------------------
     // Handlers
@@ -312,7 +338,7 @@ publicWidget.registry.WebsiteAppointmentBooking = publicWidget.Widget.extend({
         if (this.panel) {
             this.panel.scrollIntoView({behavior: "smooth", block: "nearest"});
         }
-    },
+    }
 
     /**
      * Keyboard activation on day cells — Enter or Space mirrors a click.
@@ -324,7 +350,7 @@ publicWidget.registry.WebsiteAppointmentBooking = publicWidget.Widget.extend({
             ev.preventDefault();
             this._onDayClick(ev);
         }
-    },
+    }
 
     /**
      * Handle click on a time slot button.
@@ -353,7 +379,7 @@ publicWidget.registry.WebsiteAppointmentBooking = publicWidget.Widget.extend({
             this.form.classList.remove("d-none");
             this.form.scrollIntoView({behavior: "smooth", block: "nearest"});
         }
-    },
+    }
 
     /**
      * Tz dropdown change: reload with ``?tz=<value>`` so the server buckets
@@ -370,5 +396,9 @@ publicWidget.registry.WebsiteAppointmentBooking = publicWidget.Widget.extend({
         const url = new URL(window.location.href);
         url.searchParams.set("tz", tz);
         window.location.assign(url.toString());
-    },
-});
+    }
+}
+
+registry
+    .category("public.interactions")
+    .add("website_appointment_booking.booking", WebsiteAppointmentBooking);
