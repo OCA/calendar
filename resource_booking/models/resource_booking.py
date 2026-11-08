@@ -275,8 +275,9 @@ class ResourceBooking(models.Model):
                 item.display_name = template
             elif not item.name and item.id:
                 # Automatic name for backend users
+                partner = item.partner_ids[:1] or self.env.user.partner_id
                 item.display_name = self._get_name_formatted(
-                    item.partner_ids[0], item.type_id, item.meeting_id
+                    partner, item.type_id, item.meeting_id
                 )
         return res
 
@@ -369,6 +370,9 @@ class ResourceBooking(models.Model):
         resource_partners = self.combination_id.resource_ids.filtered(
             lambda res: res.resource_type == "user"
         ).mapped("user_id.partner_id")
+        # A pre-reservation created from the shop has no partner yet. Fall back
+        # to the current user so cancelling it does not crash.
+        partner = self.partner_ids[:1] or self.env.user.partner_id
         meeting_vals = {
             "alarm_ids": [(6, 0, self.type_id.alarm_ids.ids)],
             "categ_ids": [(6, 0, self.categ_ids.ids)],
@@ -376,7 +380,7 @@ class ResourceBooking(models.Model):
             "location": self.location,
             "videocall_location": self.videocall_location,
             "name": self.name
-            or self._get_name_formatted(self.partner_ids[0], self.type_id),
+            or self._get_name_formatted(partner, self.type_id),
             "partner_ids": [
                 (4, partner.id, 0) for partner in self.partner_ids | resource_partners
             ],
@@ -401,6 +405,10 @@ class ResourceBooking(models.Model):
         _self -= self.browse(self.env.context.get("syncing_booking_ids"))
         to_create, to_delete = [], _self.env["calendar.event"]
         for one in _self:
+            if one.state == "canceled":
+                # A canceled booking must not keep or create a calendar event.
+                to_delete |= one.meeting_id
+                continue
             if one.start:
                 meeting_vals = one._prepare_meeting_vals()
                 if one.meeting_id:
