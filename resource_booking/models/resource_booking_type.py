@@ -52,7 +52,6 @@ class ResourceBookingType(models.Model):
         index=True,
         readonly=False,
         store=True,
-        string="Company",
         help="Company where this booking type is available.",
     )
     duration = fields.Float(

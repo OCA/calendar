@@ -13,14 +13,12 @@ class ResourceBookingCombinationRel(models.Model):
     sequence = fields.Integer(index=True, required=True, default=100)
     combination_id = fields.Many2one(
         comodel_name="resource.booking.combination",
-        string="Combination",
         index=True,
         required=True,
         ondelete="cascade",
     )
     type_id = fields.Many2one(
         comodel_name="resource.booking.type",
-        string="Type",
         index=True,
         required=True,
         ondelete="cascade",

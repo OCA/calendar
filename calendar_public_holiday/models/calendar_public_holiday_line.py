@@ -30,7 +30,6 @@ class CalendarHolidaysPublicLine(models.Model):
     )
     meeting_id = fields.Many2one(
         "calendar.event",
-        string="Meeting",
         copy=False,
     )
 
