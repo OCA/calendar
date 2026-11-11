@@ -65,7 +65,6 @@ class ResourceBooking(models.Model):
     active = fields.Boolean(default=True)
     meeting_id = fields.Many2one(
         comodel_name="calendar.event",
-        string="Meeting",
         context={"default_res_id": False, "default_res_model": False},
         copy=False,
         index=True,
@@ -183,7 +182,6 @@ class ResourceBooking(models.Model):
     )
     type_id = fields.Many2one(
         comodel_name="resource.booking.type",
-        string="Type",
         index=True,
         ondelete="cascade",
         required=True,

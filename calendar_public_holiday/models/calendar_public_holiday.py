@@ -25,7 +25,7 @@ class ResourceCalendarPublicHoliday(models.Model):
         "public_holiday_id",
         "Holiday Dates",
     )
-    country_id = fields.Many2one("res.country", "Country")
+    country_id = fields.Many2one("res.country")
 
     @api.constrains("year", "country_id")
     def _check_year(self):
