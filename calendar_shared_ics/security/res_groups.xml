@@ -1,0 +1,5 @@
+<odoo>
+    <record id="group_calendar_shared_ics_manager" model="res.groups">
+        <field name="name">Shared ICS Calendar Manager</field>
+    </record>
+</odoo>

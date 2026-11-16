@@ -1,0 +1,95 @@
+<odoo>
+    <record id="view_calendar_shared_ics_tree" model="ir.ui.view">
+        <field name="name">calendar.shared.ics.tree</field>
+        <field name="model">calendar.shared.ics</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name" />
+                <field name="active" />
+                <field name="partner_id" />
+                <field name="apply_partner_filter" />
+            </list>
+        </field>
+    </record>
+
+    <record id="view_calendar_shared_ics_form" model="ir.ui.view">
+        <field name="name">calendar.shared.ics.form</field>
+        <field name="model">calendar.shared.ics</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="access_token" invisible="1" />
+                    <button
+                        name="action_open_share_wizard"
+                        type="object"
+                        string="Share"
+                        class="oe_highlight"
+                    />
+                    <button
+                        name="action_reset_access_token"
+                        type="object"
+                        string="Rotate access token"
+                        confirm="This will invalidate the existing subscription link. Continue?"
+                    />
+                </header>
+                <sheet>
+                    <group>
+                        <field name="name" />
+                        <field name="active" />
+                    </group>
+                    <group string="Feed scope">
+                        <field name="apply_user_filter" />
+                        <field
+                            name="include_internal_users"
+                            invisible="not apply_user_filter"
+                        />
+                        <field
+                            name="include_portal_users"
+                            invisible="not apply_user_filter"
+                        />
+                        <field name="allowed_partner_ids" invisible="1" />
+                        <field
+                            name="partner_id"
+                            domain="[('id', 'in', allowed_partner_ids)]"
+                        />
+                        <field name="apply_partner_filter" />
+                        <field name="only_recent_events" />
+                        <field name="recent_days" invisible="not only_recent_events" />
+                        <field
+                            name="domain"
+                            widget="domain"
+                            options="{'model': 'calendar.event'}"
+                        />
+                    </group>
+                    <group string="Subscription link">
+                        <field
+                            name="share_webcal_url"
+                            readonly="1"
+                            widget="CopyClipboardChar"
+                        />
+                        <field
+                            name="share_url"
+                            readonly="1"
+                            widget="CopyClipboardChar"
+                        />
+                        <field name="access_url" readonly="1" widget="url" />
+                    </group>
+                </sheet>
+                <chatter />
+            </form>
+        </field>
+    </record>
+
+    <record id="action_calendar_shared_ics" model="ir.actions.act_window">
+        <field name="name">Shared ICS Calendars</field>
+        <field name="res_model">calendar.shared.ics</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem
+        id="menu_calendar_shared_ics_root"
+        name="Shared ICS"
+        parent="calendar.calendar_menu_config"
+        action="action_calendar_shared_ics"
+    />
+</odoo>
