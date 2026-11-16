@@ -5,7 +5,7 @@
 # Copyright 2024 Camptocamp
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
-from datetime import date
+from datetime import date, datetime
 
 from odoo import Command
 from odoo.exceptions import UserError, ValidationError
@@ -267,3 +267,89 @@ class TestCalendarPublicHoliday(BaseCommon):
         categ_id = self.env.ref("calendar_public_holiday.event_type_holiday", False)
         all_meetings = self.calendar_event.search([("categ_ids", "in", categ_id.id)])
         self.assertEqual(len(all_lines), len(all_meetings))
+
+
+class TestPublicHolidayLeaves(BaseCommon):
+    """Public holidays must block availability, not only show in the calendar.
+
+    A holiday event has no attendee, so working-hours engines never count it
+    as busy: the holiday also creates a global time off on the working hours
+    selected on the year.
+    """
+
+    _test_user_groups = ("base.group_user", "base.group_system")
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.calendar = cls.env["resource.calendar"].create(
+            {
+                "name": "Holiday calendar",
+                "attendance_ids": [
+                    Command.create(
+                        {
+                            "dayofweek": str(day),
+                            "hour_from": 8,
+                            "hour_to": 17,
+                            "day_period": "morning",
+                        }
+                    )
+                    for day in range(5)
+                ],
+            }
+        )
+        cls.env["resource.resource"].create(
+            {
+                "name": "Holiday resource",
+                "calendar_id": cls.calendar.id,
+                "resource_type": "material",
+                "tz": "America/Toronto",
+            }
+        )
+        cls.holiday = cls.env["calendar.public.holiday"].create(
+            {
+                "year": 2026,
+                "calendar_ids": [Command.set(cls.calendar.ids)],
+            }
+        )
+
+    def _line(self, day=date(2026, 12, 25)):
+        return self.env["calendar.public.holiday.line"].create(
+            {"name": "Noël", "date": day, "public_holiday_id": self.holiday.id}
+        )
+
+    def test_leave_bounds_follow_the_calendar_timezone(self):
+        line = self._line()
+        self.assertEqual(len(line.leave_ids), 1)
+        leave = line.leave_ids
+        self.assertFalse(leave.resource_id, "the time off must be global")
+        self.assertEqual(leave.calendar_id, self.calendar)
+        # Toronto is UTC-5 in December: the local day is 05:00 to 05:00 UTC.
+        self.assertEqual(leave.date_from, datetime(2026, 12, 25, 5, 0))
+        self.assertEqual(leave.date_to, datetime(2026, 12, 26, 5, 0))
+
+    def test_leave_follows_the_holiday_date(self):
+        line = self._line()
+        line.date = date(2026, 12, 24)
+        self.assertEqual(line.leave_ids.date_from, datetime(2026, 12, 24, 5, 0))
+
+    def test_removing_the_line_removes_the_leave(self):
+        line = self._line()
+        leave = line.leave_ids
+        line.unlink()
+        self.assertFalse(leave.exists())
+
+    def test_clearing_the_blocked_calendars_removes_the_leave(self):
+        line = self._line()
+        self.holiday.calendar_ids = [Command.clear()]
+        self.assertFalse(line.leave_ids)
+
+    def test_two_calendars_give_two_leaves(self):
+        other = self.env["resource.calendar"].create({"name": "Europe calendar"})
+        self.holiday.calendar_ids = [Command.link(other.id)]
+        line = self._line()
+        self.assertEqual(len(line.leave_ids), 2)
+        self.assertEqual(
+            set(line.leave_ids.mapped("calendar_id").ids),
+            set((self.calendar | other).ids),
+        )

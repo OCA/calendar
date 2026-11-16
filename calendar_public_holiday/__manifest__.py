@@ -6,7 +6,7 @@
 {
     "name": "Calendar Holidays Public",
     "summary": "Manage Public Holidays",
-    "version": "20.0.1.0.0",
+    "version": "20.0.1.1.0",
     "license": "AGPL-3",
     "category": "HR/Calendar",
     "author": "Michael Telahun Makonnen, "
@@ -16,7 +16,7 @@
     "Odoo Community Association (OCA), "
     "Camptocamp,",
     "website": "https://github.com/OCA/calendar",
-    "depends": ["calendar"],
+    "depends": ["calendar", "resource"],
     "external_dependencies": {"python": ["openupgradelib"]},
     "data": [
         "data/data.xml",

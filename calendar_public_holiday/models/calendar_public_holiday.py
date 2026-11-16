@@ -26,6 +26,14 @@ class ResourceCalendarPublicHoliday(models.Model):
         "Holiday Dates",
     )
     country_id = fields.Many2one("res.country")
+    calendar_ids = fields.Many2many(
+        comodel_name="resource.calendar",
+        string="Working Hours to Block",
+        help="Create a global time off on these working hours for every "
+        "holiday of this year, so they are not offered as available time. "
+        "Leave empty to only record the holidays and show them in the "
+        "calendar.",
+    )
 
     @api.constrains("year", "country_id")
     def _check_year(self):
@@ -54,6 +62,14 @@ class ResourceCalendarPublicHoliday(models.Model):
                 line.display_name = f"{line.year} ({line.country_id.name})"
             else:
                 line.display_name = line.year
+
+    def write(self, vals):
+        result = super().write(vals)
+        if "calendar_ids" in vals:
+            # The blocked working hours changed: resynchronise the time offs
+            # of every holiday of these years.
+            self.line_ids._sync_public_holiday_leaves()
+        return result
 
     def unlink(self):
         """Remove the generated meetings before the lines are cascade-deleted."""

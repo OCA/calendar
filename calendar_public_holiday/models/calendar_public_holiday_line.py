@@ -3,6 +3,9 @@
 # Copyright 2024 Camptocamp
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import datetime
+from zoneinfo import ZoneInfo
+
 from odoo import SUPERUSER_ID, api, fields, models
 from odoo.exceptions import ValidationError
 
@@ -30,6 +33,12 @@ class CalendarHolidaysPublicLine(models.Model):
     )
     meeting_id = fields.Many2one(
         "calendar.event",
+        copy=False,
+    )
+    leave_ids = fields.One2many(
+        comodel_name="resource.calendar.leaves",
+        inverse_name="public_holiday_line_id",
+        string="Global Time Off",
         copy=False,
     )
 
@@ -110,6 +119,55 @@ class CalendarHolidaysPublicLine(models.Model):
             if rec.meeting_id:
                 rec.meeting_id.write(rec._prepare_holidays_meeting_values())
 
+    def _prepare_leave_values(self, calendar):
+        """Global time off covering the holiday's local day on ``calendar``."""
+        self.ensure_one()
+        tz = ZoneInfo(calendar._public_holiday_timezone())
+        utc = ZoneInfo("UTC")
+        day = self.date
+        start = (
+            datetime.datetime.combine(day, datetime.time.min, tzinfo=tz)
+            .astimezone(utc)
+            .replace(tzinfo=None)
+        )
+        stop = (
+            datetime.datetime.combine(
+                day + datetime.timedelta(days=1), datetime.time.min, tzinfo=tz
+            )
+            .astimezone(utc)
+            .replace(tzinfo=None)
+        )
+        return {
+            "name": self.name,
+            "calendar_id": calendar.id,
+            "resource_id": False,
+            "date_from": start,
+            "date_to": stop,
+            "public_holiday_line_id": self.id,
+        }
+
+    def _sync_public_holiday_leaves(self):
+        """Create, update or drop the global time offs of these holidays.
+
+        A public holiday only blocks availability through a global time off:
+        the calendar event generated for the calendar view has no attendee, so
+        working-hours engines never count it as busy.
+        """
+        Leaves = self.env["resource.calendar.leaves"]
+        for line in self:
+            calendars = line.public_holiday_id.calendar_ids
+            current = line.leave_ids
+            for calendar in calendars:
+                values = line._prepare_leave_values(calendar)
+                leave = current.filtered(lambda one, c=calendar: one.calendar_id == c)
+                if leave:
+                    leave.write(
+                        {key: val for key, val in values.items() if key != "calendar_id"}
+                    )
+                else:
+                    Leaves.create(values)
+            (current - current.filtered(lambda one: one.calendar_id in calendars)).unlink()
+
     @api.model_create_multi
     def create(self, vals_list):
         res = super().create(vals_list)
@@ -117,7 +175,14 @@ class CalendarHolidaysPublicLine(models.Model):
             record.meeting_id = self.env["calendar.event"].create(
                 record._prepare_holidays_meeting_values()
             )
+        res._sync_public_holiday_leaves()
         return res
+
+    def write(self, vals):
+        result = super().write(vals)
+        if {"date", "name", "public_holiday_id"} & set(vals):
+            self._sync_public_holiday_leaves()
+        return result
 
     def unlink(self):
         self.mapped("meeting_id").unlink()

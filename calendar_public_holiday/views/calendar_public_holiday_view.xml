@@ -23,7 +23,11 @@
                         <field name="country_id" />
                     </group>
                     <group name="group_main_right">
-                        <!-- Left empty for extensions -->
+                        <field
+                            name="calendar_ids"
+                            widget="many2many_tags"
+                            options="{'no_create': True}"
+                        />
                     </group>
                 </group>
                 <separator string="Public Holidays" name="group_detail" />
