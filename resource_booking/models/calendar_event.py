@@ -90,15 +90,15 @@ class CalendarEvent(models.Model):
                 partner_ids = [cmd[2]["partner_id"]]
             elif cmd[0] == 6:
                 rb = self.env["resource.booking"].browse(cmd[2])
-                if rb.combination_auto_assign:
+                if rb.booking_mode != "resource" and rb.combination_auto_assign:
                     continue  # only auto-confirm if handpicked combination
-                partner_ids = rb.combination_id.resource_ids.user_id.partner_id.ids
+                partner_ids = rb._get_resources().user_id.partner_id.ids
         for command in attendee_commands:
             if command[0] != 0:
                 continue
             if not partner_ids:
                 rb = self.sudo().resource_booking_ids
-                partner_ids = rb.combination_id.resource_ids.user_id.partner_id.ids
+                partner_ids = rb._get_resources().user_id.partner_id.ids
             if command[2]["partner_id"] in partner_ids:
                 command[2]["state"] = "accepted"
         return attendee_commands

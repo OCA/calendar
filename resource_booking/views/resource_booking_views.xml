@@ -19,6 +19,7 @@
                 <field name="partner_ids" widget="many2many_tags" />
                 <field name="type_id" />
                 <field name="combination_id" />
+                <field name="resource_ids" widget="many2many_tags" />
                 <field name="description" />
             </calendar>
         </field>
@@ -32,6 +33,7 @@
                 <field name="partner_ids" widget="many2many_tags" optional="hide" />
                 <field name="type_id" />
                 <field name="combination_id" />
+                <field name="resource_ids" widget="many2many_tags" />
                 <field name="state" />
                 <field name="start" />
                 <field name="stop" />
@@ -137,8 +139,19 @@
                         <group name="booking">
                             <field name="partner_ids" widget="many2many_tags" />
                             <field name="type_id" />
-                            <label for="combination_id" />
-                            <div>
+                            <field name="booking_mode" invisible="1" />
+                            <field name="available_resource_ids" invisible="1" />
+                            <field
+                                name="resource_ids"
+                                widget="many2many_tags"
+                                invisible="booking_mode != 'resource'"
+                                required="booking_mode == 'resource' and state in ('scheduled', 'confirmed')"
+                            />
+                            <label
+                                for="combination_id"
+                                invisible="booking_mode != 'combination'"
+                            />
+                            <div invisible="booking_mode != 'combination'">
                                 <field name="combination_auto_assign" />
                                 <label
                                     for="combination_auto_assign"
@@ -153,7 +166,7 @@
                                 <field
                                     name="combination_id"
                                     class="oe_inline"
-                                    required="not combination_auto_assign and state in ('scheduled','confirmed')"
+                                    required="booking_mode == 'combination' and not combination_auto_assign and state in ('scheduled','confirmed')"
                                     readonly="combination_auto_assign"
                                 />
                             </div>
@@ -198,11 +211,12 @@
                 <field name="partner_ids" />
                 <field name="type_id" />
                 <field name="combination_id" />
+                <field name="resource_ids" widget="many2many_tags" />
                 <filter
                     name="is_mine"
                     string="Involving me"
                     context="{'virtual_id': False}"
-                    domain="['|', '|', ('partner_ids.user_ids', '=', uid), ('meeting_id.attendee_ids.partner_id.user_ids', '=', uid), ('combination_id.resource_ids.user_id', '=', uid)]"
+                    domain="['|', '|', '|', ('resource_ids.user_id', '=', uid), ('partner_ids.user_ids', '=', uid), ('meeting_id.attendee_ids.partner_id.user_ids', '=', uid), ('combination_id.resource_ids.user_id', '=', uid)]"
                 />
                 <filter
                     name="is_pending"

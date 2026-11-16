@@ -15,7 +15,13 @@ class ResourceResource(models.Model):
         bookings = (
             self.env["resource.booking"]
             .sudo()
-            .search([("combination_id.resource_ids", "in", self.ids)])
+            .search(
+                [
+                    "|",
+                    ("combination_id.resource_ids", "in", self.ids),
+                    ("resource_ids", "in", self.ids),
+                ]
+            )
         )
         return bookings._check_scheduling()
 

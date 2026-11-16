@@ -267,6 +267,12 @@ msgid "Available resource combinations"
 msgstr "Combinaciones de recursos disponibles"
 
 #. module: resource_booking
+#: model:ir.model.fields,field_description:resource_booking.field_resource_booking__available_resource_ids
+#: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__resource_ids
+msgid "Available resources"
+msgstr "Recursos disponibles"
+
+#. module: resource_booking
 #: model:ir.model,name:resource_booking.model_resource_booking_combination
 msgid "Bookable resource combinations"
 msgstr "Combinaciones de recursos reservables"
@@ -295,6 +301,12 @@ msgstr "Cuenta de reservas/citas"
 #: model:ir.model.fields,help:resource_booking.field_resource_booking_type__duration
 msgid "Booking default duration."
 msgstr "Duración por defecto de la reserva."
+
+#. module: resource_booking
+#: model:ir.model.fields,field_description:resource_booking.field_resource_booking__booking_mode
+#: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type__booking_mode
+msgid "Booking mode"
+msgstr "Modo de reserva"
 
 #. module: resource_booking
 #: model_terms:ir.ui.view,arch_db:resource_booking.portal_my_bookings
@@ -330,6 +342,18 @@ msgstr "Reservas/citas"
 #: model:ir.model.fields,help:resource_booking.field_resource_booking_type__booking_ids
 msgid "Bookings available for this type"
 msgstr "Reservas/citas disponibles para este tipo"
+
+#. module: resource_booking
+#: model:ir.model.fields.selection,name:resource_booking.selection__resource_booking__booking_mode__combination
+#: model:ir.model.fields.selection,name:resource_booking.selection__resource_booking_type__booking_mode__combination
+msgid "By combination"
+msgstr "Por combinación"
+
+#. module: resource_booking
+#: model:ir.model.fields.selection,name:resource_booking.selection__resource_booking__booking_mode__resource
+#: model:ir.model.fields.selection,name:resource_booking.selection__resource_booking_type__booking_mode__resource
+msgid "By resources"
+msgstr "Por recursos"
 
 #. module: resource_booking
 #: model:ir.model,name:resource_booking.model_calendar_attendee
@@ -1014,9 +1038,11 @@ msgstr ""
 
 #. module: resource_booking
 #: model:ir.model,name:resource_booking.model_resource_resource
+#: model:ir.model.fields,field_description:resource_booking.field_resource_booking__resource_ids
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_combination__resource_ids
 #: model:ir.ui.menu,name:resource_booking.menu_resource_resource
 #: model_terms:ir.ui.view,arch_db:resource_booking.portal_my_bookings
+#: model_terms:ir.ui.view,arch_db:resource_booking.resource_booking_type_view_form
 msgid "Resources"
 msgstr "Recursos"
 
@@ -1075,6 +1101,12 @@ msgstr ""
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking__access_token
 msgid "Security Token"
 msgstr "Token de seguridad"
+
+#. module: resource_booking
+#. odoo-python
+#: code:addons/resource_booking/models/resource_booking.py:0
+msgid "Select resources available for the booking type."
+msgstr "Seleccione recursos disponibles para el tipo de reserva."
 
 #. module: resource_booking
 #: model:ir.model.fields,field_description:resource_booking.field_resource_booking_type_combination_rel__sequence

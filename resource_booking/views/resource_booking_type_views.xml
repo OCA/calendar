@@ -55,7 +55,11 @@
                             />
                             <field name="requester_advice" />
                         </group>
+                        <group>
+                            <field name="booking_mode" widget="radio" />
+                        </group>
                         <group
+                            invisible="booking_mode != 'combination'"
                             string="Resource combinations"
                             name="combinations"
                             colspan="2"
@@ -67,6 +71,13 @@
                                     <field name="combination_id" />
                                 </list>
                             </field>
+                        </group>
+                        <group
+                            string="Resources"
+                            name="resources"
+                            invisible="booking_mode != 'resource'"
+                        >
+                            <field name="resource_ids" />
                         </group>
                     </group>
                 </sheet>

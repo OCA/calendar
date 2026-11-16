@@ -1232,3 +1232,69 @@ class BackendCaseCustom(BackendCaseBase):
         self.assertIn(user_0.partner_id, user_0_message.notified_partner_ids)
         user_1_message = messages.filtered(lambda x: user_1.partner_id in x.partner_ids)
         self.assertIn(user_1.partner_id, user_1_message.notified_partner_ids)
+
+
+@freeze_time("2021-02-26 09:00:00")
+class BackendCaseResources(BackendCaseBase):
+    @classmethod
+    def setUpClass(self):
+        super().setUpClass()
+        self.rbt.write(
+            {
+                "booking_mode": "resource",
+                "resource_ids": [Command.set((self.r_materials | self.r_users).ids)],
+            }
+        )
+
+    def _create_resource_booking(self, resources, **values):
+        return self.env["resource.booking"].create(
+            {
+                "type_id": self.rbt.id,
+                "partner_ids": [Command.set(self.partner.ids)],
+                "resource_ids": [Command.set(resources.ids)],
+                "start": "2021-03-01 09:00:00",
+                **values,
+            }
+        )
+
+    def test_selected_resources(self):
+        resources = self.r_materials[0] | self.r_users[0]
+        booking = self._create_resource_booking(resources)
+        self.assertFalse(booking.combination_id)
+        self.assertEqual(booking._get_resources(), resources)
+        self.assertIn(
+            self.r_users[0].user_id.partner_id, booking.meeting_id.partner_ids
+        )
+        booking.action_confirm()
+        self.assertEqual(booking.state, "confirmed")
+
+    def test_resource_conflict(self):
+        self._create_resource_booking(self.r_materials[0])
+        with self.assertRaises(ValidationError), self.env.cr.savepoint():
+            self._create_resource_booking(self.r_materials[0])
+        # Other resources remain available in the same time slot.
+        self._create_resource_booking(self.r_materials[2])
+
+    def test_resource_calendar(self):
+        with self.assertRaises(ValidationError), self.env.cr.savepoint():
+            self._create_resource_booking(self.r_materials[1])
+
+    def test_resources_required(self):
+        with self.assertRaises(ValidationError), self.env.cr.savepoint():
+            self._create_resource_booking(self.env["resource.resource"])
+
+    def test_resources_domain(self):
+        self.rbt.resource_ids = self.r_materials[0]
+        with self.assertRaises(ValidationError), self.env.cr.savepoint():
+            self._create_resource_booking(self.r_materials[2])
+
+    def test_mixed_modes_conflict(self):
+        combination_type = self.rbt.copy({"booking_mode": "combination"})
+        self._create_resource_booking(self.r_materials[0])
+        with self.assertRaises(ValidationError), self.env.cr.savepoint():
+            self._create_resource_booking(
+                self.env["resource.resource"],
+                type_id=combination_type.id,
+                combination_id=self.rbcs[0].id,
+                combination_auto_assign=False,
+            )
