@@ -1,0 +1,294 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* calendar_public_holiday
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: 2026-07-02 09:46+0000\n"
+"Last-Translator: Matjaz Mozetic <matjaz@luxim.si>\n"
+"Language-Team: none\n"
+"Language: sl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=4; plural=n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || "
+"n%100==4 ? 2 : 3;\n"
+"X-Generator: Weblate 5.15.2\n"
+
+#. module: calendar_public_holiday
+#: model_terms:ir.ui.view,arch_db:calendar_public_holiday.calendar_public_holiday_next_year_view
+msgid ""
+"By default, the most recent public holidays\n"
+"                            for each country are used as template to create\n"
+"                            public holidays for the year following the templates.\n"
+"                            <br/><br/>\n"
+"                            Normally, you should not need to input anything in\n"
+"                            optional fields and only need to click on the button\n"
+"                            \"Create\"."
+msgstr ""
+"Privzeto se kot predloga uporabijo najnovejši prazniki\n"
+"                            za vsako državo, da se ustvarijo\n"
+"                            prazniki za leto, ki sledi predlogam.\n"
+"                            <br/><br/>\n"
+"                            Običajno vam ni treba vnašati ničesar v\n"
+"                            neobvezna polja in je treba le klikniti gumb\n"
+"                            \"Ustvari\"."
+
+#. module: calendar_public_holiday
+#: model:ir.model,name:calendar_public_holiday.model_calendar_public_holiday
+msgid "Calendar Public Holiday"
+msgstr "Koledarski praznik"
+
+#. module: calendar_public_holiday
+#: model:ir.model,name:calendar_public_holiday.model_calendar_public_holiday_line
+msgid "Calendar Public Holiday Line"
+msgstr "Postavka koledarskega praznika"
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday__year
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_line__public_holiday_id
+msgid "Calendar Year"
+msgstr "Koledarsko leto"
+
+#. module: calendar_public_holiday
+#: model_terms:ir.ui.view,arch_db:calendar_public_holiday.calendar_public_holiday_next_year_view
+msgid "Cancel"
+msgstr "Prekliči"
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday__country_id
+msgid "Country"
+msgstr "Država"
+
+#. module: calendar_public_holiday
+#: model_terms:ir.ui.view,arch_db:calendar_public_holiday.calendar_public_holiday_next_year_view
+msgid "Create"
+msgstr "Ustvari"
+
+#. module: calendar_public_holiday
+#: model:ir.actions.act_window,name:calendar_public_holiday.action_create_next_year_public_holidays
+#: model:ir.ui.menu,name:calendar_public_holiday.menu_create_next_year_public_holidays
+#: model_terms:ir.ui.view,arch_db:calendar_public_holiday.calendar_public_holiday_next_year_view
+msgid "Create Next Year Public Holidays"
+msgstr "Ustvari praznike za naslednje leto"
+
+#. module: calendar_public_holiday
+#: model:ir.model,name:calendar_public_holiday.model_calendar_public_holiday_next_year
+msgid "Create Public Holiday From Existing Ones"
+msgstr "Ustvari praznike na podlagi obstoječih"
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday__create_uid
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_line__create_uid
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_next_year__create_uid
+msgid "Created by"
+msgstr "Ustvaril"
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday__create_date
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_line__create_date
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_next_year__create_date
+msgid "Created on"
+msgstr "Ustvarjeno"
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_line__date
+msgid "Date"
+msgstr "Datum"
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_line__variable_date
+msgid "Date may change"
+msgstr "Datum se lahko spremeni"
+
+#. module: calendar_public_holiday
+#. odoo-python
+#: code:addons/calendar_public_holiday/models/calendar_public_holiday_line.py:0
+msgid ""
+"Dates of holidays should be the same year as the calendar year they are "
+"being assigned to"
+msgstr ""
+"Datumi praznikov morajo biti v istem letu kot koledarsko leto, kateremu so "
+"dodeljeni"
+
+#. module: calendar_public_holiday
+#: model_terms:ir.ui.view,arch_db:calendar_public_holiday.calendar_public_holiday_next_year_view
+msgid "Defaults"
+msgstr "Privzete nastavitve"
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday__display_name
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_line__display_name
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_next_year__display_name
+msgid "Display Name"
+msgstr "Prikazani naziv"
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday__line_ids
+msgid "Holiday Dates"
+msgstr "Datumi praznikov"
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday__id
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_line__id
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_next_year__id
+msgid "ID"
+msgstr "ID"
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday__write_uid
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_line__write_uid
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_next_year__write_uid
+msgid "Last Updated by"
+msgstr "Zadnji posodobil"
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday__write_date
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_line__write_date
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_next_year__write_date
+msgid "Last Updated on"
+msgstr "Zadnjič posodobljeno"
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_line__meeting_id
+msgid "Meeting"
+msgstr "Sestanek"
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_line__name
+msgid "Name"
+msgstr "Naziv"
+
+#. module: calendar_public_holiday
+#. odoo-python
+#: code:addons/calendar_public_holiday/wizards/calendar_public_holiday_next_year_wizard.py:0
+msgid "New public holidays"
+msgstr "Novi prazniki"
+
+#. module: calendar_public_holiday
+#. odoo-python
+#: code:addons/calendar_public_holiday/wizards/calendar_public_holiday_next_year_wizard.py:0
+msgid ""
+"No Public Holidays found as template. Please create the first Public "
+"Holidays manually."
+msgstr ""
+"Kot predloga ni bilo najdenih praznikov. Prosimo, prve praznike ustvarite "
+"ročno."
+
+#. module: calendar_public_holiday
+#: model_terms:ir.ui.view,arch_db:calendar_public_holiday.calendar_public_holiday_next_year_view
+msgid "Optional"
+msgstr "Opcijsko"
+
+#. module: calendar_public_holiday
+#: model:ir.actions.act_window,name:calendar_public_holiday.open_calendar_public_holiday_view
+#: model:ir.ui.menu,name:calendar_public_holiday.menu_calendar_public_holiday
+#: model:ir.ui.menu,name:calendar_public_holiday.menu_calendar_public_holiday_view
+#: model_terms:ir.ui.view,arch_db:calendar_public_holiday.view_calendar_public_holiday_form
+msgid "Public Holidays"
+msgstr "Prazniki"
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_line__state_ids
+msgid "Related States"
+msgstr "Povezane regije"
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,help:calendar_public_holiday.field_calendar_public_holiday_next_year__public_holiday_ids
+msgid ""
+"Select the public holidays to use as template. If not set, latest public "
+"holidays of each country will be used. Only the last templates of each "
+"country for each year will be taken into account (If you select templates "
+"from 2012 and 2015, only the templates from 2015 will be taken into account."
+msgstr ""
+"Izberite praznike, ki jih želite uporabiti kot predlogo. Če ni nastavljeno, "
+"bodo uporabljeni najnovejši prazniki vsake države. Upoštevane bodo le zadnje "
+"predloge vsake države za vsako leto (če izberete predloge iz let 2012 in "
+"2015, bodo upoštevane le predloge iz leta 2015."
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_next_year__public_holiday_ids
+msgid "Templates"
+msgstr "Predloge"
+
+#. module: calendar_public_holiday
+#: model_terms:ir.ui.view,arch_db:calendar_public_holiday.calendar_public_holiday_next_year_view
+msgid ""
+"The below optional fields are here only to handle\n"
+"                            special situations like \"2011 was a special year with\n"
+"                            an additional public holiday for the 150th\n"
+"                            anniversary of the Italian unification, so you want to\n"
+"                            replicate the 2010 Italian holidays to 2012.\""
+msgstr ""
+"Spodnja neobvezna polja so tu le za obravnavo\n"
+"                            posebnih primerov, kot je \"2011 je bilo posebno "
+"leto z\n"
+"                            dodatnim praznikom ob 150.\n"
+"                            obletnici italijanske združitve, zato želite\n"
+"                            kopirati italijanske praznike iz leta 2010 v "
+"leto 2012.\""
+
+#. module: calendar_public_holiday
+#: model_terms:ir.ui.view,arch_db:calendar_public_holiday.calendar_public_holiday_next_year_view
+msgid ""
+"Use this wizard to create public holidays based on the\n"
+"                        existing ones.<br/>\n"
+"                        Only the last templates of each country\n"
+"                        will be taken into account (If you select templates\n"
+"                        from 2012 and 2015 of the same country; '\n"
+"                        only the templates from 2015 will be taken into\n"
+"                        account)."
+msgstr ""
+"S tem čarovnikom lahko ustvarite praznike na podlagi\n"
+"                        obstoječih.<br/>\n"
+"                        Upoštevane bodo le najnovejše predloge za vsako \n"
+"                        državo (če izberete predloge\n"
+"                        iz let 2012 in 2015 za isto državo,\n"
+"                        se bodo upoštevale le predloge iz leta \n"
+"                        2015)."
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,field_description:calendar_public_holiday.field_calendar_public_holiday_next_year__year
+msgid "Year"
+msgstr "Leto"
+
+#. module: calendar_public_holiday
+#: model:ir.model.fields,help:calendar_public_holiday.field_calendar_public_holiday_next_year__year
+msgid ""
+"Year for which you want to create the public holidays. By default, the year "
+"following the template."
+msgstr ""
+"Leto, za katero želite ustvariti praznike. Privzeto leto, ki sledi predlogi."
+
+#. module: calendar_public_holiday
+#. odoo-python
+#: code:addons/calendar_public_holiday/models/calendar_public_holiday_line.py:0
+msgid ""
+"You can't create duplicate public holiday per date %s and one of the country"
+" states."
+msgstr "Za datum %s in eno od regij ni mogoče ustvariti podvojenega praznika."
+
+#. module: calendar_public_holiday
+#. odoo-python
+#: code:addons/calendar_public_holiday/models/calendar_public_holiday_line.py:0
+msgid "You can't create duplicate public holiday per date %s."
+msgstr "Za datum %s ni mogoče ustvariti podvojenega praznika."
+
+#. module: calendar_public_holiday
+#. odoo-python
+#: code:addons/calendar_public_holiday/models/calendar_public_holiday.py:0
+msgid "You can't create duplicate public holiday per year and/or country"
+msgstr "Ne morete ustvariti podvojenega praznika za isto leto in/ali državo"
+
+#. module: calendar_public_holiday
+#. odoo-python
+#: code:addons/calendar_public_holiday/wizards/calendar_public_holiday_next_year_wizard.py:0
+msgid ""
+"You cannot use as template the public holidays of a year that includes "
+"public holidays on 29th of February (2016, 2020...), please select a "
+"template from another year."
+msgstr ""
+"Kot predloge ne morete uporabiti praznikov leta, ki vključuje praznike 29. "
+"februarja (2016, 2020 ...), prosimo, izberite predlogo iz drugega leta."
