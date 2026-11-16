@@ -1,0 +1,1 @@
+This addon adds a Calendar wizard for uploading an iCalendar (`.ics`) file. It creates calendar events from the file and uses each event's unique identifier (UID) to update the same event on a later import. It imports event descriptions and supports timed events, all-day events, time zones, and basic repeating rules.

@@ -1,0 +1,11 @@
+**Before you start.** The **Import Ics File** menu is hidden until an administrator assigns your user to the **Calendar Import Ics** access group. In developer mode, the administrator can open **Settings → Users & Companies → Groups**, find that group, and add your user. An ICS file is a calendar exchange file with a `.ics` extension. Each event needs a unique identifier (UID), a title, a start, and an end. The wizard imports events into your own Odoo calendar.
+
+1. In the **Calendar** app, open **Configuration** and select **Import Ics File**. The import form appears.
+2. Set **Start Import Date** if events must start on or after that date. Leave it empty to include earlier events.
+3. Set **End Import Date** if events must end on or before that date. Leave it empty to include later events. Both date filters must be empty when the file contains a repeating event.
+4. Review **Remove old events?**. It is selected by default. When selected, the import removes events previously imported for your calendar that are missing from this file within the selected date range. Clear it if the file is only a partial calendar export or if you want to retain earlier imports. Events shared with another person remain on that person's calendar.
+5. Upload the `.ics` file in the file field and select **Import**. Odoo creates new events and updates existing events with the same UID. Importing the same file again should not create extra events.
+
+**Check the result and handle errors.** Open the **Calendar** app and check an imported event's title, description, and dates. Outlook formatting in `X-ALT-DESC` is imported when it contains HTML, but an image with an empty `src` in the ICS file cannot be displayed. For example, an all-day event that starts on 1 September and has an exclusive ICS end date of 3 September appears in Odoo on 1 and 2 September. A timed event is converted from its ICS time zone to the corresponding Odoo time.
+
+If Odoo rejects the file, correct it and upload it again. The wizard rejects malformed files, events without required fields, and recurrence exceptions such as `EXDATE` or `RECURRENCE-ID`. A rejected import does not complete its cleanup step. Date filters for timed events use their UTC dates, so events near midnight can fall on a different date from the local calendar view.

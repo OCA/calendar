@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_wizard_calendar_import_ics,access_wizard_calendar_import_ics,model_calendar_import_ics,calendar_import_ics.group_calendar_import,1,1,1,1
