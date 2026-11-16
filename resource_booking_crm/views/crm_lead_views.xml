@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2026 ForgeFlow S.L.
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="crm_lead_view_form" model="ir.ui.view">
+        <field name="name">crm.lead.form - resource_booking_crm</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form" />
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button
+                    name="action_view_resource_bookings"
+                    type="object"
+                    class="oe_stat_button"
+                    icon="fa-calendar-check-o"
+                    invisible="not resource_booking_count"
+                    groups="resource_booking.group_user"
+                >
+                    <field
+                        name="resource_booking_count"
+                        widget="statinfo"
+                        string="Bookings"
+                    />
+                </button>
+            </div>
+        </field>
+    </record>
+</odoo>
