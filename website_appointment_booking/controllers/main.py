@@ -34,7 +34,11 @@ def sitemap_booking(env, rule, qs):
     cannot enumerate on its own, hence this explicit generator.
     """
     booking_types = (
-        env["resource.booking.type"].sudo().search([("is_published", "=", True)])
+        env["resource.booking.type"]
+        .sudo()
+        .search(
+            env["resource.booking.type"]._published_on_website_domain(env.website)
+        )
     )
     for booking_type in booking_types:
         loc = f"/book/{booking_type.website_slug}"
@@ -69,14 +73,11 @@ class WebsiteAppointmentBooking(http.Controller):
 
     def _get_booking_type(self, slug):
         """Look up a published booking type by its slug."""
-        return (
-            request.env["resource.booking.type"]
-            .sudo()
-            .search(
-                [("website_slug", "=", slug), ("is_published", "=", True)],
-                limit=1,
-            )
-        )
+        domain = request.env[
+            "resource.booking.type"
+        ]._published_on_website_domain(request.env.website)
+        domain.append(("website_slug", "=", slug))
+        return request.env["resource.booking.type"].sudo().search(domain, limit=1)
 
     @staticmethod
     def _validate_tz(tz):

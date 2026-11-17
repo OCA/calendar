@@ -25,11 +25,31 @@ class ResourceBookingType(models.Model):
         sanitize_attributes=False,
         help="Introductory text displayed on the public booking page.",
     )
+    website_id = fields.Many2one(
+        comodel_name="website",
+        string="Website",
+        index=True,
+        ondelete="cascade",
+        help="Restrict the public booking page to this website. "
+        "Leave empty to publish it on every website.",
+    )
 
     _website_slug_unique = models.Constraint(
         "UNIQUE(website_slug)",
         "The website slug must be unique.",
     )
+
+    @api.model
+    def _published_on_website_domain(self, website):
+        """Domain of the booking types a visitor may book on ``website``.
+
+        A type without website is published everywhere; a type bound to a
+        website is only bookable there.
+        """
+        return [
+            ("is_published", "=", True),
+            ("website_id", "in", [website.id, False]),
+        ]
 
     def _slugify(self, value):
         """URL-safe version of ``value`` (platform rules: ascii, lowercase, dashes)."""

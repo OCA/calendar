@@ -79,3 +79,56 @@ class TestResourceBookingTypeWebsite(TransactionCase):
         """Slug strips special characters and accents."""
         rbt = self._new_type("Réunion (30 min) & Café!")
         self.assertEqual(rbt.website_slug, "reunion-30-min-cafe")
+
+
+class TestWebsiteScoping(TransactionCase):
+    """A booking type bound to a website is only bookable there."""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        create_test_data(cls)
+        cls.Type = cls.env["resource.booking.type"]
+        cls.website = cls.env["website"].search([], limit=1)
+        cls.other_website = cls.env["website"].create(
+            {"name": "Other website", "domain": "https://other.test"}
+        )
+        cls.global_type = cls.Type.create(
+            {
+                "name": "Global booking",
+                "resource_calendar_id": cls.r_calendars[2].id,
+                "combination_rel_ids": [],
+                "is_published": True,
+                "website_slug": "global-booking",
+            }
+        )
+        cls.scoped_type = cls.Type.create(
+            {
+                "name": "Scoped booking",
+                "resource_calendar_id": cls.r_calendars[2].id,
+                "combination_rel_ids": [],
+                "is_published": True,
+                "website_slug": "scoped-booking",
+                "website_id": cls.other_website.id,
+            }
+        )
+
+    def test_domain_matches_global_and_current_website(self):
+        domain = self.Type._published_on_website_domain(self.website)
+        found = self.Type.search(domain)
+        self.assertIn(self.global_type, found)
+        self.assertNotIn(self.scoped_type, found)
+
+    def test_domain_matches_scoped_type_on_its_website(self):
+        found = self.Type.search(
+            self.Type._published_on_website_domain(self.other_website)
+        )
+        self.assertIn(self.global_type, found)
+        self.assertIn(self.scoped_type, found)
+
+    def test_unpublished_type_is_never_listed(self):
+        self.global_type.is_published = False
+        found = self.Type.search(
+            self.Type._published_on_website_domain(self.other_website)
+        )
+        self.assertNotIn(self.global_type, found)

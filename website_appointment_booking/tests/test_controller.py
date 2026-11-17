@@ -13,6 +13,7 @@ from lxml.html import fromstring
 from odoo.tests import tagged
 from odoo.tests.common import HttpCase
 
+from odoo.addons.http_routing.tests.common import MockRequest
 from odoo.addons.resource_booking.tests.common import create_test_data
 
 # The shared fixture (resource_booking.tests.common) has UTC calendars with
@@ -32,6 +33,18 @@ class TestWebsiteAppointmentBooking(HttpCase):
             {
                 "is_published": True,
                 "website_slug": "test-booking",
+            }
+        )
+        cls.website_other = cls.env["website"].create(
+            {"name": "Atelier test", "domain": "https://atelier.test"}
+        )
+        cls.rbt_other = cls.rbt.copy(
+            {
+                "name": "Atelier only",
+                "website_slug": "atelier-only",
+                "website_id": cls.website_other.id,
+                # ``is_published`` is not copied: publish the scoped type.
+                "is_published": True,
             }
         )
 
@@ -398,6 +411,54 @@ class TestWebsiteAppointmentBooking(HttpCase):
         self.assertIn("/success", response.url)
         booking = self._booking_for("offset@example.com")
         self.assertEqual(booking.start, datetime(2021, 3, 1, 10, 0))
+
+
+    def test_global_type_served_on_every_website(self):
+        """A type without website is bookable from any website."""
+        self.assertEqual(self.url_open("/book/test-booking").status_code, 200)
+        self.assertEqual(
+            self.url_open(
+                "/book/test-booking", headers={"Host": "atelier.test"}
+            ).status_code,
+            200,
+        )
+
+    def test_scoped_type_only_on_its_website(self):
+        """A type bound to a website is not served from the others."""
+        from odoo.addons.website_appointment_booking.controllers.main import (
+            WebsiteAppointmentBooking,
+        )
+
+        controller = WebsiteAppointmentBooking()
+        default_website = self.env["website"].search(
+            [("id", "!=", self.website_other.id)], limit=1
+        )
+        with MockRequest(self.env, website=self.website_other):
+            self.assertTrue(controller._get_booking_type("atelier-only"))
+        with MockRequest(self.env, website=default_website):
+            self.assertFalse(controller._get_booking_type("atelier-only"))
+
+    def test_sitemap_lists_scoped_page_only_on_its_website(self):
+        """Each website advertises only the booking pages it serves."""
+        from odoo.addons.website_appointment_booking.controllers.main import (
+            sitemap_booking,
+        )
+
+        default_website = self.env["website"].search(
+            [("id", "!=", self.website_other.id)], limit=1
+        )
+        # ``env.website`` reads the context: give each website its own env.
+        env_other = self.env(context=dict(self.env.context, website_id=self.website_other.id))
+        locs = [page["loc"] for page in sitemap_booking(env_other, None, "")]
+        self.assertIn("/book/atelier-only", locs)
+        self.assertIn("/book/test-booking", locs)
+        env_default = self.env(
+            context=dict(self.env.context, website_id=default_website.id)
+        )
+        locs = [page["loc"] for page in sitemap_booking(env_default, None, "")]
+        self.assertNotIn("/book/atelier-only", locs)
+        self.assertIn("/book/test-booking", locs)
+
 
 
 @freeze_time("2021-02-26 09:00:00", tick=True)

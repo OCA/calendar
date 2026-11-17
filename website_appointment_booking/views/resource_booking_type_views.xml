@@ -17,6 +17,7 @@
             <xpath expr="//group[@name='main']" position="after">
                 <group name="website" string="Website">
                     <group>
+                        <field name="website_id" options="{'no_create': True}" />
                         <field name="website_published" />
                         <field name="website_slug" invisible="not website_published" />
                         <field
