@@ -379,8 +379,7 @@ class ResourceBooking(models.Model):
             "duration": self.duration,
             "location": self.location,
             "videocall_location": self.videocall_location,
-            "name": self.name
-            or self._get_name_formatted(partner, self.type_id),
+            "name": self.name or self._get_name_formatted(partner, self.type_id),
             "partner_ids": [
                 (4, partner.id, 0) for partner in self.partner_ids | resource_partners
             ],
