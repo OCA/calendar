@@ -1,4 +1,4 @@
-from odoo import models
+from odoo import _, models
 from odoo.exceptions import UserError
 
 
@@ -9,7 +9,7 @@ class MailActivitySchedule(models.TransientModel):
         self.ensure_one()
         if self.is_batch_mode:
             raise UserError(
-                self.env._(
+                _(
                     "Scheduling an activity using the booking "
                     "is not possible on more than one record."
                 )

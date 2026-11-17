@@ -10,7 +10,7 @@ from freezegun import freeze_time
 from pytz import utc
 
 from odoo import fields
-from odoo.exceptions import ValidationError
+from odoo.exceptions import UserError, ValidationError
 from odoo.tests.common import Form, TransactionCase, new_test_user, users
 from odoo.tools import mute_logger
 
@@ -1110,6 +1110,21 @@ class TestMailActivity(TransactionCase):
         self.assertNotEqual(
             self.mail_activity.date_deadline, fields.Date.from_string("2024-01-01")
         )
+
+    def test_action_open_resource_booking_batch_mode(self):
+        """Scheduling a booking activity in batch raises a user error."""
+        partner = self.env["res.partner"].create({"name": "Batch Partner"})
+        wizard = (
+            self.env["mail.activity.schedule"]
+            .with_context(
+                active_model="res.partner",
+                active_ids=(self.partner | partner).ids,
+            )
+            .create({})
+        )
+        self.assertTrue(wizard.is_batch_mode)
+        with self.assertRaises(UserError):
+            wizard.action_open_resource_booking()
 
 
 @freeze_time("2021-02-26 09:00:00", tick=True)  # Last Friday of February
